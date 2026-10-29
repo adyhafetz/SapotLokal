@@ -114,7 +114,7 @@
                                 android:layout_width="20dp"
                                 android:layout_height="20dp"
                                 android:layout_gravity="center"
-                                android:src="@drawable/ic_coffee"
+                                android:src="@drawable/ic_gift"
                                 app:tint="@color/sapot_text_primary" />
                         </FrameLayout>
 
@@ -126,9 +126,10 @@
                             android:orientation="vertical">
 
                             <TextView
+                                android:id="@+id/tvPointsCardHeader"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="Kopi Lorong"
+                                android:text="Loyalty Rewards"
                                 android:textColor="@color/sapot_text_primary"
                                 android:textSize="16sp"
                                 android:textStyle="bold" />
@@ -137,7 +138,7 @@
                                 android:id="@+id/chipLevel"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="Bangsar · Neighbourhood café"
+                                android:text="Freshie 🔰 · 1.0x Bonus"
                                 android:textColor="@color/sapot_text_primary"
                                 android:textSize="11sp" />
                         </LinearLayout>
@@ -149,6 +150,7 @@
                             app:tint="@color/sapot_text_primary" />
                     </LinearLayout>
 
+                    <!-- Spendable Balance Metric -->
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -158,43 +160,78 @@
                         android:orientation="horizontal">
 
                         <TextView
-                            android:id="@+id/tvLifetimePoints"
+                            android:id="@+id/tvSpendablePoints"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:fontFamily="sans-serif-black"
-                            android:text="240"
+                            android:text="0"
                             android:textColor="@color/sapot_text_primary"
-                            android:textSize="42sp" />
+                            android:textSize="40sp" />
 
                         <TextView
-                            android:id="@+id/tvProgressCount"
+                            android:id="@+id/tvSpendableLabel"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginStart="8dp"
-                            android:text="Kopi Lorong points"
+                            android:text="pts available"
                             android:textColor="@color/sapot_text_primary"
-                            android:textSize="13sp" />
+                            android:textSize="14sp"
+                            android:textStyle="bold" />
+
+                        <!-- Hidden compatibility field -->
+                        <TextView
+                            android:id="@+id/tvLifetimePoints"
+                            android:layout_width="0dp"
+                            android:layout_height="0dp"
+                            android:visibility="gone" />
                     </LinearLayout>
 
-                    <!-- Points Progress Bar -->
+                    <!-- Lifetime Level Progress Metric -->
+                    <TextView
+                        android:id="@+id/tvLifetimeLevelProgress"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp"
+                        android:text="Level: Freshie 🔰 • 0 Total Pts"
+                        android:textColor="@color/sapot_text_primary"
+                        android:textSize="13sp"
+                        android:textStyle="bold" />
+
+                    <!-- Tier Points Progress Bar (Interpolated within active tier span) -->
                     <ProgressBar
                         android:id="@+id/progressLevel"
                         style="?android:attr/progressBarStyleHorizontal"
                         android:layout_width="match_parent"
                         android:layout_height="7dp"
-                        android:layout_marginTop="8dp"
-                        android:max="300"
-                        android:progress="240"
+                        android:layout_marginTop="10dp"
+                        android:max="100"
+                        android:progress="0"
                         android:progressDrawable="@drawable/progress_points" />
 
-                    <TextView
-                        android:id="@+id/tvProgressLabel"
+                    <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="10dp"
-                        android:text="60 points to your free kopi · 300 pts"
-                        android:textColor="@color/sapot_text_primary"
-                        android:textSize="12sp" />
+                        android:layout_marginTop="8dp"
+                        android:orientation="horizontal">
+
+                        <TextView
+                            android:id="@+id/tvProgressLabel"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="200 pts to Steady Buyer 🛒"
+                            android:textColor="@color/sapot_text_primary"
+                            android:textSize="12sp" />
+
+                        <TextView
+                            android:id="@+id/tvProgressCount"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="0 / 200 pts"
+                            android:textColor="@color/sapot_text_primary"
+                            android:textSize="12sp"
+                            android:textStyle="bold" />
+                    </LinearLayout>
 
                     <TextView
                         android:id="@+id/tvMaxLevel"

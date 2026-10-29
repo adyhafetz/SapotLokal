@@ -57,34 +57,16 @@ object GamesRepository {
             .addOnFailureListener { onResult(null) }
     }
 
-    fun recordSpin(userID: String, pointsWon: Int, attemptNumber: Int, onResult: (Boolean) -> Unit) =
-        recordPlay(userID, GameType.SPIN_WHEEL, PointSource.SPIN_WHEEL, pointsWon, attemptNumber, onResult)
-
-    fun recordMemoryWin(userID: String, pointsAwarded: Int, attemptNumber: Int, onResult: (Boolean) -> Unit) =
-        recordPlay(userID, GameType.MEMORY_MATCH, PointSource.MEMORY_MATCH, pointsAwarded, attemptNumber, onResult)
-
-    private fun recordPlay(
-        userID: String, gameType: String, pointSource: String,
-        points: Int, attemptNumber: Int, onResult: (Boolean) -> Unit
-    ) {
-        val gameID = db.child("games").push().key ?: return onResult(false)
-        val game = Game(
-            gameID = gameID, userID = userID, gameType = gameType,
-            gameAttempt = attemptNumber, gamePointsRewarded = points,
-            gameDay = todayKey(), gamePlayedAt = System.currentTimeMillis()
-        )
-        val updates = hashMapOf<String, Any?>("games/$gameID" to game)
-        if (points > 0) {
-            val point = PointRepository.newGamePointEntry(userID, pointSource, points)
-                ?: return onResult(false)
-            updates["points/${point.pointID}"] = point
+    fun recordSpin(userID: String, pointsWon: Int, attemptNumber: Int, onResult: (Boolean) -> Unit) {
+        PointRepository.awardMiniGamePoints(userID, pointsWon, GameType.SPIN_WHEEL, attemptNumber) { ok, _ ->
+            onResult(ok)
         }
-        db.updateChildren(updates)
-            .addOnSuccessListener {
-                ChallengeRepository.syncUserProgress(userID)
-                onResult(true)
-            }
-            .addOnFailureListener { onResult(false) }
+    }
+
+    fun recordMemoryWin(userID: String, pointsAwarded: Int, attemptNumber: Int, onResult: (Boolean) -> Unit) {
+        PointRepository.awardMiniGamePoints(userID, pointsAwarded, GameType.MEMORY_MATCH, attemptNumber) { ok, _ ->
+            onResult(ok)
+        }
     }
 }
 

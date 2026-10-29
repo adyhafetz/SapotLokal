@@ -78,50 +78,57 @@ object AppConfig {
      */
     const val VOUCHER_EXPIRY_DAYS: Int = 30
 
+    // ── Tiers (Gamification Overhaul) ─────────────────────────────────────────
+
+    /**
+     * Customer loyalty tiers based on Lifetime Accumulated Points.
+     * Separated from spendable points balance (which decreases upon voucher redemption).
+     */
+    enum class CustomerTier(
+        val code: String,
+        val title: String,
+        val emoji: String,
+        val minPoints: Int,
+        val maxPoints: Int,
+        val multiplier: Double
+    ) {
+        FRESHIE("freshie", "Freshie", "🔰", 0, 199, 1.0),
+        STEADY_BUYER("steady_buyer", "Steady Buyer", "🛒", 200, 599, 1.0),
+        TREND_SETTER("trend_setter", "Trend Setter", "🔥", 600, 1499, 1.2),
+        OTAI_LOKAL("otai_lokal", "Otai Lokal", "👑", 1500, 2499, 1.5),
+        SAPOT_GOAT("sapot_goat", "Sapot GOAT", "🐐", 2500, Int.MAX_VALUE, 2.0);
+
+        val nextTier: CustomerTier?
+            get() = entries.getOrNull(ordinal + 1)
+
+        companion object {
+            fun fromLifetimePoints(points: Int): CustomerTier {
+                return entries.lastOrNull { points >= it.minPoints } ?: FRESHIE
+            }
+        }
+    }
+
     // ── Levels ────────────────────────────────────────────────────────────────
 
     /**
-     * Lifetime-earned points required to reach each level.
-     * Level is computed from EARNED points only — it never goes down when a voucher
-     * is redeemed (build guide Open Decision #12).
-     * Level 1 = 0 points (everyone starts here).
-     *
-     * These thresholds are placeholders — update when the Figma designs confirm the
-     * level names and required point counts.
+     * Lifetime-earned points required to reach each tier.
+     * Level/Tier is computed from EARNED points only - it never goes down when a voucher
+     * is redeemed.
      */
-    val LEVEL_THRESHOLDS: List<Int> = listOf(
-        0,    // Level 1 — Pendatang Baru (Newcomer)
-        100,  // Level 2 — Tetamu Setia (Regular)
-        300,  // Level 3 — Pelanggan Emas (Gold Customer)
-        600,  // Level 4 — Sahabat Lokal (Local Friend)
-        1000  // Level 5 — Juara SapotLokal (SapotLokal Champion)
-    )
+    val LEVEL_THRESHOLDS: List<Int> = CustomerTier.entries.map { it.minPoints }
 
     /**
      * Returns the level (1-indexed) for a given lifetime-earned point total.
-     * If lifetimePoints exceeds all thresholds, returns the maximum level.
      */
     fun levelForPoints(lifetimePoints: Int): Int {
-        // Count how many thresholds the player has reached.
-        // LEVEL_THRESHOLDS[0] = 0 means everyone is at least Level 1.
-        // LEVEL_THRESHOLDS[1] = 100 means Level 2 starts at 100, etc.
-        var level = 0
-        for (threshold in LEVEL_THRESHOLDS) {
-            if (lifetimePoints >= threshold) level++
-        }
-        // level is now in [1..LEVEL_THRESHOLDS.size] because threshold[0]=0 is always met
-        return level.coerceAtLeast(1).coerceAtMost(LEVEL_THRESHOLDS.size)
+        return CustomerTier.fromLifetimePoints(lifetimePoints).ordinal + 1
     }
 
     /**
-     * Returns the point threshold to reach the NEXT level, or null if already at max.
+     * Returns the point threshold to reach the NEXT tier, or null if already at max.
      */
     fun nextLevelThreshold(lifetimePoints: Int): Int? {
-        val current = levelForPoints(lifetimePoints)
-        // current is 1-indexed; LEVEL_THRESHOLDS is 0-indexed.
-        // Level N requires LEVEL_THRESHOLDS[N-1] points.
-        // Level N+1 requires LEVEL_THRESHOLDS[N] points (index = current).
-        return LEVEL_THRESHOLDS.getOrNull(current) // null when at max level
+        return CustomerTier.fromLifetimePoints(lifetimePoints).nextTier?.minPoints
     }
 
     // ── Spin the Wheel daily limit ─────────────────────────────────────────────

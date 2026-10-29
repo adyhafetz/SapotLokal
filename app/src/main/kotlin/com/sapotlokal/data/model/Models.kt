@@ -1,6 +1,7 @@
 package com.sapotlokal.data.model
 
 import com.google.firebase.database.PropertyName
+import com.sapotlokal.AppConfig.CustomerTier
 
 /**
  * Data classes mirroring the SapotLokal ERD entities.
@@ -25,7 +26,10 @@ data class User(
     val userID: String = "",
     val userName: String = "",
     val userEmail: String = "",
-    val role: String = ""           // "customer" or "vendor"
+    val role: String = "",           // "customer" or "vendor"
+    val lifetimePoints: Int = 0,
+    val currentTier: String = CustomerTier.FRESHIE.code,
+    val unlockedBadges: Map<String, Boolean> = emptyMap()
 )
 
 // ── VENDOR ────────────────────────────────────────────────────────────────────

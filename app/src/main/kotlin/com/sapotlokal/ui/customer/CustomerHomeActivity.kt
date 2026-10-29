@@ -13,8 +13,12 @@ import androidx.appcompat.widget.PopupMenu
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
 import com.sapotlokal.AppConfig
+import com.sapotlokal.AppConfig.CustomerTier
 import com.sapotlokal.R
 import com.sapotlokal.data.model.Vendor
 import com.sapotlokal.data.repository.ChallengeRepository
@@ -24,6 +28,8 @@ import com.sapotlokal.databinding.ActivityCustomerHomeBinding
 import com.sapotlokal.service.SapotFcmService
 import com.sapotlokal.ui.auth.LoginActivity
 import com.sapotlokal.ui.games.GamesMenuActivity
+import java.text.NumberFormat
+import java.util.Locale
 
 /**
  * CustomerHomeActivity — Phase 3 real implementation adapted for the new SapotLokal UI.
@@ -40,7 +46,10 @@ class CustomerHomeActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityCustomerHomeBinding
     private var pointsListener: ValueEventListener? = null
+    private var userListener: ValueEventListener? = null
     private val auth = FirebaseAuth.getInstance()
+    private var currentUserName: String = ""
+    private var currentUserTier: CustomerTier = CustomerTier.FRESHIE
 
     private val notifPermissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestPermission()
@@ -52,15 +61,6 @@ class CustomerHomeActivity : AppCompatActivity() {
 
     /** Adapter for the "Around your corner" recently-visited shops list (Phase 3 Task 3.2). */
     private val recentShopAdapter = RecentShopAdapter()
-
-    // Level names matching AppConfig.LEVEL_THRESHOLDS
-    private val levelNames = listOf(
-        "Pendatang Baru",      // Level 1
-        "Tetamu Setia",        // Level 2
-        "Pelanggan Emas",      // Level 3
-        "Sahabat Lokal",       // Level 4
-        "Juara SapotLokal"     // Level 5
-    )
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -78,9 +78,9 @@ class CustomerHomeActivity : AppCompatActivity() {
         binding.rvRecentShops.layoutManager = LinearLayoutManager(this)
         binding.rvRecentShops.adapter = recentShopAdapter
 
-        // Show temporary greeting while fetching real name from DB
-        binding.tvGreeting.text = "Morning, there ☀"
-        loadCustomerName(user.uid)
+        // Show placeholder greeting while fetching real name & tier from DB
+        binding.tvGreeting.text = "Shopper 🔰"
+        startListeningToUser(user.uid)
         startListeningToPoints(user.uid)
 
         // Quick Actions & Navigation
@@ -145,28 +145,36 @@ class CustomerHomeActivity : AppCompatActivity() {
 
     // ── Points listener ───────────────────────────────────────────────────────
 
-    private fun loadCustomerName(uid: String) {
-        com.google.firebase.database.FirebaseDatabase
-            .getInstance(AppConfig.DATABASE_URL)
-            .reference
-            .child("users").child(uid).child("userName")
-            .addListenerForSingleValueEvent(object : com.google.firebase.database.ValueEventListener {
-                override fun onDataChange(snapshot: com.google.firebase.database.DataSnapshot) {
-                    val name = snapshot.getValue(String::class.java)?.trim() ?: ""
-                    val firstName = name.split(" ").firstOrNull { it.isNotBlank() } ?: "there"
-                    binding.tvGreeting.text = "Morning, $firstName ☀"
-                }
-                override fun onCancelled(error: com.google.firebase.database.DatabaseError) {
-                    // Leave the placeholder; not a fatal error
-                }
-            })
+    private fun startListeningToUser(uid: String) {
+        val userRef = FirebaseDatabase.getInstance(AppConfig.DATABASE_URL)
+            .reference.child("users").child(uid)
+        userListener = object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                val name = snapshot.child("userName").getValue(String::class.java)?.trim() ?: ""
+                currentUserName = name
+                val dbTierCode = snapshot.child("currentTier").getValue(String::class.java)
+                val tier = CustomerTier.entries.firstOrNull { it.code == dbTierCode } ?: currentUserTier
+                currentUserTier = tier
+                updateGreeting(tier)
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+                // Keep placeholder on network error
+            }
+        }
+        userRef.addValueEventListener(userListener!!)
+    }
+
+    private fun updateGreeting(tier: CustomerTier) {
+        val displayName = if (currentUserName.isNotBlank()) currentUserName else "Shopper"
+        binding.tvGreeting.text = "$displayName ${tier.emoji}"
     }
 
     private fun startListeningToPoints(userID: String) {
         pointsListener = PointRepository.listenToPointsForUser(
             userID = userID,
-            onUpdate = { perShopBalance, lifetimeEarned ->
-                updateUi(lifetimeEarned)
+            onUpdate = { perShopBalance, lifetimeEarned, spendableBalance ->
+                updateUi(lifetimeEarned, spendableBalance)
                 loadRecentShops(perShopBalance)
             },
             onError  = { /* keep showing last values; network error handled in ScanActivity */ }
@@ -244,31 +252,44 @@ class CustomerHomeActivity : AppCompatActivity() {
         }
     }
 
-    private fun updateUi(lifetimeEarned: Int) {
-        val level     = AppConfig.levelForPoints(lifetimeEarned)
-        val levelName = levelNames.getOrElse(level - 1) { "Juara SapotLokal" }
-        val nextThreshold = AppConfig.nextLevelThreshold(lifetimeEarned)
+    private fun updateUi(lifetimeEarned: Int, spendableBalance: Int) {
+        val tier = CustomerTier.fromLifetimePoints(lifetimeEarned)
+        currentUserTier = tier
+        updateGreeting(tier)
 
+        // 1. Spendable Balance Metric
+        binding.tvSpendablePoints.text = spendableBalance.toString()
+        binding.tvSpendableLabel.text = "pts available"
         binding.tvLifetimePoints.text = lifetimeEarned.toString()
-        binding.chipLevel.text        = "Lv $level · $levelName"
 
-        if (nextThreshold == null) {
-            // Maximum level reached
+        // 2. Lifetime Level Progress Metric
+        val formattedLifetime = NumberFormat.getNumberInstance(Locale.US).format(lifetimeEarned)
+        binding.tvLifetimeLevelProgress.text = "Level: ${tier.title} ${tier.emoji} • $formattedLifetime Total Pts"
+        binding.chipLevel.text = "${tier.title} ${tier.emoji} · ${tier.multiplier}x Bonus"
+
+        // 3. Tier Progress Bar (Interpolate within active tier's point span)
+        val nextTier = tier.nextTier
+        if (nextTier == null) {
+            // Maximum tier reached (Sapot GOAT)
             binding.progressLevel.progress = 100
-            binding.tvProgressLabel.text   = "Maximum level reached!"
-            binding.tvProgressCount.text   = ""
-            binding.tvMaxLevel.visibility  = View.VISIBLE
+            binding.tvProgressLabel.text = "🏆 Max Tier Reached (${tier.title} ${tier.emoji})"
+            binding.tvProgressCount.text = "$formattedLifetime pts"
+            binding.tvMaxLevel.visibility = View.VISIBLE
         } else {
-            // Find previous threshold to compute progress within this level
-            val prevThreshold = AppConfig.LEVEL_THRESHOLDS.getOrElse(level - 1) { 0 }
-            val rangeSize     = nextThreshold - prevThreshold
-            val earned        = lifetimeEarned - prevThreshold
-            val pct           = if (rangeSize > 0) (earned * 100 / rangeSize) else 0
+            val tierSpan = nextTier.minPoints - tier.minPoints
+            val earnedInTier = (lifetimeEarned - tier.minPoints).coerceAtLeast(0)
+            val pct = if (tierSpan > 0) {
+                ((earnedInTier.toDouble() / tierSpan.toDouble()) * 100).toInt().coerceIn(0, 100)
+            } else {
+                0
+            }
+            val ptsNeeded = nextTier.minPoints - lifetimeEarned
+            val formattedNext = NumberFormat.getNumberInstance(Locale.US).format(nextTier.minPoints)
 
             binding.progressLevel.progress = pct
-            binding.tvProgressLabel.text   = "Progress to Level ${level + 1}"
-            binding.tvProgressCount.text   = "$lifetimeEarned / $nextThreshold pts"
-            binding.tvMaxLevel.visibility  = View.GONE
+            binding.tvProgressLabel.text = "$ptsNeeded pts to ${nextTier.title} ${nextTier.emoji}"
+            binding.tvProgressCount.text = "$formattedLifetime / $formattedNext pts"
+            binding.tvMaxLevel.visibility = View.GONE
         }
     }
 
@@ -276,18 +297,24 @@ class CustomerHomeActivity : AppCompatActivity() {
 
     override fun onStop() {
         super.onStop()
-        // Detach live listener to avoid memory leaks and unnecessary reads
         val uid = auth.currentUser?.uid ?: return
         pointsListener?.let { PointRepository.removePointsListener(uid, it) }
         pointsListener = null
+        userListener?.let {
+            FirebaseDatabase.getInstance(AppConfig.DATABASE_URL).reference
+                .child("users").child(uid).removeEventListener(it)
+        }
+        userListener = null
     }
 
     override fun onStart() {
         super.onStart()
-        // Re-attach listener if we're returning from ScanActivity or Games
         val uid = auth.currentUser?.uid ?: return
         if (pointsListener == null) {
             startListeningToPoints(uid)
+        }
+        if (userListener == null) {
+            startListeningToUser(uid)
         }
         ChallengeRepository.syncUserProgress(uid)
     }

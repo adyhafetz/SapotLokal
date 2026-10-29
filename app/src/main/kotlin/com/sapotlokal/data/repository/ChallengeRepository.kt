@@ -5,6 +5,7 @@ import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
 import com.sapotlokal.AppConfig
+import com.sapotlokal.AppConfig.CustomerTier
 import com.sapotlokal.data.model.Challenge
 import com.sapotlokal.data.model.ChallengeWithProgress
 import com.sapotlokal.data.model.Game
@@ -282,33 +283,49 @@ object ChallengeRepository {
             return
         }
 
-        val pointRow = PointRepository.newChallengePointEntry(userID, challenge.challengeRewardPoint)
-        if (pointRow == null) {
-            onResult(false, "Could not generate point transaction")
-            return
-        }
+        db.child("users").child(userID).addListenerForSingleValueEvent(object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                val currentLifetime = snapshot.child("lifetimePoints").getValue(Long::class.java)?.toInt() ?: 0
+                val tier = CustomerTier.fromLifetimePoints(currentLifetime)
+                val earnedPoints = (challenge.challengeRewardPoint * tier.multiplier).toInt().coerceAtLeast(1)
+                val newLifetime = currentLifetime + earnedPoints
+                val newTier = CustomerTier.fromLifetimePoints(newLifetime)
 
-        val recordKey = userChallenge.userChallengeID.ifBlank { "${userID}_${challenge.challengeID}" }
-        val updatedUserChallenge = userChallenge.copy(
-            userChallengeID = recordKey,
-            userID = userID,
-            challengeID = challenge.challengeID,
-            currentValue = challenge.challengeTargetValue,
-            userChallengeStatus = UserChallengeStatus.CLAIMED
-        )
+                val pointRow = PointRepository.newChallengePointEntry(userID, earnedPoints)
+                if (pointRow == null) {
+                    onResult(false, "Could not generate point transaction")
+                    return
+                }
 
-        val updates = hashMapOf<String, Any?>(
-            "userChallenges/$recordKey" to updatedUserChallenge,
-            "points/${pointRow.pointID}" to pointRow
-        )
+                val recordKey = userChallenge.userChallengeID.ifBlank { "${userID}_${challenge.challengeID}" }
+                val updatedUserChallenge = userChallenge.copy(
+                    userChallengeID = recordKey,
+                    userID = userID,
+                    challengeID = challenge.challengeID,
+                    currentValue = challenge.challengeTargetValue,
+                    userChallengeStatus = UserChallengeStatus.CLAIMED
+                )
 
-        db.updateChildren(updates)
-            .addOnSuccessListener {
-                onResult(true, null)
+                val updates = hashMapOf<String, Any?>(
+                    "userChallenges/$recordKey" to updatedUserChallenge,
+                    "points/${pointRow.pointID}" to pointRow,
+                    "users/$userID/lifetimePoints" to com.google.firebase.database.ServerValue.increment(earnedPoints.toLong()),
+                    "users/$userID/currentTier" to newTier.code
+                )
+
+                db.updateChildren(updates)
+                    .addOnSuccessListener {
+                        onResult(true, null)
+                    }
+                    .addOnFailureListener { e ->
+                        onResult(false, e.message)
+                    }
             }
-            .addOnFailureListener { e ->
-                onResult(false, e.message)
+
+            override fun onCancelled(error: DatabaseError) {
+                onResult(false, error.message)
             }
+        })
     }
 }
 
