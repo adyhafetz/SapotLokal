@@ -94,3 +94,4 @@ class WeeklyMissionTest {
         assertTrue(claimed.isClaimed)
     }
 }
+

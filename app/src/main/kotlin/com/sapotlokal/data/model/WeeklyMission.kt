@@ -46,3 +46,4 @@ data class WeeklyMissionWithProgress(
     val isClaimed: Boolean
         get() = userMission?.isClaimed == true
 }
+
