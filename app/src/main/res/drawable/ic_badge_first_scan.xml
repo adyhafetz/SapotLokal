@@ -1,0 +1,23 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="72dp"
+    android:height="72dp"
+    android:viewportWidth="72"
+    android:viewportHeight="72">
+    <!-- Outer Background -->
+    <path
+        android:fillColor="#E6F2E9"
+        android:pathData="M36,4C18.33,4 4,18.33 4,36s14.33,32 32,32 32,-14.33 32,-32S53.67,4 36,4z" />
+    <!-- Outer Ring Accent -->
+    <path
+        android:fillColor="#256347"
+        android:pathData="M36,8C20.54,8 8,20.54 8,36s12.54,28 28,28 28,-12.54 28,-28S51.46,8 36,8zm0,52C22.75,60 12,49.25 12,36S22.75,12 36,12s24,10.75 24,24 -10.75,24 -24,24z" />
+    <!-- Scan Framing Corner Brackets -->
+    <path
+        android:fillColor="#256347"
+        android:pathData="M23,23h8v3h-5v5h-3V23z M41,23h8v8h-3v-5h-5V23z M23,41h3v5h5v3h-8V41z M46,41h3v8h-8v-3h5V41z" />
+    <!-- Center First Step Star -->
+    <path
+        android:fillColor="#256347"
+        android:pathData="M36,28l2.5,5.1 5.6,0.8 -4.1,4 1,5.6 -5,-2.6 -5,2.6 1,-5.6 -4.1,-4 5.6,-0.8z" />
+</vector>
+
