@@ -141,6 +141,15 @@ object MissionRepository {
             }
 
             override fun onCancelled(error: DatabaseError) {
+                Log.w(TAG, "userMissions listener cancelled: ${error.message}")
+                val fallbackList = DEFAULT_MISSIONS.map { mission ->
+                    WeeklyMissionWithProgress(
+                        mission = mission,
+                        userMission = null,
+                        weekExpiresAtMillis = expiresAt
+                    )
+                }
+                onUpdate(fallbackList)
                 onError(error.message)
             }
         }
