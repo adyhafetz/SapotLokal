@@ -118,8 +118,13 @@ class CustomerHomeActivity : AppCompatActivity() {
         binding.cardRewardNudge.setOnClickListener {
             startActivity(Intent(this, MyVouchersActivity::class.java))
         }
-        binding.bottomNav.tabProfile.setOnClickListener { view ->
-            showProfileMenu(view)
+        binding.bottomNav.tabProfile.setOnClickListener {
+            startActivity(Intent(this, CustomerProfileActivity::class.java))
+        }
+
+        // Hero Points Card navigates directly to Profile & Badges showcase
+        binding.cardPointsHero.setOnClickListener {
+            startActivity(Intent(this, CustomerProfileActivity::class.java))
         }
 
         // Top notification bell options
@@ -133,6 +138,10 @@ class CustomerHomeActivity : AppCompatActivity() {
         popup.menuInflater.inflate(R.menu.menu_customer_home, popup.menu)
         popup.setOnMenuItemClickListener { item ->
             when (item.itemId) {
+                R.id.action_profile -> {
+                    startActivity(Intent(this, CustomerProfileActivity::class.java))
+                    true
+                }
                 R.id.action_logout -> {
                     auth.signOut()
                     goToLogin()
