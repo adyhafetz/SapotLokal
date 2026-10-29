@@ -34,7 +34,7 @@
                 android:textColor="@color/sapot_text_primary"
                 android:textSize="16sp"
                 android:textStyle="bold"
-                tools:text="Local Explorer" />
+                tools:text="Tapah Explorer" />
 
             <TextView
                 android:id="@+id/tvRewardBadge"
@@ -47,7 +47,7 @@
                 android:textColor="@color/sapot_text_primary"
                 android:textSize="12sp"
                 android:textStyle="bold"
-                tools:text="+30 pts" />
+                tools:text="+100 pts" />
         </LinearLayout>
 
         <!-- Description -->
@@ -58,13 +58,51 @@
             android:layout_marginTop="6dp"
             android:textColor="@color/sapot_text_secondary"
             android:textSize="13sp"
-            tools:text="Visit 3 different local shops and scan their QR code" />
+            tools:text="Visit 3 different local shops in Tapah this week" />
+
+        <!-- Metadata Row: Badge Pill + Countdown Timer -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/tvBadgeRewardPill"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/bg_pill_leaf"
+                android:paddingHorizontal="8dp"
+                android:paddingVertical="3dp"
+                android:textColor="@color/sapot_text_primary"
+                android:textSize="11sp"
+                android:textStyle="bold"
+                android:visibility="gone"
+                tools:text="🎖️ Regular Badge"
+                tools:visibility="visible" />
+
+            <View
+                android:id="@+id/spaceMeta"
+                android:layout_width="0dp"
+                android:layout_height="1dp"
+                android:layout_weight="1" />
+
+            <TextView
+                android:id="@+id/tvCountdownTimer"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/sapot_text_secondary"
+                android:textSize="12sp"
+                android:textStyle="italic"
+                tools:text="⏱ 4 days left" />
+        </LinearLayout>
 
         <!-- Progress bar & counter -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="12dp"
+            android:layout_marginTop="10dp"
             android:gravity="center_vertical"
             android:orientation="horizontal">
 
@@ -89,11 +127,27 @@
                 tools:text="2 / 3" />
         </LinearLayout>
 
-        <!-- Status / Claim Button -->
+        <!-- Actions: Start Now / Claim / Claimed -->
         <FrameLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="12dp">
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnStartNow"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                android:layout_width="match_parent"
+                android:layout_height="44dp"
+                android:text="Start Now ➔"
+                android:textAllCaps="false"
+                android:textColor="@color/sapot_text_primary"
+                android:textSize="13sp"
+                android:textStyle="bold"
+                app:cornerRadius="12dp"
+                app:strokeColor="@color/sapot_divider"
+                app:strokeWidth="1.5dp"
+                android:visibility="gone"
+                tools:visibility="gone" />
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnClaimReward"
@@ -118,13 +172,13 @@
                 android:background="@drawable/bg_pill_gray"
                 android:paddingHorizontal="12dp"
                 android:paddingVertical="5dp"
-                android:text="In Progress"
+                android:text="✓ Claimed"
                 android:textColor="@color/sapot_text_secondary"
                 android:textSize="12sp"
-                android:textStyle="bold" />
+                android:textStyle="bold"
+                android:visibility="gone" />
         </FrameLayout>
 
     </LinearLayout>
 
 </com.google.android.material.card.MaterialCardView>
-

@@ -235,6 +235,15 @@ class ScanActivity : AppCompatActivity() {
                             }
                         }
                     )
+                    // Phase 3 Weekly Missions & Gamification Hook
+                    val scanTimestamp = System.currentTimeMillis()
+                    com.sapotlokal.data.repository.MissionRepository.recordShopVisitEvent(
+                        activity = this@ScanActivity,
+                        userId = userID,
+                        vendorId = vendorID,
+                        timestamp = scanTimestamp
+                    )
+
                     // Task 6.1: Sync challenge progress on shop visit
                     com.sapotlokal.data.repository.ChallengeRepository.syncUserProgress(userID)
                     mainHandler.post {

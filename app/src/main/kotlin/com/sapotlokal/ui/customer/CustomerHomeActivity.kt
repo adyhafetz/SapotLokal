@@ -103,6 +103,7 @@ class CustomerHomeActivity : AppCompatActivity() {
         // Notification permission & FCM token synchronization (Phase 6)
         checkNotificationPermission(user.uid)
         ChallengeRepository.syncUserProgress(user.uid)
+        com.sapotlokal.data.repository.MissionRepository.syncUserMissions(user.uid)
 
         // Bottom Navigation
         binding.bottomNav.tabHome.setOnClickListener {
@@ -317,6 +318,7 @@ class CustomerHomeActivity : AppCompatActivity() {
             startListeningToUser(uid)
         }
         ChallengeRepository.syncUserProgress(uid)
+        com.sapotlokal.data.repository.MissionRepository.syncUserMissions(uid)
     }
 
     private fun checkNotificationPermission(userID: String) {

@@ -145,6 +145,13 @@ class SpinWheelActivity : AppCompatActivity() {
                 binding.resultText.text = getString(R.string.games_spin_result, pointsWon)
                 setBusy(false)
                 showSpunToday()
+
+                // Phase 3 Weekly Missions & Gamification Hook
+                com.sapotlokal.data.repository.MissionRepository.recordSpinEvent(
+                    activity = this@SpinWheelActivity,
+                    userId = userID,
+                    pointsWon = pointsWon
+                )
             }
             .start()
     }

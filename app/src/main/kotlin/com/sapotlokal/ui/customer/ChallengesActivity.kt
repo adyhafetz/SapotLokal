@@ -1,5 +1,6 @@
 package com.sapotlokal.ui.customer
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import android.widget.Toast
@@ -7,23 +8,25 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.ValueEventListener
-import com.sapotlokal.data.model.ChallengeWithProgress
-import com.sapotlokal.data.model.UserChallenge
-import com.sapotlokal.data.model.UserChallengeStatus
-import com.sapotlokal.data.repository.ChallengeRepository
+import com.sapotlokal.data.model.UserMission
+import com.sapotlokal.data.model.WeeklyMissionWithProgress
+import com.sapotlokal.data.repository.MissionRepository
 import com.sapotlokal.databinding.ActivityChallengesBinding
 import com.sapotlokal.service.SapotFcmService
+import com.sapotlokal.ui.games.GamesMenuActivity
 
 /**
- * ChallengesActivity — Phase 6 Task 6.1:
- * Displays active loyalty challenges with customer progress and one-time reward claiming.
+ * ChallengesActivity — Phase 3 Weekly Missions Screen.
+ *
+ * Displays the 6 weekly recurring missions with live progress,
+ * attached badge previews, countdown timers, and "Start Now" / "Claim Reward" flows.
  */
 class ChallengesActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityChallengesBinding
     private val auth = FirebaseAuth.getInstance()
     private lateinit var adapter: ChallengeAdapter
-    private var challengesListener: ValueEventListener? = null
+    private var missionsListener: ValueEventListener? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -39,25 +42,30 @@ class ChallengesActivity : AppCompatActivity() {
             return
         }
 
-        adapter = ChallengeAdapter { item ->
-            claimReward(user.uid, item)
-        }
+        adapter = ChallengeAdapter(
+            onStartClick = { item ->
+                handleStartMission(item)
+            },
+            onClaimClick = { item ->
+                claimReward(user.uid, item)
+            }
+        )
 
         binding.rvChallenges.layoutManager = LinearLayoutManager(this)
         binding.rvChallenges.adapter = adapter
 
         binding.progressBar.visibility = View.VISIBLE
 
-        // Synchronize ledger progress against challenges
-        ChallengeRepository.syncUserProgress(user.uid) {
+        // Synchronize and seed weekly missions
+        MissionRepository.syncUserMissions(user.uid) {
             runOnUiThread {
                 binding.progressBar.visibility = View.GONE
             }
         }
 
-        // Real-time listener for challenges and user challenge progress
-        challengesListener = ChallengeRepository.listenToChallengesWithProgress(
-            userID = user.uid,
+        // Real-time listener for current ISO week missions
+        missionsListener = MissionRepository.listenToWeeklyMissions(
+            userId = user.uid,
             onUpdate = { list ->
                 runOnUiThread {
                     binding.progressBar.visibility = View.GONE
@@ -69,35 +77,51 @@ class ChallengesActivity : AppCompatActivity() {
             onError = { err ->
                 runOnUiThread {
                     binding.progressBar.visibility = View.GONE
-                    Toast.makeText(this, "Error loading challenges: $err", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this, "Error loading missions: $err", Toast.LENGTH_SHORT).show()
                 }
             }
         )
     }
 
-    private fun claimReward(userID: String, item: ChallengeWithProgress) {
-        val userChallenge = item.userChallenge ?: UserChallenge(
-            userChallengeID = "${userID}_${item.challenge.challengeID}",
-            userID = userID,
-            challengeID = item.challenge.challengeID,
-            currentValue = item.challenge.challengeTargetValue,
-            userChallengeStatus = UserChallengeStatus.COMPLETED
+    private fun handleStartMission(item: WeeklyMissionWithProgress) {
+        when (item.mission.missionId) {
+            "arcade_champion" -> {
+                startActivity(Intent(this, GamesMenuActivity::class.java))
+            }
+            "daily_tri_play" -> {
+                startActivity(Intent(this, GamesMenuActivity::class.java))
+            }
+            else -> {
+                // Shop visit missions: tapah_explorer, loyal_supporter, weekend_warrior, night_owl
+                startActivity(Intent(this, ScanActivity::class.java))
+            }
+        }
+    }
+
+    private fun claimReward(userId: String, item: WeeklyMissionWithProgress) {
+        val userMission = item.userMission ?: UserMission(
+            userMissionId = "${userId}_${item.mission.missionId}",
+            userId = userId,
+            missionId = item.mission.missionId,
+            currentProgress = item.mission.targetCount,
+            isCompleted = true
         )
 
-        ChallengeRepository.claimReward(
-            userID = userID,
-            challenge = item.challenge,
-            userChallenge = userChallenge
+        MissionRepository.claimMissionReward(
+            activity = this,
+            userId = userId,
+            mission = item.mission,
+            userMission = userMission
         ) { success, errorMsg ->
             if (success) {
-                val reward = item.challenge.challengeRewardPoint
+                val reward = item.mission.rewardPoints
                 Toast.makeText(this, "🎉 Claimed +$reward bonus points!", Toast.LENGTH_LONG).show()
 
                 // Trigger local notification
                 SapotFcmService.showLocalNotification(
                     context = this,
-                    title = "Challenge Completed!",
-                    body = "You earned +$reward bonus points for completing \"${item.challenge.challengeTitle}\"!",
+                    title = "Mission Completed!",
+                    body = "You earned +$reward bonus points for completing \"${item.mission.title}\"!",
                     channelId = SapotFcmService.CHANNEL_REWARDS
                 )
             } else {
@@ -108,7 +132,6 @@ class ChallengesActivity : AppCompatActivity() {
 
     override fun onDestroy() {
         super.onDestroy()
-        challengesListener?.let { ChallengeRepository.removeListener(it) }
+        missionsListener?.let { MissionRepository.removeListener(it) }
     }
 }
-

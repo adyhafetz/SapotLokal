@@ -195,6 +195,14 @@ class MemoryMatchActivity : AppCompatActivity() {
                 }
                 binding.newGameButton.isEnabled = true
                 refreshInfo()
+
+                // Phase 3 Weekly Missions & Gamification Hook
+                com.sapotlokal.data.repository.MissionRepository.recordMemoryMatchEvent(
+                    activity = this@MemoryMatchActivity,
+                    userId = userID,
+                    pointsWon = award,
+                    moves = pendingSaveMoves
+                )
             }
         }
     }

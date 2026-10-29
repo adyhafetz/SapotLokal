@@ -35,3 +35,4 @@ class BadgeDefTest {
         assertNull(BadgeDef.fromId("non_existent_badge"))
     }
 }
+

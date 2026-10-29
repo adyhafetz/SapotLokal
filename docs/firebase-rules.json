@@ -81,6 +81,31 @@
       "$userChallengeID": {
         ".write": "auth != null && newData.child('userID').val() === auth.uid"
       }
+    },
+    "missions": {
+      ".read": "auth != null",
+      "$missionID": {
+        ".write": "auth != null"
+      }
+    },
+    "userMissions": {
+      ".read": "auth != null",
+      ".indexOn": ["userId", "userID", "weekYearKey"],
+      "$userMissionID": {
+        ".write": "auth != null"
+      }
+    },
+    "userMissionTracking": {
+      ".read": "auth != null",
+      "$userId": {
+        ".write": "auth != null && auth.uid === $userId"
+      }
+    },
+    "shopVisits": {
+      ".read": "auth != null",
+      "$userId": {
+        ".write": "auth != null && auth.uid === $userId"
+      }
     }
   }
 }

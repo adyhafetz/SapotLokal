@@ -18,7 +18,7 @@
             android:layout_height="?attr/actionBarSize"
             app:navigationIcon="@drawable/ic_arrow_right"
             app:navigationIconTint="@color/sapot_text_primary"
-            app:title="Challenges"
+            app:title="Weekly Missions"
             app:titleTextColor="@color/sapot_text_primary" />
 
     </com.google.android.material.appbar.AppBarLayout>
@@ -67,18 +67,20 @@
                         android:orientation="vertical">
 
                         <TextView
+                            android:id="@+id/tvBannerHeader"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Bonus Points Await!"
+                            android:text="Weekly Missions"
                             android:textColor="@color/sapot_text_primary"
                             android:textSize="15sp"
                             android:textStyle="bold" />
 
                         <TextView
+                            android:id="@+id/tvBannerSubtext"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="2dp"
-                            android:text="Complete tasks below to claim bonus rewards and unlock higher membership tiers."
+                            android:text="Complete all 6 missions to earn bonus points and unlock badges! Resets every Sunday at 23:59:59."
                             android:textColor="@color/sapot_text_secondary"
                             android:textSize="12sp" />
                     </LinearLayout>
