@@ -95,3 +95,4 @@ class CustomerProfileTest {
         assertNull(currentTier.nextTier)
     }
 }
+

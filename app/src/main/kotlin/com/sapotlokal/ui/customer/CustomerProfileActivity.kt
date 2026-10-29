@@ -29,7 +29,7 @@ import com.sapotlokal.data.model.BadgeDef
 import com.sapotlokal.data.repository.PointRepository
 import com.sapotlokal.databinding.ActivityCustomerProfileBinding
 import com.sapotlokal.databinding.DialogBadgeDetailsBinding
-import com.sapotlokal.ui.auth.RolePickerActivity
+import com.sapotlokal.ui.auth.LoginActivity
 import java.text.NumberFormat
 import java.util.Locale
 
@@ -63,7 +63,7 @@ class CustomerProfileActivity : AppCompatActivity() {
 
         val currentUser = auth.currentUser
         if (currentUser == null) {
-            goToOnboarding()
+            goToLogin()
             return
         }
 
@@ -287,14 +287,14 @@ class CustomerProfileActivity : AppCompatActivity() {
             .setMessage("Are you sure you want to sign out of SapotLokal?")
             .setPositiveButton("Sign Out") { _, _ ->
                 auth.signOut()
-                goToOnboarding()
+                goToLogin()
             }
             .setNegativeButton("Cancel", null)
             .show()
     }
 
-    private fun goToOnboarding() {
-        val intent = Intent(this, RolePickerActivity::class.java).apply {
+    private fun goToLogin() {
+        val intent = Intent(this, LoginActivity::class.java).apply {
             flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
         }
         startActivity(intent)

@@ -78,8 +78,16 @@ class CustomerHomeActivity : AppCompatActivity() {
         binding.rvRecentShops.layoutManager = LinearLayoutManager(this)
         binding.rvRecentShops.adapter = recentShopAdapter
 
-        // Show placeholder greeting while fetching real name & tier from DB
-        binding.tvGreeting.text = "Shopper 🔰"
+        // Load cached user name & tier to prevent greeting flicker
+        val prefs = getSharedPreferences("sapot_user_prefs", MODE_PRIVATE)
+        val cachedName = prefs.getString("cached_user_name", "") ?: ""
+        val cachedTierCode = prefs.getString("cached_user_tier", CustomerTier.FRESHIE.code)
+        currentUserTier = CustomerTier.entries.firstOrNull { it.code == cachedTierCode } ?: CustomerTier.FRESHIE
+        if (cachedName.isNotBlank()) {
+            currentUserName = cachedName
+        }
+        updateGreeting(currentUserTier)
+
         startListeningToUser(user.uid)
         startListeningToPoints(user.uid)
 
@@ -161,11 +169,21 @@ class CustomerHomeActivity : AppCompatActivity() {
         userListener = object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
                 val name = snapshot.child("userName").getValue(String::class.java)?.trim() ?: ""
-                currentUserName = name
-                val dbTierCode = snapshot.child("currentTier").getValue(String::class.java)
-                val tier = CustomerTier.entries.firstOrNull { it.code == dbTierCode } ?: currentUserTier
-                currentUserTier = tier
-                updateGreeting(tier)
+                if (name.isNotBlank()) {
+                    currentUserName = name
+                }
+                val dbLifetime = snapshot.child("lifetimePoints").getValue(Long::class.java)?.toInt() ?: 0
+                if (dbLifetime > 0) {
+                    val tierFromLifetime = CustomerTier.fromLifetimePoints(dbLifetime)
+                    if (tierFromLifetime.ordinal >= currentUserTier.ordinal) {
+                        currentUserTier = tierFromLifetime
+                    }
+                }
+                updateGreeting(currentUserTier)
+                getSharedPreferences("sapot_user_prefs", MODE_PRIVATE).edit()
+                    .putString("cached_user_name", currentUserName)
+                    .putString("cached_user_tier", currentUserTier.code)
+                    .apply()
             }
 
             override fun onCancelled(error: DatabaseError) {
@@ -267,6 +285,20 @@ class CustomerHomeActivity : AppCompatActivity() {
         currentUserTier = tier
         updateGreeting(tier)
 
+        getSharedPreferences("sapot_user_prefs", MODE_PRIVATE).edit()
+            .putString("cached_user_name", currentUserName)
+            .putString("cached_user_tier", currentUserTier.code)
+            .apply()
+
+        auth.currentUser?.uid?.let { uid ->
+            val updates = hashMapOf<String, Any>(
+                "lifetimePoints" to lifetimeEarned,
+                "currentTier" to tier.code
+            )
+            FirebaseDatabase.getInstance(AppConfig.DATABASE_URL).reference
+                .child("users").child(uid).updateChildren(updates)
+        }
+
         // 1. Spendable Balance Metric
         binding.tvSpendablePoints.text = spendableBalance.toString()
         binding.tvSpendableLabel.text = "pts available"
@@ -328,6 +360,11 @@ class CustomerHomeActivity : AppCompatActivity() {
         }
         ChallengeRepository.syncUserProgress(uid)
         com.sapotlokal.data.repository.MissionRepository.syncUserMissions(uid)
+    }
+
+    override fun onResume() {
+        super.onResume()
+        updateGreeting(currentUserTier)
     }
 
     private fun checkNotificationPermission(userID: String) {

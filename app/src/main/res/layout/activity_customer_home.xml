@@ -80,7 +80,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="6dp"
                 android:fontFamily="sans-serif-black"
-                android:text="Morning, Aina ☀"
+                tools:text="Shopper 🔰"
                 android:textColor="@color/sapot_text_primary"
                 android:textSize="28sp" />
 
