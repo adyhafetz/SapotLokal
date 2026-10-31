@@ -326,11 +326,11 @@ Allow vendors to manually flip their shop status between OPEN and CLOSED on thei
      * Tapping notification launches `ShopDetailActivity` with `vendorId`.
 
 ### 6.3 Expected Output Checklist (Phase 6)
-- [ ] Vendor can flip the OPEN/CLOSE switch on `VendorHomeActivity`.
-- [ ] Toggling status updates `/vendors/{vendorId}/isOpen` in Firebase immediately.
-- [ ] When vendor flips to OPEN, subscribed customer devices receive a push notification.
-- [ ] When vendor changes status, any open customer `ShopDetailActivity` or `FindShopsActivity` screen updates the status chip from green to red (or vice-versa) in real time without refreshing.
-- [ ] Vendor can update `operatingHours` in Shop Settings, and the updated hours reflect on the customer side.
+- [x] Vendor can flip the OPEN/CLOSE switch on `VendorHomeActivity`.
+- [x] Toggling status updates `/vendors/{vendorId}/isOpen` in Firebase immediately.
+- [x] When vendor flips to OPEN, subscribed customer devices receive a push notification.
+- [x] When vendor changes status, any open customer `ShopDetailActivity` or `FindShopsActivity` screen updates the status chip from green to red (or vice-versa) in real time without refreshing.
+- [x] Vendor can update `operatingHours` in Shop Settings, and the updated hours reflect on the customer side.
 
 ---
 

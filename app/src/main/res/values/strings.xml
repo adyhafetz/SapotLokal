@@ -115,5 +115,15 @@
     <string name="notif_channel_rewards_desc">Alerts when you earn a new voucher or reach a reward milestone</string>
     <string name="notif_channel_levels_name">Level Up!</string>
     <string name="notif_channel_levels_desc">Congratulations when you reach a new loyalty level</string>
+    <string name="notif_channel_shops_name">Shop Updates &amp; Openings</string>
+    <string name="notif_channel_shops_desc">Alerts when your favourite local shops open for business</string>
+
+    <!-- Phase 6: Store Status & Vendor Controls -->
+    <string name="store_operating_status">Store Operating Status</string>
+    <string name="store_status_open_desc">Store is currently OPEN for customers</string>
+    <string name="store_status_closed_desc">Store is currently CLOSED</string>
+    <string name="store_status_open_badge">● OPEN</string>
+    <string name="store_status_closed_badge">● CLOSED</string>
+    <string name="store_status_hours_prefix">Hours: %s</string>
 
 </resources>

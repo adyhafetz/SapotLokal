@@ -244,6 +244,16 @@ class ScanActivity : AppCompatActivity() {
                         timestamp = scanTimestamp
                     )
 
+                    // Phase 6: Subscribe customer to FCM updates for this shop
+                    com.google.firebase.messaging.FirebaseMessaging.getInstance()
+                        .subscribeToTopic("shop_${vendorID}")
+                        .addOnSuccessListener {
+                            Log.d("ScanActivity", "Subscribed to FCM topic: shop_${vendorID}")
+                        }
+                        .addOnFailureListener { e ->
+                            Log.w("ScanActivity", "Could not subscribe to FCM topic: shop_${vendorID}", e)
+                        }
+
                     // Task 6.1: Sync challenge progress on shop visit
                     com.sapotlokal.data.repository.ChallengeRepository.syncUserProgress(userID)
                     mainHandler.post {

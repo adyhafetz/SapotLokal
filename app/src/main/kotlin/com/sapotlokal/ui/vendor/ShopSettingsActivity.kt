@@ -91,6 +91,7 @@ class ShopSettingsActivity : AppCompatActivity() {
         binding.etShopCategory.setText(vendor.vendorCategory)
         binding.etShopAddress.setText(vendor.vendorAddress)
         binding.etShopDesc.setText(vendor.vendorDescription)
+        binding.etOperatingHours.setText(vendor.operatingHours)
         binding.etSsmNumber.setText(vendor.ssmNumber)
     }
 
@@ -101,6 +102,7 @@ class ShopSettingsActivity : AppCompatActivity() {
         val category = binding.etShopCategory.text.toString().trim()
         val address = binding.etShopAddress.text.toString().trim()
         val desc = binding.etShopDesc.text.toString().trim()
+        val hours = binding.etOperatingHours.text.toString().trim()
 
         var hasError = false
         if (name.isEmpty()) {
@@ -130,7 +132,8 @@ class ShopSettingsActivity : AppCompatActivity() {
             vendorName = name,
             vendorCategory = category,
             vendorAddress = address,
-            vendorDescription = desc
+            vendorDescription = desc,
+            operatingHours = hours
         )
 
         setLoading(true)

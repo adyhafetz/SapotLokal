@@ -11,15 +11,16 @@ import com.sapotlokal.databinding.ItemShopCardBinding
 /**
  * RecentShopAdapter — displays a customer's recently visited shops on CustomerHomeActivity.
  *
- * Each item shows the shop name, category, and the customer's current point balance
+ * Each item shows the shop name, category, live OPEN/CLOSED status, and the customer's current point balance
  * for that specific shop. The list is driven by [RecentShopItem], a lightweight
  * view-model that merges data from /points and /vendors.
  *
  * Uses ListAdapter + DiffUtil so only changed rows re-bind — avoids full list flickers
  * when the live points listener fires an update.
  */
-class RecentShopAdapter :
-    ListAdapter<RecentShopItem, RecentShopAdapter.ViewHolder>(DIFF_CALLBACK) {
+class RecentShopAdapter(
+    private val onItemClick: (String) -> Unit = {}
+) : ListAdapter<RecentShopItem, RecentShopAdapter.ViewHolder>(DIFF_CALLBACK) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val binding = ItemShopCardBinding.inflate(
@@ -29,7 +30,9 @@ class RecentShopAdapter :
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        holder.bind(getItem(position))
+        val item = getItem(position)
+        holder.bind(item)
+        holder.itemView.setOnClickListener { onItemClick(item.vendorID) }
     }
 
     class ViewHolder(private val binding: ItemShopCardBinding) :
@@ -40,6 +43,15 @@ class RecentShopAdapter :
             binding.tvShopSubtitle.text = item.category
             binding.tvShopPoints.text  = "${item.balance} pts"
 
+            // Status chip
+            if (item.isOpen) {
+                binding.tvShopStatus.text = "● OPEN"
+                binding.tvShopStatus.setBackgroundResource(R.drawable.bg_status_chip_open)
+            } else {
+                binding.tvShopStatus.text = "● CLOSED"
+                binding.tvShopStatus.setBackgroundResource(R.drawable.bg_status_chip_closed)
+            }
+
             // Category icon: map known category keywords to the existing drawables;
             // fall back to the generic croissant drawable for unknown categories.
             val (bgRes, iconRes) = categoryDrawables(item.category)
@@ -49,7 +61,7 @@ class RecentShopAdapter :
 
         /**
          * Returns a Pair<backgroundDrawable, iconDrawable> for the given category string.
-         * Matches are intentionally fuzzy (contains) so \"Café\", \"café\", \"Kopitiam\" all
+         * Matches are intentionally fuzzy (contains) so "Café", "café", "Kopitiam" all
          * map to the coffee icon without exhaustive enumeration.
          */
         private fun categoryDrawables(category: String): Pair<Int, Int> {
@@ -80,11 +92,12 @@ class RecentShopAdapter :
  * [category]  — from /vendors/{vendorID}/vendorCategory
  * [balance]   — per-shop earned minus redeemed, from /points
  * [vendorID]  — used as the stable item ID for DiffUtil
+ * [isOpen]    — live operating status from /vendors/{vendorID}/isOpen
  */
 data class RecentShopItem(
     val vendorID: String,
     val shopName: String,
     val category: String,
-    val balance: Int
+    val balance: Int,
+    val isOpen: Boolean = true
 )
-

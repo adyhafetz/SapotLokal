@@ -60,10 +60,11 @@
         <activity android:name=".ui.auth.SignUpCustomerActivity"    android:exported="false" />
         <activity android:name=".ui.auth.SignUpVendorActivity"      android:exported="false" />
 
-        <!-- Phase 3 customer activities -->
+        <!-- Phase 3 & 5 customer activities -->
         <activity android:name=".ui.customer.FindShopsActivity"    android:exported="false" />
         <activity android:name=".ui.customer.ScanActivity"         android:exported="false" />
         <activity android:name=".ui.customer.CustomerProfileActivity" android:exported="false" />
+        <activity android:name=".ui.customer.ShopDetailActivity"   android:exported="false" />
 
         <!-- Phase 5 voucher activities -->
         <activity android:name=".ui.customer.MyVouchersActivity"   android:exported="false" />

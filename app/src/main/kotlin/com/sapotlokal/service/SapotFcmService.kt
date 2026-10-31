@@ -59,6 +59,9 @@ class SapotFcmService : FirebaseMessagingService() {
         /** Notification channel ID for level-up congratulations. */
         const val CHANNEL_LEVELS = "channel_levels"
 
+        /** Notification channel ID for shop status and opening alerts (Phase 6). */
+        const val CHANNEL_SHOPS = "channel_shops"
+
         /**
          * Ensures FCM token is fetched and written to /users/{uid}/fcmToken.
          * Safe to call on sign-in or home activity startup.
@@ -109,7 +112,7 @@ class SapotFcmService : FirebaseMessagingService() {
                 .setContentText(body)
                 .setStyle(NotificationCompat.BigTextStyle().bigText(body))
                 .setPriority(
-                    if (channelId == CHANNEL_LEVELS) NotificationCompat.PRIORITY_HIGH
+                    if (channelId == CHANNEL_LEVELS || channelId == CHANNEL_SHOPS) NotificationCompat.PRIORITY_HIGH
                     else NotificationCompat.PRIORITY_DEFAULT
                 )
                 .setAutoCancel(true)
@@ -117,6 +120,63 @@ class SapotFcmService : FirebaseMessagingService() {
 
             val notificationId = System.currentTimeMillis().toInt()
             NotificationManagerCompat.from(context).notify(notificationId, notification)
+        }
+
+        /**
+         * Phase 6: Posts a shop status notification informing customers that a shop is OPEN.
+         * Tapping launches ShopDetailActivity for the specified vendorId.
+         */
+        fun showShopStatusNotification(
+            context: android.content.Context,
+            vendorId: String,
+            vendorName: String
+        ) {
+            ensureChannels(context)
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                val granted = ContextCompat.checkSelfPermission(
+                    context, Manifest.permission.POST_NOTIFICATIONS
+                ) == PackageManager.PERMISSION_GRANTED
+                if (!granted) {
+                    Log.w(TAG, "POST_NOTIFICATIONS not granted — shop notification suppressed")
+                    return
+                }
+            }
+
+            val title = "$vendorName is now OPEN! 🟢"
+            val body = "$vendorName is now OPEN! Drop by today to earn your loyalty points."
+
+            val intent = if (vendorId.isNotBlank()) {
+                android.content.Intent(context, com.sapotlokal.ui.customer.ShopDetailActivity::class.java).apply {
+                    putExtra(com.sapotlokal.ui.customer.ShopDetailActivity.EXTRA_VENDOR_ID, vendorId)
+                    flags = android.content.Intent.FLAG_ACTIVITY_NEW_TASK or android.content.Intent.FLAG_ACTIVITY_CLEAR_TOP
+                }
+            } else {
+                android.content.Intent(context, com.sapotlokal.ui.customer.CustomerHomeActivity::class.java).apply {
+                    flags = android.content.Intent.FLAG_ACTIVITY_NEW_TASK or android.content.Intent.FLAG_ACTIVITY_CLEAR_TOP
+                }
+            }
+
+            val pendingIntent = android.app.PendingIntent.getActivity(
+                context,
+                (vendorId.hashCode() and 0x7FFFFFFF),
+                intent,
+                android.app.PendingIntent.FLAG_UPDATE_CURRENT or android.app.PendingIntent.FLAG_IMMUTABLE
+            )
+
+            val notification = NotificationCompat.Builder(context, CHANNEL_SHOPS)
+                .setSmallIcon(R.mipmap.ic_launcher)
+                .setContentTitle(title)
+                .setContentText(body)
+                .setStyle(NotificationCompat.BigTextStyle().bigText(body))
+                .setPriority(NotificationCompat.PRIORITY_HIGH)
+                .setContentIntent(pendingIntent)
+                .setAutoCancel(true)
+                .build()
+
+            val notificationId = (vendorId.hashCode() and 0x7FFFFFFF)
+            NotificationManagerCompat.from(context).notify(notificationId, notification)
+            Log.d(TAG, "Posted shop status notification for vendorId=$vendorId, title=\"$title\"")
         }
 
         fun ensureChannels(context: android.content.Context) {
@@ -139,8 +199,17 @@ class SapotFcmService : FirebaseMessagingService() {
                 description = context.getString(R.string.notif_channel_levels_desc)
             }
 
+            val shopsChannel = NotificationChannel(
+                CHANNEL_SHOPS,
+                context.getString(R.string.notif_channel_shops_name),
+                NotificationManager.IMPORTANCE_HIGH
+            ).apply {
+                description = context.getString(R.string.notif_channel_shops_desc)
+            }
+
             manager.createNotificationChannel(rewardsChannel)
             manager.createNotificationChannel(levelsChannel)
+            manager.createNotificationChannel(shopsChannel)
         }
     }
 
@@ -200,6 +269,22 @@ class SapotFcmService : FirebaseMessagingService() {
 
         createNotificationChannels()
 
+        // Phase 6: Handle shop_status notification type
+        val type = remoteMessage.data["type"]
+        if (type == "shop_status") {
+            val vendorId = remoteMessage.data["vendorId"] ?: remoteMessage.data["vendorID"] ?: ""
+            val vendorName = remoteMessage.data["vendorName"] ?: "A local shop"
+            val title = remoteMessage.notification?.title
+                ?: remoteMessage.data["title"]
+                ?: "$vendorName is now OPEN! 🟢"
+            val body = remoteMessage.notification?.body
+                ?: remoteMessage.data["body"]
+                ?: "$vendorName is now OPEN! Drop by today to earn your loyalty points."
+
+            showShopNotification(title, body, vendorId)
+            return
+        }
+
         // Resolve title and body — prefer the FCM notification object, fall back to data.
         val title = remoteMessage.notification?.title
             ?: remoteMessage.data["title"]
@@ -224,36 +309,58 @@ class SapotFcmService : FirebaseMessagingService() {
     // -------------------------------------------------------------------------
 
     /**
-     * Ensures both notification channels exist. Safe to call repeatedly — the OS
+     * Ensures all notification channels exist. Safe to call repeatedly — the OS
      * no-ops duplicate channel creation.
-     *
-     * Must be called before any notification is posted and before [onNewToken] returns
-     * so that channels are ready even if the first notification arrives very quickly.
      */
     private fun createNotificationChannels() {
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) return
+        ensureChannels(this)
+    }
 
-        val manager = getSystemService(NotificationManager::class.java) ?: return
-
-        val rewardsChannel = NotificationChannel(
-            CHANNEL_REWARDS,
-            getString(R.string.notif_channel_rewards_name),
-            NotificationManager.IMPORTANCE_DEFAULT
-        ).apply {
-            description = getString(R.string.notif_channel_rewards_desc)
+    /**
+     * Constructs and posts a shop status notification that routes to ShopDetailActivity on click.
+     */
+    private fun showShopNotification(title: String, body: String, vendorId: String) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            val granted = ContextCompat.checkSelfPermission(
+                this, Manifest.permission.POST_NOTIFICATIONS
+            ) == PackageManager.PERMISSION_GRANTED
+            if (!granted) {
+                Log.w(TAG, "POST_NOTIFICATIONS not granted — shop notification suppressed")
+                return
+            }
         }
 
-        val levelsChannel = NotificationChannel(
-            CHANNEL_LEVELS,
-            getString(R.string.notif_channel_levels_name),
-            NotificationManager.IMPORTANCE_HIGH
-        ).apply {
-            description = getString(R.string.notif_channel_levels_desc)
+        val intent = if (vendorId.isNotBlank()) {
+            android.content.Intent(this, com.sapotlokal.ui.customer.ShopDetailActivity::class.java).apply {
+                putExtra(com.sapotlokal.ui.customer.ShopDetailActivity.EXTRA_VENDOR_ID, vendorId)
+                flags = android.content.Intent.FLAG_ACTIVITY_NEW_TASK or android.content.Intent.FLAG_ACTIVITY_CLEAR_TOP
+            }
+        } else {
+            android.content.Intent(this, com.sapotlokal.ui.customer.CustomerHomeActivity::class.java).apply {
+                flags = android.content.Intent.FLAG_ACTIVITY_NEW_TASK or android.content.Intent.FLAG_ACTIVITY_CLEAR_TOP
+            }
         }
 
-        manager.createNotificationChannel(rewardsChannel)
-        manager.createNotificationChannel(levelsChannel)
-        Log.d(TAG, "Notification channels ensured")
+        val pendingIntent = android.app.PendingIntent.getActivity(
+            this,
+            (vendorId.hashCode() and 0x7FFFFFFF),
+            intent,
+            android.app.PendingIntent.FLAG_UPDATE_CURRENT or android.app.PendingIntent.FLAG_IMMUTABLE
+        )
+
+        val notification = NotificationCompat.Builder(this, CHANNEL_SHOPS)
+            .setSmallIcon(R.mipmap.ic_launcher)
+            .setContentTitle(title)
+            .setContentText(body)
+            .setStyle(NotificationCompat.BigTextStyle().bigText(body))
+            .setPriority(NotificationCompat.PRIORITY_HIGH)
+            .setContentIntent(pendingIntent)
+            .setAutoCancel(true)
+            .build()
+
+        val notificationId = (vendorId.hashCode() and 0x7FFFFFFF)
+        NotificationManagerCompat.from(this).notify(notificationId, notification)
+        Log.d(TAG, "Shop notification posted: id=$notificationId channel=$CHANNEL_SHOPS title=\"$title\"")
     }
 
     /**

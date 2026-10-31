@@ -121,6 +121,26 @@
                     android:lines="2" />
             </com.google.android.material.textfield.TextInputLayout>
 
+            <!-- Operating Hours (Phase 6) -->
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/tilOperatingHours"
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="14dp"
+                app:startIconDrawable="@drawable/ic_clock"
+                app:startIconTint="?attr/colorPrimary"
+                app:helperText="e.g. 8:00 AM - 10:00 PM (Daily)"
+                android:hint="Operating Hours">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/etOperatingHours"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="textCapSentences"
+                    android:maxLines="1" />
+            </com.google.android.material.textfield.TextInputLayout>
+
             <!-- SSM Registration Number (Read-only) -->
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/tilSsmNumber"

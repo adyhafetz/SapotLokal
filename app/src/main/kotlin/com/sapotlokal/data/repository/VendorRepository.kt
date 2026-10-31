@@ -60,6 +60,64 @@ object VendorRepository {
     }
 
     /**
+     * Listens live to updates for a single vendor by ID.
+     * Used by ShopDetailActivity to track live OPEN/CLOSED status and operating hours.
+     */
+    fun listenToVendor(
+        vendorID: String,
+        onUpdate: (Vendor?) -> Unit,
+        onError: (String) -> Unit
+    ): ValueEventListener {
+        val listener = object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                onUpdate(snapshot.getValue(Vendor::class.java))
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+                onError(error.message)
+            }
+        }
+        db.child("vendors").child(vendorID).addValueEventListener(listener)
+        return listener
+    }
+
+    /**
+     * Listens live to all vendors.
+     * Used by FindShopsActivity so live status chips update in real-time.
+     */
+    fun listenToAllVendors(
+        onUpdate: (List<Vendor>) -> Unit,
+        onError: (String) -> Unit
+    ): ValueEventListener {
+        val listener = object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                val vendors = snapshot.children.mapNotNull { it.getValue(Vendor::class.java) }
+                onUpdate(vendors)
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+                onError(error.message)
+            }
+        }
+        db.child("vendors").addValueEventListener(listener)
+        return listener
+    }
+
+    /**
+     * Detaches a listener from a specific vendor node.
+     */
+    fun removeVendorListener(vendorID: String, listener: ValueEventListener) {
+        db.child("vendors").child(vendorID).removeEventListener(listener)
+    }
+
+    /**
+     * Detaches a listener from the /vendors node.
+     */
+    fun removeAllVendorsListener(listener: ValueEventListener) {
+        db.child("vendors").removeEventListener(listener)
+    }
+
+    /**
      * Looks up the vendorID that belongs to a given userID.
      * Used in Phase 4 when a Shop Owner logs in to find their own vendor record.
      */
@@ -96,17 +154,82 @@ object VendorRepository {
             return
         }
 
-        val updates = mapOf(
+        val updates = mutableMapOf<String, Any>(
             "vendorName" to vendor.vendorName,
             "vendorCategory" to vendor.vendorCategory,
             "vendorAddress" to vendor.vendorAddress,
-            "vendorDescription" to vendor.vendorDescription
+            "vendorDescription" to vendor.vendorDescription,
+            "operatingHours" to vendor.operatingHours
         )
 
         db.child("vendors").child(vendor.vendorID)
             .updateChildren(updates)
             .addOnSuccessListener { onResult(true, null) }
             .addOnFailureListener { e -> onResult(false, e.message) }
+    }
+
+    /**
+     * Toggles vendor open/closed status and records timestamp.
+     */
+    fun updateVendorStatus(
+        vendorID: String,
+        isOpen: Boolean,
+        onResult: (success: Boolean, errorMsg: String?) -> Unit
+    ) {
+        if (vendorID.isBlank()) {
+            onResult(false, "Invalid vendor ID")
+            return
+        }
+
+        val updates = mapOf<String, Any>(
+            "isOpen" to isOpen,
+            "lastStatusChangedAt" to com.google.firebase.database.ServerValue.TIMESTAMP
+        )
+
+        db.child("vendors").child(vendorID)
+            .updateChildren(updates)
+            .addOnSuccessListener { onResult(true, null) }
+            .addOnFailureListener { e -> onResult(false, e.message) }
+    }
+
+    /**
+     * Dispatches an FCM topic notification broadcast event when a shop opens.
+     * Records event under /shopNotifications for tracking, live dispatch, and FCM cloud hooks.
+     */
+    fun broadcastShopStatus(
+        vendorID: String,
+        vendorName: String,
+        isOpen: Boolean,
+        onComplete: (Boolean) -> Unit = {}
+    ) {
+        if (vendorID.isBlank()) {
+            onComplete(false)
+            return
+        }
+
+        val notifRef = db.child("shopNotifications").push()
+        val payload = mapOf(
+            "notificationId" to (notifRef.key ?: ""),
+            "vendorID" to vendorID,
+            "vendorId" to vendorID,
+            "vendorName" to vendorName,
+            "type" to "shop_status",
+            "isOpen" to isOpen,
+            "topic" to "shop_$vendorID",
+            "title" to "$vendorName is now OPEN! 🟢",
+            "body" to "$vendorName is now OPEN! Drop by today to earn your loyalty points.",
+            "timestamp" to com.google.firebase.database.ServerValue.TIMESTAMP
+        )
+
+        notifRef.setValue(payload)
+            .addOnSuccessListener {
+                android.util.Log.i("VendorRepository", "FCM topic broadcast dispatched for /topics/shop_$vendorID ($vendorName)")
+                onComplete(true)
+            }
+            .addOnFailureListener { e ->
+                android.util.Log.w("VendorRepository", "FCM topic broadcast logging failed", e)
+                onComplete(false)
+            }
     }
 
     /**

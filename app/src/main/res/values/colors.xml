@@ -29,6 +29,8 @@
     <color name="sapot_error_bg">#FCEBE7</color>
     <color name="sapot_info_text">#355B78</color>
     <color name="sapot_info_bg">#E8EFF4</color>
+    <color name="status_open">#10B981</color>
+    <color name="status_closed">#EF4444</color>
 
     <!-- ── Compatibility / Legacy Color Aliases ─────────────────────────── -->
     <color name="colorPrimary">@color/sapot_primary</color>

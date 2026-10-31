@@ -34,6 +34,9 @@ class VendorHomeActivity : AppCompatActivity() {
 
     // Holds the vendor record for this session (set after the DB lookup)
     private var vendorID: String = ""
+    private var currentVendor: com.sapotlokal.data.model.Vendor? = null
+    private var vendorListener: ValueEventListener? = null
+    private var isProgrammaticUpdate: Boolean = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -45,6 +48,7 @@ class VendorHomeActivity : AppCompatActivity() {
         val user = auth.currentUser
         if (user == null) { goToLogin(); return }
 
+        setupStatusSwitch()
         refreshVendorProfile()
         user.let { com.sapotlokal.service.SapotFcmService.syncTokenForUser(it.uid) }
 
@@ -59,6 +63,78 @@ class VendorHomeActivity : AppCompatActivity() {
         refreshVendorProfile()
     }
 
+    private fun setupStatusSwitch() {
+        binding.switchStoreStatus.setOnCheckedChangeListener { _, isChecked ->
+            if (isProgrammaticUpdate) return@setOnCheckedChangeListener
+            val currentId = vendorID
+            if (currentId.isBlank()) return@setOnCheckedChangeListener
+
+            // Immediately provide responsive local UI feedback
+            updateStatusCardUi(isChecked, currentVendor?.operatingHours.orEmpty())
+
+            VendorRepository.updateVendorStatus(currentId, isChecked) { success, errorMsg ->
+                if (success) {
+                    val vendorName = currentVendor?.vendorName.orEmpty().ifBlank { "Your shop" }
+                    if (isChecked) {
+                        VendorRepository.broadcastShopStatus(currentId, vendorName, isOpen = true)
+                        android.widget.Toast.makeText(
+                            this,
+                            "$vendorName is now OPEN! Customers notified. ✓",
+                            android.widget.Toast.LENGTH_SHORT
+                        ).show()
+                    } else {
+                        android.widget.Toast.makeText(
+                            this,
+                            "Store status updated to CLOSED.",
+                            android.widget.Toast.LENGTH_SHORT
+                        ).show()
+                    }
+                } else {
+                    android.widget.Toast.makeText(
+                        this,
+                        "Failed to update status: ${errorMsg ?: "Network error"}",
+                        android.widget.Toast.LENGTH_SHORT
+                    ).show()
+                    // Revert switch to actual vendor state
+                    currentVendor?.let {
+                        updateStatusCardUi(it.isOpen, it.operatingHours)
+                    }
+                }
+            }
+        }
+    }
+
+    private fun updateStatusCardUi(isOpen: Boolean, operatingHours: String) {
+        isProgrammaticUpdate = true
+        binding.switchStoreStatus.isChecked = isOpen
+        isProgrammaticUpdate = false
+
+        if (isOpen) {
+            binding.cardStoreStatus.strokeColor = androidx.core.content.ContextCompat.getColor(
+                this,
+                com.sapotlokal.R.color.status_open
+            )
+            binding.tvStatusBadge.text = getString(com.sapotlokal.R.string.store_status_open_badge)
+            binding.tvStatusBadge.setBackgroundResource(com.sapotlokal.R.drawable.bg_status_chip_open)
+            binding.tvStatusDescription.text = getString(com.sapotlokal.R.string.store_status_open_desc)
+        } else {
+            binding.cardStoreStatus.strokeColor = androidx.core.content.ContextCompat.getColor(
+                this,
+                com.sapotlokal.R.color.status_closed
+            )
+            binding.tvStatusBadge.text = getString(com.sapotlokal.R.string.store_status_closed_badge)
+            binding.tvStatusBadge.setBackgroundResource(com.sapotlokal.R.drawable.bg_status_chip_closed)
+            binding.tvStatusDescription.text = getString(com.sapotlokal.R.string.store_status_closed_desc)
+        }
+
+        if (operatingHours.isNotBlank()) {
+            binding.tvOperatingHoursHint.text = "Hours: $operatingHours"
+            binding.tvOperatingHoursHint.visibility = android.view.View.VISIBLE
+        } else {
+            binding.tvOperatingHoursHint.visibility = android.view.View.GONE
+        }
+    }
+
     private fun refreshVendorProfile() {
         val user = auth.currentUser ?: return
 
@@ -70,9 +146,13 @@ class VendorHomeActivity : AppCompatActivity() {
                     binding.tvShopName.text = "Shop details not found"
                     return@fetchVendorByUserId
                 }
+                currentVendor = vendor
                 vendorID = vendor.vendorID
                 binding.tvWelcome.text  = "Welcome back, ${vendor.vendorName}!"
                 binding.tvShopName.text = "${vendor.vendorCategory} · ${vendor.vendorAddress}"
+
+                updateStatusCardUi(vendor.isOpen, vendor.operatingHours)
+                attachLiveVendorListener(vendor.vendorID)
 
                 // Navigation — all screens need the vendorID
                 binding.btnShowQr.setOnClickListener {
@@ -115,6 +195,31 @@ class VendorHomeActivity : AppCompatActivity() {
             auth.signOut()
             goToLogin()
         }
+    }
+
+    private fun attachLiveVendorListener(targetVendorId: String) {
+        if (vendorListener != null) return
+        vendorListener = VendorRepository.listenToVendor(
+            vendorID = targetVendorId,
+            onUpdate = { updated ->
+                if (updated != null) {
+                    currentVendor = updated
+                    binding.tvShopName.text = "${updated.vendorCategory} · ${updated.vendorAddress}"
+                    updateStatusCardUi(updated.isOpen, updated.operatingHours)
+                }
+            },
+            onError = { _ -> }
+        )
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        vendorListener?.let {
+            if (vendorID.isNotBlank()) {
+                VendorRepository.removeVendorListener(vendorID, it)
+            }
+        }
+        vendorListener = null
     }
 
     override fun onCreateOptionsMenu(menu: android.view.Menu): Boolean {

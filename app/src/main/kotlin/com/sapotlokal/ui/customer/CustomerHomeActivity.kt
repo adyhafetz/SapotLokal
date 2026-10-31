@@ -59,8 +59,16 @@ class CustomerHomeActivity : AppCompatActivity() {
         }
     }
 
+    private var shopNotificationListener: com.google.firebase.database.ChildEventListener? = null
+    private val sessionStartTime = System.currentTimeMillis()
+
     /** Adapter for the "Around your corner" recently-visited shops list (Phase 3 Task 3.2). */
-    private val recentShopAdapter = RecentShopAdapter()
+    private val recentShopAdapter = RecentShopAdapter { vendorId ->
+        val intent = Intent(this, ShopDetailActivity::class.java).apply {
+            putExtra(ShopDetailActivity.EXTRA_VENDOR_ID, vendorId)
+        }
+        startActivity(intent)
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -110,6 +118,7 @@ class CustomerHomeActivity : AppCompatActivity() {
 
         // Notification permission & FCM token synchronization (Phase 6)
         checkNotificationPermission(user.uid)
+        startListeningToShopNotifications()
         ChallengeRepository.syncUserProgress(user.uid)
         com.sapotlokal.data.repository.MissionRepository.syncUserMissions(user.uid)
 
@@ -245,7 +254,8 @@ class CustomerHomeActivity : AppCompatActivity() {
                                     vendorID  = vendorID,
                                     shopName  = vendor.vendorName.ifBlank { "Unknown Shop" },
                                     category  = vendor.vendorCategory.ifBlank { "Shop" },
-                                    balance   = balance
+                                    balance   = balance,
+                                    isOpen    = vendor.isOpen
                                 )
                             )
                         }
@@ -381,6 +391,50 @@ class CustomerHomeActivity : AppCompatActivity() {
         } else {
             SapotFcmService.syncTokenForUser(userID)
         }
+    }
+
+    private fun startListeningToShopNotifications() {
+        if (shopNotificationListener != null) return
+        val notifRef = com.google.firebase.database.FirebaseDatabase
+            .getInstance(AppConfig.DATABASE_URL)
+            .reference
+            .child("shopNotifications")
+
+        val listener = object : com.google.firebase.database.ChildEventListener {
+            override fun onChildAdded(snapshot: com.google.firebase.database.DataSnapshot, previousChildName: String?) {
+                val timestamp = snapshot.child("timestamp").getValue(Long::class.java) ?: 0L
+                if (timestamp < sessionStartTime) return // Only notify for real-time events during this session
+
+                val isOpen = snapshot.child("isOpen").getValue(Boolean::class.java) ?: false
+                if (!isOpen) return
+
+                val vendorId = snapshot.child("vendorId").getValue(String::class.java)
+                    ?: snapshot.child("vendorID").getValue(String::class.java).orEmpty()
+                val vendorName = snapshot.child("vendorName").getValue(String::class.java).orEmpty().ifBlank { "A shop you follow" }
+
+                SapotFcmService.showShopStatusNotification(this@CustomerHomeActivity, vendorId, vendorName)
+            }
+
+            override fun onChildChanged(snapshot: com.google.firebase.database.DataSnapshot, previousChildName: String?) {}
+            override fun onChildRemoved(snapshot: com.google.firebase.database.DataSnapshot) {}
+            override fun onChildMoved(snapshot: com.google.firebase.database.DataSnapshot, previousChildName: String?) {}
+            override fun onCancelled(error: com.google.firebase.database.DatabaseError) {}
+        }
+
+        notifRef.limitToLast(10).addChildEventListener(listener)
+        shopNotificationListener = listener
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        shopNotificationListener?.let {
+            com.google.firebase.database.FirebaseDatabase
+                .getInstance(AppConfig.DATABASE_URL)
+                .reference
+                .child("shopNotifications")
+                .removeEventListener(it)
+        }
+        shopNotificationListener = null
     }
 
     private fun goToLogin() {

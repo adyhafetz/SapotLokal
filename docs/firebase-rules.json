@@ -106,6 +106,12 @@
       "$userId": {
         ".write": "auth != null && auth.uid === $userId"
       }
+    },
+    "shopNotifications": {
+      ".read": "auth != null",
+      "$notificationId": {
+        ".write": "auth != null"
+      }
     }
   }
 }

@@ -45,7 +45,14 @@ data class Vendor(
     val vendorCategory: String = "",
     val vendorAddress: String = "",
     val ssmNumber: String = "",     // Required; stored but never auto-verified
-    val vendorDescription: String = "" // Optional merchant description (Phase 6)
+    val vendorDescription: String = "", // Optional merchant description (Phase 6)
+
+    @get:PropertyName("isOpen")
+    @set:PropertyName("isOpen")
+    var isOpen: Boolean = true,
+
+    val operatingHours: String = "",
+    val lastStatusChangedAt: Long = 0L
 )
 
 // ── QRCODE ────────────────────────────────────────────────────────────────────
