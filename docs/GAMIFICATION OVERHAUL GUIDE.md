@@ -361,11 +361,11 @@ Create a competitive ranking screen showcasing the top 3 customers on an elevate
      * When `"This Week"` is selected: calculate weekly points earned from `/points` within the current week's timestamp window.
 
 ### 7.3 Expected Output Checklist (Phase 7)
-- [ ] Leaderboard loads and renders top 3 players on distinct podium heights with gold, silver, and bronze badges.
-- [ ] Players ranked 4th and below appear in the scrollable list with correct rank numbers.
-- [ ] Current user's rank is always visible on the sticky bottom card, regardless of scroll position.
-- [ ] Display names include tier emojis (e.g. `Amirul 👑`).
-- [ ] Toggling between All-Time and This Week switches ranking calculations.
+- [x] Leaderboard loads and renders top 3 players on distinct podium heights with gold, silver, and bronze badges.
+- [x] Players ranked 4th and below appear in the scrollable list with correct rank numbers.
+- [x] Current user's rank is always visible on the sticky bottom card, regardless of scroll position.
+- [x] Display names include tier emojis (e.g. `Amirul 👑`).
+- [x] Toggling between All-Time and This Week switches ranking calculations.
 
 ---
 
@@ -381,4 +381,4 @@ Once all 7 phases are completed, execute this end-to-end user journey test:
 | **TC-4: Vendor Live Toggle** | Vendor flips shop to CLOSED on dashboard. | Customer app immediately updates shop chip to red "CLOSED". | [ ] |
 | **TC-5: Vendor Open Push** | Vendor flips shop to OPEN. | Customer receives push notification stating shop is now open. | [ ] |
 | **TC-6: Shop Detail** | Tap shop in Find Shops list. | Opens details page with address, hours, status chip, shop points, and map launcher. | [ ] |
-| **TC-7: Leaderboard** | Open Leaderboard from navigation. | Top 3 podium renders with avatars, ranked list below, and sticky "You" card pinned at bottom. | [ ] |
+| **TC-7: Leaderboard** | Open Leaderboard from navigation. | Top 3 podium renders with avatars, ranked list below, and sticky "You" card pinned at bottom. | [x] |

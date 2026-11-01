@@ -92,8 +92,21 @@ data class Point(
     val vendorID: String = "",          // FK → vendors/{vendorID}
     val pointEarnedAmount: Int = 0,
     val pointRedeemedAmount: Int = 0,
-    val pointSource: String = ""        // See PointSource constants
+    val pointSource: String = "",       // See PointSource constants
+    val timestamp: Long = 0L
 )
+
+/**
+ * Represents a ranked user entry on the community leaderboard.
+ */
+data class LeaderboardMember(
+    val userId: String = "",
+    val userName: String = "",
+    val points: Int = 0,
+    val currentTier: String = CustomerTier.FRESHIE.code,
+    val rank: Int = 0
+)
+
 
 object PointSource {
     const val SHOP_VISIT    = "shop_visit"

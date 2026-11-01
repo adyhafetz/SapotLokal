@@ -77,6 +77,7 @@
 
         <!-- Phase 6 customer & vendor activities -->
         <activity android:name=".ui.customer.ChallengesActivity"   android:exported="false" />
+        <activity android:name=".ui.customer.LeaderboardActivity"  android:exported="false" />
         <activity android:name=".ui.vendor.ShopSettingsActivity"   android:exported="false" />
         <activity android:name=".ui.vendor.VendorStatsActivity"    android:exported="false" />
 

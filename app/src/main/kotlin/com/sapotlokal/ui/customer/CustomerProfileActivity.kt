@@ -207,6 +207,10 @@ class CustomerProfileActivity : AppCompatActivity() {
             finish()
         }
 
+        binding.btnViewLeaderboard.setOnClickListener {
+            startActivity(Intent(this, LeaderboardActivity::class.java))
+        }
+
         binding.btnEditProfile.setOnClickListener {
             showEditNameDialog()
         }

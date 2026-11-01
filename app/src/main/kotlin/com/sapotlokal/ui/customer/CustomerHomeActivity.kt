@@ -112,6 +112,9 @@ class CustomerHomeActivity : AppCompatActivity() {
         binding.btnMyVouchers.setOnClickListener {
             startActivity(Intent(this, MyVouchersActivity::class.java))
         }
+        binding.btnLeaderboard.setOnClickListener {
+            startActivity(Intent(this, LeaderboardActivity::class.java))
+        }
         binding.btnExplore.setOnClickListener {
             startActivity(Intent(this, FindShopsActivity::class.java))
         }
@@ -157,6 +160,10 @@ class CustomerHomeActivity : AppCompatActivity() {
             when (item.itemId) {
                 R.id.action_profile -> {
                     startActivity(Intent(this, CustomerProfileActivity::class.java))
+                    true
+                }
+                R.id.action_leaderboard -> {
+                    startActivity(Intent(this, LeaderboardActivity::class.java))
                     true
                 }
                 R.id.action_logout -> {

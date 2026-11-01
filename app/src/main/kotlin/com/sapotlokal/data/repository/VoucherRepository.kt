@@ -484,7 +484,8 @@ object VoucherRepository {
             vendorID            = voucherUser.vendorID,
             pointEarnedAmount   = 0,
             pointRedeemedAmount = voucherUser.pointsRequiredSnapshot,
-            pointSource         = PointSource.REDEMPTION
+            pointSource         = PointSource.REDEMPTION,
+            timestamp           = System.currentTimeMillis()
         )
 
         val updates = mapOf<String, Any>(

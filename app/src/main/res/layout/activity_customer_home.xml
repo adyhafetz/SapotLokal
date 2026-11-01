@@ -357,6 +357,24 @@
                     app:iconTint="@color/sapot_text_primary" />
             </LinearLayout>
 
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnLeaderboard"
+                android:layout_width="match_parent"
+                android:layout_height="52dp"
+                android:layout_marginTop="10dp"
+                android:backgroundTint="@color/sapot_primary_light"
+                android:text="Community Leaderboard 🏆"
+                android:textAllCaps="false"
+                android:textColor="@color/sapot_text_primary"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                app:cornerRadius="16dp"
+                app:icon="@drawable/ic_badge_raja"
+                app:iconGravity="textStart"
+                app:iconTint="@color/sapot_text_primary"
+                app:strokeColor="@color/sapot_primary_yellow"
+                app:strokeWidth="1dp" />
+
             <!-- Section: Around your corner -->
             <RelativeLayout
                 android:layout_width="match_parent"

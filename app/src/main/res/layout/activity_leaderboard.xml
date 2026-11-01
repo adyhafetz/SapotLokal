@@ -1,0 +1,585 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/sapot_bg"
+    android:orientation="vertical">
+
+    <!-- Top App Bar -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="56dp"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingHorizontal="16dp">
+
+        <ImageView
+            android:id="@+id/btnBack"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:clickable="true"
+            android:contentDescription="Back"
+            android:focusable="true"
+            android:padding="6dp"
+            android:rotation="90"
+            android:src="@drawable/ic_chevron_down"
+            app:tint="@color/sapot_text_primary" />
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_weight="1"
+            android:fontFamily="@font/inter"
+            android:text="Community Leaderboard"
+            android:textColor="@color/sapot_text_primary"
+            android:textSize="20sp"
+            android:textStyle="bold" />
+
+        <ImageView
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:contentDescription="Leaderboard"
+            android:src="@drawable/ic_badge_raja" />
+    </LinearLayout>
+
+    <!-- Top Filter Tab: All-Time vs This Week -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingHorizontal="24dp"
+        android:paddingVertical="8dp">
+
+        <com.google.android.material.button.MaterialButtonToggleGroup
+            android:id="@+id/toggleFilter"
+            android:layout_width="match_parent"
+            android:layout_height="44dp"
+            app:checkedButton="@id/btnFilterAllTime"
+            app:selectionRequired="true"
+            app:singleSelection="true">
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnFilterAllTime"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:fontFamily="sans-serif-medium"
+                android:text="All-Time"
+                android:textAllCaps="false"
+                android:textColor="@color/sapot_text_primary"
+                android:textSize="13sp"
+                app:cornerRadius="12dp"
+                app:strokeColor="@color/sapot_border" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnFilterThisWeek"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:fontFamily="sans-serif-medium"
+                android:text="This Week"
+                android:textAllCaps="false"
+                android:textColor="@color/sapot_text_primary"
+                android:textSize="13sp"
+                app:cornerRadius="12dp"
+                app:strokeColor="@color/sapot_border" />
+        </com.google.android.material.button.MaterialButtonToggleGroup>
+    </LinearLayout>
+
+    <!-- Main Content Container (Podium + 4th+ List) -->
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1">
+
+        <androidx.core.widget.NestedScrollView
+            android:id="@+id/scrollView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:fillViewport="true">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:paddingBottom="96dp">
+
+                <!-- Podium Container (Top 3) -->
+                <LinearLayout
+                    android:id="@+id/containerPodium"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:baselineAligned="false"
+                    android:gravity="bottom"
+                    android:orientation="horizontal"
+                    android:paddingHorizontal="16dp"
+                    android:paddingTop="12dp"
+                    android:paddingBottom="4dp">
+
+                    <!-- 2nd Place (Left, Medium Podium) -->
+                    <LinearLayout
+                        android:id="@+id/podium2nd"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:gravity="center_horizontal"
+                        android:orientation="vertical">
+
+                        <ImageView
+                            android:layout_width="22dp"
+                            android:layout_height="22dp"
+                            android:layout_marginBottom="4dp"
+                            android:contentDescription="Silver Medal"
+                            android:src="@drawable/ic_medal_silver" />
+
+                        <!-- Silver Avatar Frame -->
+                        <FrameLayout
+                            android:layout_width="56dp"
+                            android:layout_height="56dp"
+                            android:background="@drawable/bg_avatar_ring_silver">
+
+                            <ImageView
+                                android:id="@+id/ivAvatar2nd"
+                                android:layout_width="32dp"
+                                android:layout_height="32dp"
+                                android:layout_gravity="center"
+                                android:contentDescription="2nd Place Avatar"
+                                android:src="@drawable/ic_user_round"
+                                app:tint="#546E7A" />
+
+                            <TextView
+                                android:id="@+id/tvInitials2nd"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_gravity="center"
+                                android:fontFamily="sans-serif-black"
+                                android:textColor="#37474F"
+                                android:textSize="18sp"
+                                android:visibility="gone"
+                                tools:text="SY" />
+                        </FrameLayout>
+
+                        <TextView
+                            android:id="@+id/tvName2nd"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="6dp"
+                            android:ellipsize="end"
+                            android:fontFamily="sans-serif-black"
+                            android:gravity="center"
+                            android:maxLines="1"
+                            android:textColor="@color/sapot_text_primary"
+                            android:textSize="13sp"
+                            tools:text="Sarah 🔥" />
+
+                        <TextView
+                            android:id="@+id/tvTier2nd"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="1dp"
+                            android:gravity="center"
+                            android:textColor="@color/sapot_text_secondary"
+                            android:textSize="10sp"
+                            tools:text="Trend Setter" />
+
+                        <TextView
+                            android:id="@+id/tvPoints2nd"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="2dp"
+                            android:layout_marginBottom="6dp"
+                            android:fontFamily="sans-serif-black"
+                            android:textColor="#546E7A"
+                            android:textSize="13sp"
+                            tools:text="1,250 pts" />
+
+                        <!-- Silver Podium Pillar -->
+                        <FrameLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="90dp"
+                            android:layout_marginHorizontal="4dp"
+                            android:background="@drawable/bg_podium_silver">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_gravity="center_horizontal"
+                                android:layout_marginTop="12dp"
+                                android:fontFamily="sans-serif-black"
+                                android:text="2"
+                                android:textColor="#546E7A"
+                                android:textSize="32sp" />
+                        </FrameLayout>
+                    </LinearLayout>
+
+                    <!-- 1st Place (Center, Tallest Podium) -->
+                    <LinearLayout
+                        android:id="@+id/podium1st"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1.15"
+                        android:gravity="center_horizontal"
+                        android:orientation="vertical">
+
+                        <ImageView
+                            android:layout_width="30dp"
+                            android:layout_height="30dp"
+                            android:layout_marginBottom="4dp"
+                            android:contentDescription="Gold Crown"
+                            android:src="@drawable/ic_crown_gold" />
+
+                        <!-- Gold Avatar Frame -->
+                        <FrameLayout
+                            android:layout_width="68dp"
+                            android:layout_height="68dp"
+                            android:background="@drawable/bg_avatar_ring_gold">
+
+                            <ImageView
+                                android:id="@+id/ivAvatar1st"
+                                android:layout_width="38dp"
+                                android:layout_height="38dp"
+                                android:layout_gravity="center"
+                                android:contentDescription="1st Place Avatar"
+                                android:src="@drawable/ic_user_round"
+                                app:tint="@color/sapot_text_primary" />
+
+                            <TextView
+                                android:id="@+id/tvInitials1st"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_gravity="center"
+                                android:fontFamily="sans-serif-black"
+                                android:textColor="@color/sapot_text_primary"
+                                android:textSize="22sp"
+                                android:visibility="gone"
+                                tools:text="AF" />
+                        </FrameLayout>
+
+                        <TextView
+                            android:id="@+id/tvName1st"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="6dp"
+                            android:ellipsize="end"
+                            android:fontFamily="sans-serif-black"
+                            android:gravity="center"
+                            android:maxLines="1"
+                            android:textColor="@color/sapot_text_primary"
+                            android:textSize="14sp"
+                            tools:text="Amirul 👑" />
+
+                        <TextView
+                            android:id="@+id/tvTier1st"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="1dp"
+                            android:gravity="center"
+                            android:textColor="@color/sapot_text_secondary"
+                            android:textSize="11sp"
+                            tools:text="Otai Lokal" />
+
+                        <TextView
+                            android:id="@+id/tvPoints1st"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="2dp"
+                            android:layout_marginBottom="6dp"
+                            android:fontFamily="sans-serif-black"
+                            android:textColor="#E65100"
+                            android:textSize="15sp"
+                            tools:text="2,650 pts" />
+
+                        <!-- Gold Podium Pillar -->
+                        <FrameLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="125dp"
+                            android:layout_marginHorizontal="4dp"
+                            android:background="@drawable/bg_podium_gold">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_gravity="center_horizontal"
+                                android:layout_marginTop="12dp"
+                                android:fontFamily="sans-serif-black"
+                                android:text="1"
+                                android:textColor="#B78103"
+                                android:textSize="38sp" />
+                        </FrameLayout>
+                    </LinearLayout>
+
+                    <!-- 3rd Place (Right, Lowest Podium) -->
+                    <LinearLayout
+                        android:id="@+id/podium3rd"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:gravity="center_horizontal"
+                        android:orientation="vertical">
+
+                        <ImageView
+                            android:layout_width="22dp"
+                            android:layout_height="22dp"
+                            android:layout_marginBottom="4dp"
+                            android:contentDescription="Bronze Medal"
+                            android:src="@drawable/ic_medal_bronze" />
+
+                        <!-- Bronze Avatar Frame -->
+                        <FrameLayout
+                            android:layout_width="54dp"
+                            android:layout_height="54dp"
+                            android:background="@drawable/bg_avatar_ring_bronze">
+
+                            <ImageView
+                                android:id="@+id/ivAvatar3rd"
+                                android:layout_width="30dp"
+                                android:layout_height="30dp"
+                                android:layout_gravity="center"
+                                android:contentDescription="3rd Place Avatar"
+                                android:src="@drawable/ic_user_round"
+                                app:tint="#6D4C41" />
+
+                            <TextView
+                                android:id="@+id/tvInitials3rd"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_gravity="center"
+                                android:fontFamily="sans-serif-black"
+                                android:textColor="#4E342E"
+                                android:textSize="17sp"
+                                android:visibility="gone"
+                                tools:text="DL" />
+                        </FrameLayout>
+
+                        <TextView
+                            android:id="@+id/tvName3rd"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="6dp"
+                            android:ellipsize="end"
+                            android:fontFamily="sans-serif-black"
+                            android:gravity="center"
+                            android:maxLines="1"
+                            android:textColor="@color/sapot_text_primary"
+                            android:textSize="13sp"
+                            tools:text="Danial 🛒" />
+
+                        <TextView
+                            android:id="@+id/tvTier3rd"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="1dp"
+                            android:gravity="center"
+                            android:textColor="@color/sapot_text_secondary"
+                            android:textSize="10sp"
+                            tools:text="Steady Buyer" />
+
+                        <TextView
+                            android:id="@+id/tvPoints3rd"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="2dp"
+                            android:layout_marginBottom="6dp"
+                            android:fontFamily="sans-serif-black"
+                            android:textColor="#6D4C41"
+                            android:textSize="13sp"
+                            tools:text="890 pts" />
+
+                        <!-- Bronze Podium Pillar -->
+                        <FrameLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="65dp"
+                            android:layout_marginHorizontal="4dp"
+                            android:background="@drawable/bg_podium_bronze">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_gravity="center_horizontal"
+                                android:layout_marginTop="12dp"
+                                android:fontFamily="sans-serif-black"
+                                android:text="3"
+                                android:textColor="#6D4C41"
+                                android:textSize="28sp" />
+                        </FrameLayout>
+                    </LinearLayout>
+                </LinearLayout>
+
+                <!-- Section Divider / Header -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:layout_marginBottom="8dp"
+                    android:paddingHorizontal="20dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="sans-serif-medium"
+                        android:text="Community Rankings (4th onwards)"
+                        android:textColor="@color/sapot_text_secondary"
+                        android:textSize="12sp"
+                        android:textStyle="bold" />
+                </LinearLayout>
+
+                <!-- Ranked RecyclerView (4th place onwards) -->
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/rvLeaderboard"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:nestedScrollingEnabled="false"
+                    tools:itemCount="5"
+                    tools:listitem="@layout/item_leaderboard_row" />
+
+                <!-- Empty State Message -->
+                <TextView
+                    android:id="@+id/tvEmptyLeaderboard"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="32dp"
+                    android:gravity="center"
+                    android:text="No points recorded yet this week.\nBe the first to scan and take #1!"
+                    android:textColor="@color/sapot_text_secondary"
+                    android:textSize="13sp"
+                    android:visibility="gone" />
+
+            </LinearLayout>
+        </androidx.core.widget.NestedScrollView>
+
+        <!-- Loading Spinner -->
+        <ProgressBar
+            android:id="@+id/progressBar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:indeterminateTint="@color/sapot_primary_yellow"
+            android:visibility="gone" />
+
+    </RelativeLayout>
+
+    <!-- Sticky "You" Bottom Card (Pinned at bottom of layout) -->
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/cardStickyYou"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="16dp"
+        android:layout_marginTop="4dp"
+        android:layout_marginBottom="12dp"
+        app:cardBackgroundColor="@color/sapot_primary_light"
+        app:cardCornerRadius="20dp"
+        app:cardElevation="6dp"
+        app:strokeColor="@color/sapot_primary_yellow"
+        app:strokeWidth="2dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:paddingHorizontal="16dp"
+            android:paddingVertical="12dp">
+
+            <!-- Your Rank Badge -->
+            <FrameLayout
+                android:layout_width="38dp"
+                android:layout_height="38dp"
+                android:background="@drawable/bg_primary_button">
+
+                <TextView
+                    android:id="@+id/tvStickyRank"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:fontFamily="sans-serif-black"
+                    android:textColor="@color/sapot_text_primary"
+                    android:textSize="14sp"
+                    tools:text="#14" />
+            </FrameLayout>
+
+            <!-- Your Avatar -->
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_marginStart="12dp"
+                app:cardBackgroundColor="@color/sapot_primary_yellow"
+                app:cardCornerRadius="20dp"
+                app:cardElevation="0dp">
+
+                <FrameLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent">
+
+                    <ImageView
+                        android:id="@+id/ivStickyAvatar"
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:layout_gravity="center"
+                        android:contentDescription="Your Avatar"
+                        android:src="@drawable/ic_user_round"
+                        app:tint="@color/sapot_text_primary" />
+
+                    <TextView
+                        android:id="@+id/tvStickyInitials"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:fontFamily="sans-serif-black"
+                        android:textColor="@color/sapot_text_primary"
+                        android:textSize="15sp"
+                        android:visibility="gone"
+                        tools:text="ME" />
+                </FrameLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Your Name & Tier Badge -->
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="12dp"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/tvStickyName"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:ellipsize="end"
+                    android:fontFamily="sans-serif-black"
+                    android:maxLines="1"
+                    android:textColor="@color/sapot_text_primary"
+                    android:textSize="14sp"
+                    tools:text="Amirul (You) 👑" />
+
+                <TextView
+                    android:id="@+id/tvStickyTier"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="1dp"
+                    android:textColor="@color/sapot_text_secondary"
+                    android:textSize="11sp"
+                    tools:text="Otai Lokal · Your Position" />
+            </LinearLayout>
+
+            <!-- Your Points -->
+            <TextView
+                android:id="@+id/tvStickyPoints"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:fontFamily="sans-serif-black"
+                android:textColor="@color/sapot_text_primary"
+                android:textSize="16sp"
+                tools:text="1,650 pts" />
+
+        </LinearLayout>
+
+    </com.google.android.material.card.MaterialCardView>
+
+</LinearLayout>
+

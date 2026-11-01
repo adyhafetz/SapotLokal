@@ -386,6 +386,17 @@
                 android:orientation="vertical">
 
                 <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnViewLeaderboard"
+                    style="@style/Widget.SapotLokal.Button.Outlined"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="12dp"
+                    android:text="View Community Leaderboard"
+                    app:icon="@drawable/ic_badge_raja"
+                    app:iconGravity="textStart"
+                    app:iconTint="@color/sapot_text_primary" />
+
+                <com.google.android.material.button.MaterialButton
                     android:id="@+id/btnEditProfile"
                     style="@style/Widget.SapotLokal.Button.Outlined"
                     android:layout_width="match_parent"

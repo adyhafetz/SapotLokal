@@ -29,6 +29,36 @@ object MissionDateUtils {
     }
 
     /**
+     * Returns the epoch milliseconds of Monday 00:00:00.000 of the current ISO week in KL timezone.
+     */
+    fun getWeekStartMillis(timestampMillis: Long = System.currentTimeMillis()): Long {
+        val zdt = ZonedDateTime.ofInstant(Instant.ofEpochMilli(timestampMillis), KL_ZONE)
+        val monday = zdt.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY))
+            .withHour(0)
+            .withMinute(0)
+            .withSecond(0)
+            .withNano(0)
+        return monday.toInstant().toEpochMilli()
+    }
+
+    /**
+     * Decodes the creation timestamp in milliseconds from a Firebase Realtime Database push key.
+     * The first 8 characters encode the 48-bit timestamp.
+     */
+    fun extractTimestampFromPushKey(pushKey: String): Long {
+        val pushChars = "-0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ_abcdefghijklmnopqrstuvwxyz"
+        if (pushKey.length < 8) return 0L
+        var time = 0L
+        for (i in 0 until 8) {
+            val c = pushKey[i]
+            val index = pushChars.indexOf(c)
+            if (index == -1) return 0L
+            time = time * 64 + index
+        }
+        return time
+    }
+
+    /**
      * Returns the epoch milliseconds of Sunday 23:59:59 of the current ISO week in KL timezone.
      */
     fun getWeekExpiresAtMillis(timestampMillis: Long = System.currentTimeMillis()): Long {
@@ -40,6 +70,7 @@ object MissionDateUtils {
             .withNano(999_000_000)
         return sunday.toInstant().toEpochMilli()
     }
+
 
     /**
      * Formats the remaining time until expiration into a human-readable string.

@@ -104,7 +104,8 @@ object PointRepository {
                     vendorID           = vendorID,
                     pointEarnedAmount  = earnedPoints,
                     pointRedeemedAmount = 0,
-                    pointSource        = pointSource
+                    pointSource        = pointSource,
+                    timestamp          = System.currentTimeMillis()
                 )
 
                 val updates = hashMapOf<String, Any>(
@@ -219,7 +220,8 @@ object PointRepository {
                     pointSource        = when (gameType) {
                         PointSource.SPIN_WHEEL -> PointSource.SPIN_WHEEL
                         else -> PointSource.MEMORY_MATCH
-                    }
+                    },
+                    timestamp          = System.currentTimeMillis()
                 )
 
                 val updates = hashMapOf<String, Any?>(
