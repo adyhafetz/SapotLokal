@@ -1,6 +1,7 @@
 package com.sapotlokal.data.model
 
 import com.google.firebase.database.PropertyName
+import com.sapotlokal.AppConfig
 import com.sapotlokal.AppConfig.CustomerTier
 
 /**
@@ -30,7 +31,9 @@ data class User(
     val lifetimePoints: Int = 0,
     val currentTier: String = CustomerTier.FRESHIE.code,
     val unlockedBadges: Map<String, Boolean> = emptyMap(),
-    val avatar: String = ""          // optional profile avatar id (see AvatarDef); empty = none
+    val avatar: String = "",         // optional profile avatar id (see AvatarDef); empty = none
+    val xp: Int = 0,                 // customers only; never decreases (REFRACTOR.md §4)
+    val rank: Int = 1                // 1–5, cached from xp for the leaderboard and display
 )
 
 // ── VENDOR ────────────────────────────────────────────────────────────────────
@@ -53,7 +56,8 @@ data class Vendor(
     var isOpen: Boolean = true,
 
     val operatingHours: String = "",
-    val lastStatusChangedAt: Long = 0L
+    val lastStatusChangedAt: Long = 0L,
+    val pointsPerVisit: Int = AppConfig.DEFAULT_POINTS_PER_VISIT  // one of AppConfig.ALLOWED_POINTS_PER_VISIT
 )
 
 // ── QRCODE ────────────────────────────────────────────────────────────────────
@@ -94,7 +98,9 @@ data class Point(
     val pointEarnedAmount: Int = 0,
     val pointRedeemedAmount: Int = 0,
     val pointSource: String = "",       // See PointSource constants
-    val timestamp: Long = 0L
+    val timestamp: Long = 0L,
+    val basePoints: Int = 0,            // shop_visit: the shop's points per visit at the time
+    val rankBonus: Double = 1.0         // shop_visit: the customer's rank bonus at the time
 )
 
 /**

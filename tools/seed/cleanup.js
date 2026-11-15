@@ -58,11 +58,28 @@ async function main() {
   const count = {};
 
   // Records keyed by a seeded id.
-  for (const node of ["users", "vendors", "vendorPhotos", "vouchers", "userMissionTracking", "shopVisits"]) {
+  for (const node of [
+    "users", "vendors", "vendorPhotos", "vouchers",
+    "xpEvents", "userStats", "missionProgress", "badges",
+    "userMissionTracking", "shopVisits", // OLD — drop from this list in Phase 5
+  ]) {
     const keys = await keysWithPrefix(db, node);
     mark(node, keys);
     count[node] = keys.length;
   }
+
+  // Leaderboard rows: /weeklyVisits/{weekKey}/{uid}.
+  const weeks = await db.ref("weeklyVisits").once("value");
+  let weeklyRows = 0;
+  weeks.forEach((week) => {
+    week.forEach((row) => {
+      if (row.key.startsWith(PREFIX)) {
+        updates[`weeklyVisits/${week.key}/${row.key}`] = null;
+        weeklyRows++;
+      }
+    });
+  });
+  count.weeklyVisits = weeklyRows;
 
   // Records that point at a seeded user or shop.
   const byField = [
@@ -100,7 +117,10 @@ async function main() {
   console.log("\nDone. You can now delete your service-account key (see README.md).");
 }
 
-main().catch((e) => {
-  console.error(e);
-  process.exit(1);
-});
+// firebase-admin keeps its database connection open, so exit explicitly once the work is done.
+main()
+  .then(() => process.exit(0))
+  .catch((e) => {
+    console.error(e);
+    process.exit(1);
+  });
