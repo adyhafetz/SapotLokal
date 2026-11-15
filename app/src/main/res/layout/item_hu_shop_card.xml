@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Stacked shop card (Hadiah Utama): logo, name, points, kopi-cup stamps, one status line. -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/bg_hu_shop_card"
+    android:clickable="true"
+    android:elevation="3dp"
+    android:focusable="true"
+    android:foreground="?attr/selectableItemBackground"
+    android:orientation="vertical"
+    android:paddingHorizontal="18dp"
+    android:paddingTop="16dp"
+    android:paddingBottom="18dp"
+    tools:backgroundTint="#E0436A">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+        <TextView
+            android:id="@+id/tvLogo"
+            android:layout_width="34dp"
+            android:layout_height="34dp"
+            android:background="@drawable/bg_hu_logo"
+            android:fontFamily="@font/figtree_extrabold"
+            android:gravity="center"
+            android:importantForAccessibility="no"
+            android:textSize="13sp"
+            app:fontFamily="@font/figtree_extrabold"
+            tools:text="KK" />
+
+        <TextView
+            android:id="@+id/tvName"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="10dp"
+            android:layout_weight="1"
+            android:ellipsize="end"
+            android:fontFamily="@font/figtree_extrabold"
+            android:importantForAccessibility="no"
+            android:maxLines="2"
+            android:textColor="@color/hu_bg"
+            android:textSize="18sp"
+            app:fontFamily="@font/figtree_extrabold"
+            tools:text="Kopi Kita Cafe" />
+
+        <TextView
+            android:id="@+id/tvPoints"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:fontFamily="@font/figtree_extrabold"
+            android:importantForAccessibility="no"
+            android:textColor="@color/hu_bg"
+            android:textSize="22sp"
+            app:fontFamily="@font/figtree_extrabold"
+            tools:text="20 pts" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="14dp"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+        <LinearLayout
+            android:id="@+id/stamps"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:importantForAccessibility="no"
+            android:orientation="horizontal" />
+
+        <TextView
+            android:id="@+id/tvReady"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/bg_hu_pill"
+            android:backgroundTint="@color/hu_accent"
+            android:fontFamily="@font/figtree_extrabold"
+            android:importantForAccessibility="no"
+            android:paddingHorizontal="10dp"
+            android:paddingVertical="3dp"
+            android:text="@string/hu_ready"
+            android:textColor="@color/hu_ink"
+            android:textSize="13sp"
+            android:visibility="gone"
+            app:fontFamily="@font/figtree_extrabold"
+            tools:visibility="visible" />
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/tvStatus"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:fontFamily="@font/figtree_bold"
+        android:importantForAccessibility="no"
+        android:textSize="15sp"
+        app:fontFamily="@font/figtree_bold"
+        tools:text="Free Kopi is ready" />
+</LinearLayout>

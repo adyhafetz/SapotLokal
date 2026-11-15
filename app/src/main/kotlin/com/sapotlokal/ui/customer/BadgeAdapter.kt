@@ -55,28 +55,38 @@ class BadgeAdapter(
 
         fun bind(item: BadgeShowcaseItem) {
             val badge = item.badge
-            binding.tvBadgeTitle.text = badge.title
+            binding.tvBadgeTitle.text = com.sapotlokal.util.ContentText.badgeTitle(binding.root.context, badge)
+            binding.tvBadgeDesc.text = com.sapotlokal.util.ContentText.badgeDescription(binding.root.context, badge)
             binding.ivBadgeIcon.setImageResource(badge.iconRes)
 
             val context = binding.root.context
+            val accent = BadgeStyle.accent(badge)
             if (item.isUnlocked) {
-                // Full color, active status
+                // Full colour with a soft glow in the badge's own colour.
                 binding.layoutBadgeContent.alpha = 1.0f
                 binding.ivBadgeIcon.colorFilter = null
                 binding.ivBadgeLock.visibility = View.GONE
-                binding.tvBadgeStatus.text = "Unlocked"
-                binding.tvBadgeStatus.setBackgroundResource(R.drawable.bg_badge_success)
-                binding.tvBadgeStatus.setTextColor(ContextCompat.getColor(context, R.color.sapot_success_text))
+                binding.ivBadgeGlow.background = BadgeStyle.halo(context, accent)
+                binding.ivBadgeGlow.visibility = View.VISIBLE
+                binding.cardBadge.setCardBackgroundColor(androidx.core.graphics.ColorUtils.setAlphaComponent(accent, 18))
+                binding.cardBadge.strokeColor = androidx.core.graphics.ColorUtils.setAlphaComponent(accent, 110)
+                binding.cardBadge.strokeWidth = (1.5f * context.resources.displayMetrics.density).toInt()
+                binding.tvBadgeStatus.text = binding.root.context.getString(com.sapotlokal.R.string.k_unlocked)
+                binding.tvBadgeStatus.background = BadgeStyle.pill(context, accent)
+                binding.tvBadgeStatus.setTextColor(accent)
             } else {
-                // 40% opacity grayscale with lock icon
-                binding.layoutBadgeContent.alpha = 0.4f
+                // Greyed out with a lock, no glow.
+                binding.layoutBadgeContent.alpha = 0.5f
                 binding.ivBadgeIcon.colorFilter = grayscaleFilter
                 binding.ivBadgeLock.visibility = View.VISIBLE
-                binding.tvBadgeStatus.text = "Locked"
+                binding.ivBadgeGlow.visibility = View.GONE
+                binding.cardBadge.setCardBackgroundColor(ContextCompat.getColor(context, R.color.hu_bg))
+                binding.cardBadge.strokeColor = ContextCompat.getColor(context, R.color.hu_line)
+                binding.cardBadge.strokeWidth = context.resources.displayMetrics.density.toInt()
+                binding.tvBadgeStatus.text = binding.root.context.getString(com.sapotlokal.R.string.k_locked)
                 binding.tvBadgeStatus.setBackgroundResource(R.drawable.bg_pill_gray)
-                binding.tvBadgeStatus.setTextColor(ContextCompat.getColor(context, R.color.sapot_text_secondary))
+                binding.tvBadgeStatus.setTextColor(ContextCompat.getColor(context, R.color.hu_soft))
             }
-
             binding.cardBadge.setOnClickListener {
                 onBadgeClick(badge, item.isUnlocked)
             }

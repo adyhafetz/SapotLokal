@@ -7,25 +7,26 @@ import android.os.Bundle
 import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.ValueEventListener
+import com.sapotlokal.AppConfig
 import com.sapotlokal.R
+import com.sapotlokal.data.model.ShopCategory
 import com.sapotlokal.data.model.Vendor
+import com.sapotlokal.data.model.Voucher
+import com.sapotlokal.data.model.VoucherStatus
+import com.sapotlokal.data.model.VoucherUser
 import com.sapotlokal.data.repository.PointRepository
 import com.sapotlokal.data.repository.VendorRepository
 import com.sapotlokal.data.repository.VoucherRepository
 import com.sapotlokal.databinding.ActivityShopDetailBinding
+import com.sapotlokal.util.VoucherClaimHelper
 
 /**
- * ShopDetailActivity — Phase 5: Shop Details Screen & Live Status Indicator.
- *
- * WHAT IT DOES:
- *   1. Displays real-time vendor information: shop name, category, address, operating hours.
- *   2. Displays a real-time OPEN/CLOSED status indicator chip that responds live to merchant changes.
- *   3. Shows the customer's current points accumulated specifically at this shop.
- *   4. Lists active reward rules/vouchers offered by this vendor with eligibility indicators.
- *   5. "Open in Google Maps" button opens the shop's street address in Google Maps or a map viewer.
+ * Shop page (Hadiah Utama). One job: "what can I get here?"
+ * The shop's colour card (your points here, cup stamps, open status), a bar ticked at each of this
+ * shop's reward costs, the rewards with Claim (spends points at claim time), then about, location,
+ * hours and Maps. Viewing a shop follows it for "now open" alerts, as before.
  */
 class ShopDetailActivity : AppCompatActivity() {
 
@@ -35,194 +36,166 @@ class ShopDetailActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityShopDetailBinding
     private val auth = FirebaseAuth.getInstance()
-    private val voucherAdapter = ShopVoucherAdapter()
 
-    private var vendorId: String = ""
-    private var currentVendor: Vendor? = null
+    private var vendorId = ""
+    private var vendor: Vendor? = null
+    private var balance = 0
+    private var rules: List<Voucher> = emptyList()
+    private var myVouchers: List<VoucherUser> = emptyList()
 
     private var vendorListener: ValueEventListener? = null
     private var pointsListener: ValueEventListener? = null
     private var rulesListener: ValueEventListener? = null
+    private var vouchersListener: ValueEventListener? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityShopDetailBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        vendorId = intent.getStringExtra(EXTRA_VENDOR_ID) ?: ""
+        vendorId = intent.getStringExtra(EXTRA_VENDOR_ID).orEmpty()
         if (vendorId.isBlank()) {
-            Toast.makeText(this, "Shop not found", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, getString(R.string.k_shop_not_found), Toast.LENGTH_SHORT).show()
             finish()
             return
         }
-
-        setupToolbar()
-        setupRecyclerView()
-        setupListeners()
+        com.sapotlokal.util.FollowedShops.follow(this, vendorId)
+        binding.btnBack.setOnClickListener { finish() }
+        binding.btnHowPoints.setOnClickListener { HowPoints.show(this) }
+        binding.btnOpenMaps.setOnClickListener {
+            val address = vendor?.vendorAddress.orEmpty().trim()
+            if (address.isBlank()) Toast.makeText(this, getString(R.string.k_shop_address_na), Toast.LENGTH_SHORT).show()
+            else openInMaps(address)
+        }
         loadData()
 
-        // Phase 6: Subscribe customer to FCM updates when viewing this shop
-        com.google.firebase.messaging.FirebaseMessaging.getInstance()
-            .subscribeToTopic("shop_${vendorId}")
-            .addOnSuccessListener {
-                android.util.Log.d("ShopDetailActivity", "Subscribed to FCM topic: shop_${vendorId}")
-            }
-            .addOnFailureListener { e ->
-                android.util.Log.w("ShopDetailActivity", "Could not subscribe to FCM topic: shop_${vendorId}", e)
-            }
-    }
-
-    private fun setupToolbar() {
-        setSupportActionBar(binding.toolbar)
-        supportActionBar?.setDisplayHomeAsUpEnabled(true)
-        supportActionBar?.setDisplayShowTitleEnabled(false)
-        binding.toolbar.setNavigationOnClickListener { finish() }
-    }
-
-    private fun setupRecyclerView() {
-        binding.rvShopVouchers.layoutManager = LinearLayoutManager(this)
-        binding.rvShopVouchers.adapter = voucherAdapter
-    }
-
-    private fun setupListeners() {
-        binding.btnOpenMaps.setOnClickListener {
-            val address = currentVendor?.vendorAddress.orEmpty().trim()
-            if (address.isBlank()) {
-                Toast.makeText(this, "Shop address not available", Toast.LENGTH_SHORT).show()
-                return@setOnClickListener
-            }
-            openInMaps(address)
-        }
+        // Subscribe to this shop's FCM topic so its "now open" alerts arrive.
+        com.google.firebase.messaging.FirebaseMessaging.getInstance().subscribeToTopic("shop_$vendorId")
     }
 
     private fun loadData() {
-        binding.progressBar.visibility = View.VISIBLE
-        binding.layoutContent.visibility = View.GONE
-
-        // 1. Live listener for Vendor data (name, category, isOpen, operatingHours, address)
         vendorListener = VendorRepository.listenToVendor(
             vendorID = vendorId,
-            onUpdate = { vendor ->
-                if (vendor == null) {
-                    Toast.makeText(this, "Shop not available", Toast.LENGTH_SHORT).show()
+            onUpdate = { v ->
+                if (v == null) {
+                    Toast.makeText(this, getString(R.string.k_shop_not_available), Toast.LENGTH_SHORT).show()
                     finish()
                     return@listenToVendor
                 }
-                currentVendor = vendor
-                bindVendorData(vendor)
-
+                vendor = v
                 binding.progressBar.visibility = View.GONE
                 binding.layoutContent.visibility = View.VISIBLE
+                render()
             },
-            onError = { errorMsg ->
+            onError = { msg ->
                 binding.progressBar.visibility = View.GONE
-                Toast.makeText(this, "Error loading shop: $errorMsg", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, getString(R.string.k_error_loading_shop, msg), Toast.LENGTH_SHORT).show()
             }
         )
-
-        // 2. Live listener for Customer's Points at this shop
-        val userId = auth.currentUser?.uid
-        if (!userId.isNullOrBlank()) {
+        val uid = auth.currentUser?.uid
+        if (!uid.isNullOrBlank()) {
             pointsListener = PointRepository.listenToPointsForUser(
-                userID = userId,
-                onUpdate = { perShopBalance, _, _ ->
-                    val balance = perShopBalance[vendorId] ?: 0
-                    binding.tvShopLoyaltyPoints.text = "$balance pts"
-                    voucherAdapter.updateCustomerPoints(balance)
-                },
-                onError = {
-                    binding.tvShopLoyaltyPoints.text = "0 pts"
-                }
+                userID = uid,
+                onUpdate = { perShop, _, _ -> balance = perShop[vendorId] ?: 0; render() },
+                onError = { render() }
             )
-        } else {
-            binding.tvShopLoyaltyPoints.text = "0 pts"
+            vouchersListener = VoucherRepository.listenToVouchersForUser(
+                userID = uid, onUpdate = { myVouchers = it; render() }, onError = { }
+            )
         }
-
-        // 3. Live listener for active vouchers/reward rules for this vendor
         rulesListener = VoucherRepository.listenToRulesForVendor(
             vendorID = vendorId,
-            onUpdate = { rules ->
-                val activeRules = rules.filter { it.isActive }
-                voucherAdapter.submitList(activeRules)
-                binding.tvNoVouchers.visibility = if (activeRules.isEmpty()) View.VISIBLE else View.GONE
-                binding.rvShopVouchers.visibility = if (activeRules.isEmpty()) View.GONE else View.VISIBLE
-            },
-            onError = { _ ->
-                binding.tvNoVouchers.visibility = View.VISIBLE
-                binding.rvShopVouchers.visibility = View.GONE
-            }
+            onUpdate = { r -> rules = r.filter { it.isActive }.sortedBy { it.pointsRequired }; render() },
+            onError = { rules = emptyList(); render() }
         )
     }
 
-    private fun bindVendorData(vendor: Vendor) {
-        binding.toolbar.title = vendor.vendorName.ifBlank { "Shop Details" }
-        binding.tvShopName.text = vendor.vendorName.ifBlank { "Local Merchant" }
-        binding.tvHeroCategory.text = vendor.vendorCategory.ifBlank { "Local Shop" }
-        binding.tvCategoryPill.text = vendor.vendorCategory.ifBlank { "Shop" }
+    private fun render() {
+        val v = vendor ?: return
+        val name = v.vendorName.ifBlank { getString(R.string.k_local_merchant) }
+        binding.tvTitle.text = name
 
-        // Live OPEN/CLOSED status chip
-        if (vendor.isOpen) {
-            binding.tvShopStatus.text = "● OPEN"
-            binding.tvShopStatus.setBackgroundResource(R.drawable.bg_status_chip_open)
+        val now = System.currentTimeMillis()
+        val held = myVouchers.filter {
+            it.vendorID == vendorId && it.voucherStatus == VoucherStatus.ACTIVE &&
+                (it.voucherExpiryDate == 0L || it.voucherExpiryDate > now)
+        }.map { it.voucherID }.toSet()
+        val claimable = rules.firstOrNull { it.voucherID !in held && it.pointsRequired > 0 && balance >= it.pointsRequired }
+        val next = rules.firstOrNull { it.pointsRequired > balance }
+
+        // Shop colour card
+        binding.shopCardSlot.removeAllViews()
+        val card = ShopCard.inflate(binding.shopCardSlot)
+        val meta = listOf(
+            ShopCategory.label(this, v.vendorCategory).ifBlank { null },
+            getString(if (v.isOpen) R.string.hu_open else R.string.hu_closed)
+        ).filterNotNull().joinToString(" · ")
+        ShopCard.bind(card, v, vendorId, balance, claimable != null || held.isNotEmpty(), next, readyReward = claimable, meta = meta)
+        card.root.isClickable = false
+        card.root.foreground = null
+        binding.shopCardSlot.addView(card.root)
+
+        binding.tvPointsRule.text = getString(R.string.hu_points_here_only, AppConfig.POINTS_PER_SHOP_VISIT, name)
+
+        // Bar ticked at this shop's reward costs
+        val costs = rules.map { it.pointsRequired }.filter { it > 0 }.distinct()
+        if (costs.isEmpty()) {
+            binding.rewardBar.visibility = View.GONE
         } else {
-            binding.tvShopStatus.text = "● CLOSED"
-            binding.tvShopStatus.setBackgroundResource(R.drawable.bg_status_chip_closed)
+            binding.rewardBar.visibility = View.VISIBLE
+            binding.rewardBar.set(balance, costs.max(), listOf(0) + costs)
         }
 
-        // Operating hours
-        binding.tvOperatingHours.text = if (vendor.operatingHours.isNotBlank()) {
-            vendor.operatingHours
-        } else {
-            "Hours not specified"
+        // Rewards
+        val rows = binding.rewardRows
+        rows.removeAllViews()
+        binding.tvNoVouchers.visibility = if (rules.isEmpty()) View.VISIBLE else View.GONE
+        rules.forEach { rule ->
+            val row = RewardRow.inflate(rows)
+            val sub = listOf(getString(R.string.hu_n_pts, rule.pointsRequired), rule.voucherDescription.ifBlank { null })
+                .filterNotNull().joinToString(" · ")
+            when {
+                rule.voucherID in held -> RewardRow.bind(
+                    row, vendorId, name, rule.voucherName, sub, getString(R.string.hu_already_claimed), true,
+                    getString(R.string.hu_show_qr)
+                ) { startActivity(Intent(this, MyVouchersActivity::class.java)) }
+                balance >= rule.pointsRequired && rule.pointsRequired > 0 -> RewardRow.bind(
+                    row, vendorId, name, rule.voucherName, sub,
+                    getString(R.string.hu_uses_points_at, rule.pointsRequired, balance, name), true,
+                    getString(R.string.hu_claim, rule.pointsRequired)
+                ) {
+                    val uid = auth.currentUser?.uid.orEmpty()
+                    VoucherClaimHelper.confirmAndClaim(this, uid, rule, name)
+                }
+                else -> RewardRow.bind(
+                    row, vendorId, name, rule.voucherName, sub,
+                    getString(R.string.hu_need_more, rule.pointsRequired - balance), false, null, null
+                )
+            }
+            // A claim button says its cost on its own line here, so the row button stays short.
+            if (row.btnAction.visibility == View.VISIBLE && rule.voucherID !in held) row.btnAction.text = getString(R.string.k_claim)
+            rows.addView(row.root)
         }
 
-        // Address
-        binding.tvShopAddress.text = if (vendor.vendorAddress.isNotBlank()) {
-            vendor.vendorAddress
-        } else {
-            "Address not specified"
-        }
-
-        // Optional Description
-        if (vendor.vendorDescription.isNotBlank()) {
-            binding.tvShopDescription.text = vendor.vendorDescription
-            binding.tvShopDescription.visibility = View.VISIBLE
-        } else {
-            binding.tvShopDescription.visibility = View.GONE
-        }
-
-        // Category icon mapping
-        val (bgRes, iconRes) = getCategoryVisuals(vendor.vendorCategory)
-        binding.heroAvatarContainer.setBackgroundResource(bgRes)
-        binding.ivHeroCategoryIcon.setImageResource(iconRes)
-    }
-
-    private fun getCategoryVisuals(category: String): Pair<Int, Int> {
-        val c = category.lowercase()
-        return when {
-            c.contains("kopi") || c.contains("caf") || c.contains("coffee") || c.contains("tea") ->
-                R.drawable.bg_shop_icon_coffee to R.drawable.ic_coffee
-            c.contains("baker") || c.contains("roti") || c.contains("cake") || c.contains("pastry") ->
-                R.drawable.bg_shop_icon_croissant to R.drawable.ic_croissant
-            else ->
-                R.drawable.bg_shop_icon_croissant to R.drawable.ic_store
-        }
+        // About, location, hours, status
+        binding.tvShopDescription.text = v.vendorDescription
+        binding.tvShopDescription.visibility = if (v.vendorDescription.isBlank()) View.GONE else View.VISIBLE
+        binding.tvShopAddress.text = v.vendorAddress.ifBlank { getString(R.string.k_address_not_specified) }
+        binding.tvOperatingHours.text = getString(R.string.hu_hours, v.operatingHours.ifBlank { getString(R.string.k_hours_not_specified) })
+        binding.tvShopStatus.text = getString(if (v.isOpen) R.string.hu_open else R.string.hu_closed)
+        binding.tvShopStatus.backgroundTintList = android.content.res.ColorStateList.valueOf(
+            getColor(if (v.isOpen) R.color.hu_ok_tint else R.color.hu_fill)
+        )
+        binding.tvShopStatus.setTextColor(getColor(if (v.isOpen) R.color.hu_ok else R.color.hu_soft))
     }
 
     private fun openInMaps(address: String) {
         val uri = Uri.parse("geo:0,0?q=${Uri.encode(address)}")
-        val mapIntent = Intent(Intent.ACTION_VIEW, uri).apply {
-            setPackage("com.google.android.apps.maps")
-        }
         try {
-            startActivity(mapIntent)
+            startActivity(Intent(Intent.ACTION_VIEW, uri).setPackage("com.google.android.apps.maps"))
         } catch (e: ActivityNotFoundException) {
-            // Google Maps not installed; fall back to generic map viewer or browser
-            val genericIntent = Intent(Intent.ACTION_VIEW, uri)
-            try {
-                startActivity(genericIntent)
-            } catch (e2: Exception) {
-                Toast.makeText(this, "No map application found on device", Toast.LENGTH_SHORT).show()
+            try { startActivity(Intent(Intent.ACTION_VIEW, uri)) } catch (e2: Exception) {
+                Toast.makeText(this, getString(R.string.k_no_map_app), Toast.LENGTH_SHORT).show()
             }
         }
     }
@@ -230,10 +203,11 @@ class ShopDetailActivity : AppCompatActivity() {
     override fun onDestroy() {
         super.onDestroy()
         vendorListener?.let { VendorRepository.removeVendorListener(vendorId, it) }
-        // Clean up other listeners
-        vendorListener = null
-        pointsListener = null
-        rulesListener = null
+        val uid = auth.currentUser?.uid
+        if (uid != null) {
+            pointsListener?.let { PointRepository.removePointsListener(uid, it) }
+            vouchersListener?.let { VoucherRepository.removeVouchersListener(uid, it) }
+        }
+        rulesListener?.let { VoucherRepository.removeRulesListener(vendorId, it) }
     }
 }
-

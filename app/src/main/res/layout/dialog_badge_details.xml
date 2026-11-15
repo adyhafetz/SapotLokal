@@ -19,14 +19,15 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:background="@drawable/bg_badge_success"
+        android:fontFamily="@font/figtree_medium"
+        android:letterSpacing="0.08"
         android:paddingStart="14dp"
         android:paddingTop="6dp"
         android:paddingEnd="14dp"
         android:paddingBottom="6dp"
-        android:text="UNLOCKED"
-        android:textColor="@color/sapot_success_text"
+        android:text="@string/badge_details_unlocked"
+        android:textColor="@color/hu_ok"
         android:textSize="12sp"
-        android:letterSpacing="0.08"
         android:textStyle="bold" />
 
     <!-- Badge Icon -->
@@ -55,7 +56,7 @@
             android:padding="6dp"
             android:src="@drawable/ic_lock"
             android:visibility="gone"
-            app:tint="@color/sapot_text_secondary"
+            app:tint="@color/hu_soft"
             tools:visibility="visible" />
     </FrameLayout>
 
@@ -64,11 +65,12 @@
         android:id="@+id/tvBadgeTitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:fontFamily="sans-serif-black"
+        android:fontFamily="@font/figtree_bold"
         android:gravity="center"
-        android:text="Langkah Kanan"
-        android:textColor="@color/sapot_text_primary"
-        android:textSize="20sp" />
+        android:text="@string/badge_details_langkah_kanan"
+        android:textColor="@color/hu_ink"
+        android:textSize="20sp"
+        android:textStyle="bold" />
 
     <!-- Unlock Criteria Description -->
     <TextView
@@ -76,22 +78,25 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
-        android:fontFamily="@font/inter"
+        android:fontFamily="@font/figtree_medium"
         android:gravity="center"
         android:lineSpacingExtra="4dp"
-        android:text="Scanned your first shop visit."
-        android:textColor="@color/sapot_text_secondary"
+        android:text="@string/badge_details_scanned_your_first_shop"
+        android:textColor="@color/hu_soft"
         android:textSize="14sp" />
 
     <!-- Dismiss button -->
     <com.google.android.material.button.MaterialButton
         android:id="@+id/btnDismissBadgeDialog"
-        style="@style/Widget.SapotLokal.Button.Primary"
+        style="@style/Widget.HU.Button"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="52dp"
         android:layout_marginTop="20dp"
-        android:text="Got it"
-        android:textAllCaps="false" />
+        android:text="@string/badge_details_got_it"
+        android:textAllCaps="false"
+        android:textSize="15sp"
+        android:textStyle="bold"
+        app:cornerRadius="@dimen/radius_control" />
 
 </LinearLayout>
 

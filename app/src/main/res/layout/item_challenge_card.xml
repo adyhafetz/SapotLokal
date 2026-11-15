@@ -1,184 +1,168 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- Weekly mission card (brand design "challenge-card"). -->
 <com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    style="@style/Widget.HU.Card"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginBottom="12dp"
-    app:cardBackgroundColor="@color/sapot_white"
-    app:cardCornerRadius="20dp"
-    app:cardElevation="2dp"
-    app:strokeColor="@color/sapot_divider"
-    app:strokeWidth="1dp">
+    android:layout_margin="6dp">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:padding="16dp">
+        android:padding="22dp">
 
-        <!-- Top row: Title + Points Badge -->
-        <LinearLayout
+        <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center_vertical"
-            android:orientation="horizontal">
+            android:layout_height="wrap_content">
 
-            <TextView
-                android:id="@+id/tvChallengeTitle"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:ellipsize="end"
-                android:maxLines="1"
-                android:textColor="@color/sapot_text_primary"
-                android:textSize="16sp"
-                android:textStyle="bold"
-                tools:text="Tapah Explorer" />
+            <FrameLayout
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:id="@+id/missionIconBox"
+                android:background="@drawable/bg_hu_icon_tile">
+
+                <ImageView
+                    android:id="@+id/ivMissionIcon"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:layout_gravity="center"
+                    android:src="@drawable/ic_store"
+                    app:tint="@color/hu_ink" />
+            </FrameLayout>
 
             <TextView
                 android:id="@+id/tvRewardBadge"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="8dp"
-                android:background="@drawable/bg_pill_yellow"
+                android:layout_alignParentEnd="true"
+                android:background="@drawable/bg_hu_icon_tile"
+                android:fontFamily="@font/figtree_medium"
                 android:paddingHorizontal="10dp"
                 android:paddingVertical="4dp"
-                android:textColor="@color/sapot_text_primary"
+                android:textColor="@color/hu_ink"
                 android:textSize="12sp"
                 android:textStyle="bold"
-                tools:text="+100 pts" />
-        </LinearLayout>
+                tools:text="+100 points" />
+        </RelativeLayout>
 
-        <!-- Description -->
+        <TextView
+            android:id="@+id/tvMissionType"
+            android:visibility="gone"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="18dp"
+            android:fontFamily="@font/figtree_medium"
+            android:letterSpacing="0.06"
+            android:textAllCaps="true"
+            android:textColor="@color/hu_soft"
+            android:textSize="11sp"
+            android:textStyle="bold"
+            tools:text="Explore" />
+
+        <TextView
+            android:id="@+id/tvChallengeTitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:fontFamily="@font/figtree_bold"
+            android:textColor="@color/hu_ink"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            tools:text="Tapah Explorer" />
+
         <TextView
             android:id="@+id/tvChallengeDesc"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="6dp"
-            android:textColor="@color/sapot_text_secondary"
+            android:fontFamily="@font/figtree_medium"
+            android:textColor="@color/hu_soft"
             android:textSize="13sp"
-            tools:text="Visit 3 different local shops in Tapah this week" />
+            tools:text="Visit 3 different local shops this week" />
 
-        <!-- Metadata Row: Badge Pill + Countdown Timer -->
-        <LinearLayout
+        <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:gravity="center_vertical"
-            android:orientation="horizontal">
-
-            <TextView
-                android:id="@+id/tvBadgeRewardPill"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:background="@drawable/bg_pill_leaf"
-                android:paddingHorizontal="8dp"
-                android:paddingVertical="3dp"
-                android:textColor="@color/sapot_text_primary"
-                android:textSize="11sp"
-                android:textStyle="bold"
-                android:visibility="gone"
-                tools:text="🎖️ Regular Badge"
-                tools:visibility="visible" />
-
-            <View
-                android:id="@+id/spaceMeta"
-                android:layout_width="0dp"
-                android:layout_height="1dp"
-                android:layout_weight="1" />
-
-            <TextView
-                android:id="@+id/tvCountdownTimer"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textColor="@color/sapot_text_secondary"
-                android:textSize="12sp"
-                android:textStyle="italic"
-                tools:text="⏱ 4 days left" />
-        </LinearLayout>
-
-        <!-- Progress bar & counter -->
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
-            android:gravity="center_vertical"
-            android:orientation="horizontal">
-
-            <ProgressBar
-                android:id="@+id/pbChallenge"
-                style="?android:attr/progressBarStyleHorizontal"
-                android:layout_width="0dp"
-                android:layout_height="8dp"
-                android:layout_weight="1"
-                android:max="100"
-                android:progressDrawable="@drawable/progress_points"
-                tools:progress="66" />
+            android:layout_marginTop="18dp">
 
             <TextView
                 android:id="@+id/tvProgressText"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="10dp"
-                android:textColor="@color/sapot_text_primary"
+                android:fontFamily="@font/figtree_medium"
+                android:textColor="@color/hu_ink"
                 android:textSize="12sp"
-                android:textStyle="bold"
-                tools:text="2 / 3" />
-        </LinearLayout>
-
-        <!-- Actions: Start Now / Claim / Claimed -->
-        <FrameLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="12dp">
-
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/btnStartNow"
-                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
-                android:layout_width="match_parent"
-                android:layout_height="44dp"
-                android:text="Start Now ➔"
-                android:textAllCaps="false"
-                android:textColor="@color/sapot_text_primary"
-                android:textSize="13sp"
-                android:textStyle="bold"
-                app:cornerRadius="12dp"
-                app:strokeColor="@color/sapot_divider"
-                app:strokeWidth="1.5dp"
-                android:visibility="gone"
-                tools:visibility="gone" />
-
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/btnClaimReward"
-                style="@style/Widget.MaterialComponents.Button"
-                android:layout_width="match_parent"
-                android:layout_height="44dp"
-                android:backgroundTint="@color/sapot_primary_yellow"
-                android:text="Claim Reward 🎉"
-                android:textAllCaps="false"
-                android:textColor="@color/sapot_text_primary"
-                android:textSize="13sp"
-                android:textStyle="bold"
-                app:cornerRadius="12dp"
-                android:visibility="gone"
-                tools:visibility="visible" />
+                tools:text="1 / 3 completed" />
 
             <TextView
-                android:id="@+id/tvStatusBadge"
+                android:id="@+id/tvCountdownTimer"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="end|center_vertical"
-                android:background="@drawable/bg_pill_gray"
-                android:paddingHorizontal="12dp"
-                android:paddingVertical="5dp"
-                android:text="✓ Claimed"
-                android:textColor="@color/sapot_text_secondary"
+                android:layout_alignParentEnd="true"
+                android:fontFamily="@font/figtree_medium"
+                android:textColor="@color/hu_soft"
                 android:textSize="12sp"
-                android:textStyle="bold"
-                android:visibility="gone" />
-        </FrameLayout>
+                tools:text="In progress" />
+        </RelativeLayout>
 
+        <ProgressBar
+            android:id="@+id/pbChallenge"
+            style="?android:attr/progressBarStyleHorizontal"
+            android:layout_width="match_parent"
+            android:layout_height="6dp"
+            android:layout_marginTop="6dp"
+            android:max="100"
+            android:progress="0"
+            android:progressDrawable="@drawable/bg_hu_progress" />
+
+        <TextView
+            android:id="@+id/tvBadgeRewardPill"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:background="@drawable/bg_hu_icon_tile"
+            android:fontFamily="@font/figtree_medium"
+            android:paddingHorizontal="10dp"
+            android:paddingVertical="4dp"
+            android:textColor="@color/hu_ink"
+            android:textSize="11sp"
+            android:textStyle="bold"
+            android:visibility="gone"
+            tools:text="Badge: Regular" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnClaimReward"
+            style="@style/Widget.HU.Button"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:layout_marginTop="16dp"
+            android:text="@string/challenge_card_collect_your_reward"
+            android:visibility="gone" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnStartNow"
+            style="@style/Widget.HU.Button.Outlined"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:layout_marginTop="16dp"
+            android:text="@string/challenge_card_get_started" />
+
+        <TextView
+            android:id="@+id/tvStatusBadge"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:background="@color/hu_fill"
+            android:fontFamily="@font/figtree_medium"
+            android:gravity="center"
+            android:paddingVertical="12dp"
+            android:textColor="@color/hu_ink"
+            android:textSize="13sp"
+            android:textStyle="bold"
+            android:visibility="gone"
+            tools:text="Reward collected" />
     </LinearLayout>
-
 </com.google.android.material.card.MaterialCardView>

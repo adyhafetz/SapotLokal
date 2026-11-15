@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- EN | BM switch. Wired up by util/AppLanguage.bindToggle(). -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/languageToggle"
+    android:layout_width="wrap_content"
+    android:layout_height="36dp"
+    android:background="@drawable/bg_lang_container"
+    android:orientation="horizontal"
+    android:padding="2dp">
+
+    <TextView
+        android:id="@+id/langEn"
+        android:layout_width="44dp"
+        android:layout_height="match_parent"
+        android:contentDescription="English"
+        android:fontFamily="@font/manrope"
+        android:gravity="center"
+        android:text="EN"
+        android:textSize="12sp"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/langMs"
+        android:layout_width="44dp"
+        android:layout_height="match_parent"
+        android:contentDescription="Bahasa Melayu"
+        android:fontFamily="@font/manrope"
+        android:gravity="center"
+        android:text="BM"
+        android:textSize="12sp"
+        android:textStyle="bold" />
+</LinearLayout>

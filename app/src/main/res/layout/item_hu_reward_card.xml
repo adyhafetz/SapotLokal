@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Reward card (Hadiah Utama): shop logo + name, cost, reward name, detail, photo, one action. -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/bg_hu_reward_card"
+    android:orientation="vertical"
+    android:padding="16dp"
+    tools:backgroundTint="#22E0436A">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+        <TextView
+            android:id="@+id/tvLogo"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:background="@drawable/bg_hu_logo"
+            android:fontFamily="@font/figtree_extrabold"
+            android:gravity="center"
+            android:importantForAccessibility="no"
+            android:textSize="12sp"
+            app:fontFamily="@font/figtree_extrabold"
+            tools:text="KK" />
+
+        <TextView
+            android:id="@+id/tvShop"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="10dp"
+            android:layout_weight="1"
+            android:ellipsize="end"
+            android:fontFamily="@font/figtree_extrabold"
+            android:maxLines="1"
+            android:textColor="@color/hu_ink"
+            android:textSize="15sp"
+            app:fontFamily="@font/figtree_extrabold"
+            tools:text="Kopi Kita Cafe" />
+
+        <TextView
+            android:id="@+id/tvCost"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/figtree_semibold"
+            android:textColor="@color/hu_ink"
+            android:textSize="22sp"
+            app:fontFamily="@font/figtree_semibold"
+            tools:text="10 pts" />
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/tvTitle"
+        style="@style/HU.Text.Reward"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        tools:text="Free Kopi" />
+
+    <TextView
+        android:id="@+id/tvDetail"
+        style="@style/HU.Text.Body"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="2dp"
+        android:textColor="@color/hu_ink"
+        tools:text="Uses 10 of your 20 points at Kopi Kita" />
+
+    <FrameLayout
+        android:id="@+id/photoFrame"
+        android:layout_width="match_parent"
+        android:layout_height="140dp"
+        android:visibility="gone"
+        android:layout_marginTop="14dp"
+        android:background="@drawable/bg_hu_photo"
+        android:clipToOutline="true"
+        android:importantForAccessibility="no">
+
+        <FrameLayout
+            android:id="@+id/photoFallback"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <TextView
+                android:id="@+id/tvPhotoLogo"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:fontFamily="@font/figtree_extrabold"
+                android:textSize="40sp"
+                app:fontFamily="@font/figtree_extrabold"
+                tools:text="KK" />
+        </FrameLayout>
+
+        <ImageView
+            android:id="@+id/ivPhoto"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:contentDescription="@null"
+            android:scaleType="centerCrop" />
+    </FrameLayout>
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btnAction"
+        style="@style/Widget.HU.Button"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="14dp"
+        tools:text="Claim for 10 points" />
+</LinearLayout>

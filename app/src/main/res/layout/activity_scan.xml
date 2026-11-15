@@ -1,170 +1,287 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<!-- Scan: camera card with scan frame, flashlight, and a manual code box (brand design "Scan & earn"). -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#000000">
+    android:background="@color/hu_bg"
+    android:orientation="vertical"
+    tools:context=".ui.customer.ScanActivity">
 
-    <!-- Camera preview fills the whole screen -->
-    <androidx.camera.view.PreviewView
-        android:id="@+id/previewView"
+    <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="0dp"
+        android:layout_weight="1">
 
-    <!-- Semi-transparent top bar with back button and title -->
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="56dp"
-        android:layout_gravity="top"
-        android:background="#88000000"
-        android:gravity="center_vertical"
-        android:orientation="horizontal"
-        android:paddingHorizontal="8dp">
-
-        <ImageButton
-            android:id="@+id/btnBack"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
-            android:background="?attr/selectableItemBackgroundBorderless"
-            android:contentDescription="Back"
-            android:src="@drawable/ic_back"
-            android:tint="@color/colorOnPrimary" />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Scan Shop QR"
-            android:textColor="@color/colorOnPrimary"
-            android:textSize="18sp"
-            android:fontFamily="sans-serif-medium"
-            android:layout_marginStart="8dp" />
-
-    </LinearLayout>
-
-    <!-- Viewfinder guide box -->
-    <View
-        android:id="@+id/viewfinder"
-        android:layout_width="260dp"
-        android:layout_height="260dp"
-        android:layout_gravity="center"
-        android:background="@drawable/viewfinder_border" />
-
-    <!-- Instruction label below the viewfinder -->
-    <TextView
-        android:id="@+id/tvInstruction"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
-        android:layout_marginTop="380dp"
-        android:text="Point the camera at the shop's QR code"
-        android:textColor="#CCFFFFFF"
-        android:textSize="14sp" />
-
-    <!-- ─────────────────────────────────────────────────────────────
-         ⚠️ DEBUG HELPER — REMOVE BEFORE PHASE 7
-         Allows pasting a QR code value manually for testing without
-         a second device. Marked with a red background so it's obvious.
-         ───────────────────────────────────────────────────────────── -->
-    <LinearLayout
-        android:id="@+id/debugPanel"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom"
-        android:layout_marginBottom="16dp"
-        android:background="#CC880000"
-        android:orientation="vertical"
-        android:padding="12dp">
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="⚠️ DEBUG: Paste QR value manually (remove in Phase 7)"
-            android:textColor="#FFFF99"
-            android:textSize="11sp" />
-
-        <LinearLayout
+        <ScrollView
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="6dp"
-            android:orientation="horizontal">
+            android:layout_height="match_parent"
+            android:clipToPadding="false"
+            android:fillViewport="true">
 
-            <com.google.android.material.textfield.TextInputLayout
-                android:layout_width="0dp"
+            <LinearLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense">
+                android:orientation="vertical"
+                android:padding="20dp">
 
-                <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/etDebugCode"
+                <ImageView
+                    android:id="@+id/btnBack"
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
+                    android:visibility="gone" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/figtree_bold"
+                    android:text="@string/customer_bottom_nav_scan"
+                    android:textColor="@color/hu_ink"
+                    android:textSize="26sp"
+                    android:textStyle="bold" />
+
+                <!-- Camera card -->
+                <com.google.android.material.card.MaterialCardView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="Paste QR value here"
-                    android:textColor="@color/colorOnPrimary"
-                    android:textColorHint="#AAFFFFFF"
-                    android:imeOptions="actionDone"
-                    android:inputType="text" />
+                    android:layout_marginTop="16dp"
+                    app:cardBackgroundColor="#F0F2F4"
+                    app:cardCornerRadius="20dp"
+                    app:cardElevation="0dp"
+                    app:strokeColor="@color/hu_line"
+                    app:strokeWidth="1dp">
 
-            </com.google.android.material.textfield.TextInputLayout>
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:padding="16dp">
 
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/btnDebugSubmit"
+                        <RelativeLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:minHeight="44dp">
+
+                            <TextView
+                                android:id="@+id/tvScanStatus"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_centerVertical="true"
+                                android:drawablePadding="8dp"
+                                android:fontFamily="@font/figtree_medium"
+                                android:text="@string/scan_starting_camera"
+                                android:textColor="@color/hu_soft"
+                                android:textSize="12sp"
+                                app:drawableStartCompat="@drawable/bg_hu_dot_ok" />
+
+                            <ImageView
+                                android:id="@+id/btnFlash"
+                                android:layout_width="44dp"
+                                android:layout_height="44dp"
+                                android:layout_alignParentEnd="true"
+                                android:background="?attr/selectableItemBackgroundBorderless"
+                                android:contentDescription="Flashlight"
+                                android:padding="11dp"
+                                android:src="@drawable/ic_flash"
+                                app:tint="@color/hu_ink" />
+                        </RelativeLayout>
+
+                        <FrameLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="340dp"
+                            android:layout_marginTop="8dp"
+                            android:background="@drawable/bg_scan_camera"
+                            android:clipToOutline="true">
+
+                            <androidx.camera.view.PreviewView
+                                android:id="@+id/previewView"
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                app:implementationMode="compatible" />
+
+                            <!-- Scan frame with brown corner brackets -->
+                            <FrameLayout
+                                android:id="@+id/viewfinder"
+                                android:layout_width="210dp"
+                                android:layout_height="210dp"
+                                android:layout_gravity="center"
+                                android:background="@drawable/bg_hu_scan_frame" />
+                        </FrameLayout>
+
+                        <TextView
+                            android:id="@+id/tvInstruction"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="14dp"
+                            android:fontFamily="@font/figtree_medium"
+                            android:gravity="center"
+                            android:text="@string/scan_position_the_qr_code"
+                            android:textColor="@color/hu_ink"
+                            android:textSize="14sp" />
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="6dp"
+                            android:fontFamily="@font/figtree_medium"
+                            android:gravity="center"
+                            android:text="@string/scan_your_camera_is_only"
+                            android:textColor="@color/hu_soft"
+                            android:textSize="11sp" />
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
+
+                <!-- Help + manual code -->
+                <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/debugPanel"
+                    style="@style/Widget.HU.Card"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="14dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:padding="20dp">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:gravity="center_vertical"
+                            android:orientation="horizontal">
+
+                            <FrameLayout
+                                android:layout_width="48dp"
+                                android:layout_height="48dp"
+                                android:background="@drawable/bg_hu_icon_tile">
+
+                                <ImageView
+                                    android:layout_width="26dp"
+                                    android:layout_height="26dp"
+                                    android:layout_gravity="center"
+                                    android:src="@drawable/ic_scan"
+                                    app:tint="@color/hu_ink" />
+                            </FrameLayout>
+
+                            <TextView
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="14dp"
+                                android:layout_weight="1"
+                                android:fontFamily="@font/figtree_medium"
+                                android:text="@string/scan_look_for_the_sapotlokal"
+                                android:textColor="@color/hu_soft"
+                                android:textSize="13sp" />
+                        </LinearLayout>
+
+                        <View
+                            android:layout_width="match_parent"
+                            android:layout_height="1dp"
+                            android:layout_marginVertical="16dp"
+                            android:background="@color/hu_line" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:fontFamily="@font/figtree_bold"
+                            android:text="@string/scan_enter_a_code"
+                            android:textColor="@color/hu_ink"
+                            android:textSize="15sp"
+                            android:textStyle="bold" />
+
+                        <com.google.android.material.textfield.TextInputLayout
+                            style="@style/Widget.SapotLokal.TextInputLayout"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="10dp"
+                            android:hint="@string/scan_shop_code">
+
+                            <com.google.android.material.textfield.TextInputEditText
+                                android:id="@+id/etDebugCode"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:imeOptions="actionDone"
+                                android:inputType="textNoSuggestions" />
+                        </com.google.android.material.textfield.TextInputLayout>
+
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/btnDebugSubmit"
+                            style="@style/Widget.HU.Button"
+                            android:layout_width="match_parent"
+                            android:layout_height="52dp"
+                            android:layout_marginTop="12dp"
+                            android:text="@string/scan_confirm_code" />
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
+            </LinearLayout>
+        </ScrollView>
+
+        <!-- Success overlay (hidden until a valid scan) -->
+        <LinearLayout
+            android:id="@+id/successOverlay"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="#F2FAFAFA"
+            android:clickable="true"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:visibility="gone">
+
+            <FrameLayout
+                android:layout_width="72dp"
+                android:layout_height="72dp"
+                android:background="@drawable/bg_hu_icon_tile">
+
+                <ImageView
+                    android:layout_width="36dp"
+                    android:layout_height="36dp"
+                    android:layout_gravity="center"
+                    android:src="@drawable/ic_circle_check"
+                    app:tint="@color/hu_ink" />
+            </FrameLayout>
+
+            <TextView
+                android:id="@+id/tvPointsAwarded"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="8dp"
-                android:text="Go" />
+                android:layout_marginTop="16dp"
+                android:fontFamily="@font/figtree_bold"
+                android:text="@string/scan_10_points"
+                android:textColor="@color/hu_ink"
+                android:textSize="32sp"
+                android:textStyle="bold" />
 
+            <TextView
+                android:id="@+id/tvShopName"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="6dp"
+                android:fontFamily="@font/figtree_medium"
+                android:textColor="@color/hu_soft"
+                android:textSize="16sp" />
         </LinearLayout>
 
-    </LinearLayout>
-
-    <!-- Success overlay (hidden until a valid scan) -->
-    <LinearLayout
-        android:id="@+id/successOverlay"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="#CC000000"
-        android:gravity="center"
-        android:orientation="vertical"
-        android:visibility="gone">
-
+        <!-- Error message -->
         <TextView
-            android:layout_width="wrap_content"
+            android:id="@+id/tvError"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="✅"
-            android:textSize="64sp" />
+            android:layout_gravity="top"
+            android:layout_margin="20dp"
+            android:background="#F7FCEBE7"
+            android:fontFamily="@font/figtree_medium"
+            android:gravity="center"
+            android:paddingHorizontal="14dp"
+            android:paddingVertical="10dp"
+            android:textColor="@color/hu_danger"
+            android:textSize="13sp"
+            android:textStyle="bold"
+            android:visibility="gone" />
+    </FrameLayout>
 
-        <TextView
-            android:id="@+id/tvPointsAwarded"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textSize="36sp"
-            android:textColor="@color/colorSecondary"
-            android:fontFamily="sans-serif-medium"
-            android:text="+10 Points!" />
-
-        <TextView
-            android:id="@+id/tvShopName"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textSize="18sp"
-            android:textColor="#CCFFFFFF"
-            android:layout_marginTop="8dp"
-            android:text="" />
-
-    </LinearLayout>
-
-    <!-- Error message (fades in/out below viewfinder) -->
-    <TextView
-        android:id="@+id/tvError"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
-        android:layout_marginTop="420dp"
-        android:layout_marginHorizontal="24dp"
-        android:gravity="center"
-        android:textColor="#FFDD00"
-        android:textSize="14sp"
-        android:visibility="gone" />
-
-</FrameLayout>
+    <include
+        android:id="@+id/customerNav"
+        layout="@layout/layout_customer_bottom_nav" />
+</LinearLayout>

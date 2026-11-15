@@ -60,6 +60,9 @@ class CustomerProfileActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityCustomerProfileBinding.inflate(layoutInflater)
         setContentView(binding.root)
+        com.sapotlokal.util.AppLanguage.bindToggle(binding.languageToggle.root)
+        // Me is a page opened from Home or Play: back arrow, no bottom bar.
+        binding.customerNav.root.visibility = android.view.View.GONE
 
         val currentUser = auth.currentUser
         if (currentUser == null) {
@@ -71,6 +74,9 @@ class CustomerProfileActivity : AppCompatActivity() {
         binding.tvUserEmail.text = currentUser.email ?: ""
 
         setupBadgesGrid()
+        // Badges live in Play (one place for them); Me keeps the account only.
+        binding.rvBadges.visibility = View.GONE
+        (binding.tvBadgesUnlockedCount.parent as View).visibility = View.GONE
         setupListeners(currentUserId)
         setupActions()
     }
@@ -79,7 +85,7 @@ class CustomerProfileActivity : AppCompatActivity() {
         badgeAdapter = BadgeAdapter { badge, isUnlocked ->
             showBadgeDetailsDialog(badge, isUnlocked)
         }
-        binding.rvBadges.layoutManager = GridLayoutManager(this, 4)
+        binding.rvBadges.layoutManager = GridLayoutManager(this, 2)
         binding.rvBadges.adapter = badgeAdapter
         refreshBadgesGrid()
     }
@@ -93,7 +99,7 @@ class CustomerProfileActivity : AppCompatActivity() {
         }
         badgeAdapter.submitList(items)
         val unlockedCount = items.count { it.isUnlocked }
-        binding.tvBadgesUnlockedCount.text = "$unlockedCount / ${items.size} Unlocked"
+        binding.tvBadgesUnlockedCount.text = getString(com.sapotlokal.R.string.k_n_unlocked, unlockedCount, items.size)
     }
 
     private fun setupListeners(userId: String) {
@@ -105,7 +111,7 @@ class CustomerProfileActivity : AppCompatActivity() {
             override fun onDataChange(snapshot: DataSnapshot) {
                 val name = snapshot.child("userName").getValue(String::class.java)?.trim() ?: ""
                 currentUserName = name
-                binding.tvUserName.text = if (name.isNotBlank()) name else "Shopper"
+                binding.tvUserName.text = if (name.isNotBlank()) name else getString(com.sapotlokal.R.string.k_shopper)
 
                 val email = snapshot.child("userEmail").getValue(String::class.java)?.trim() ?: ""
                 if (email.isNotBlank()) {
@@ -131,6 +137,9 @@ class CustomerProfileActivity : AppCompatActivity() {
                     binding.tvAvatarInitials.visibility = View.GONE
                     binding.ivAvatar.visibility = View.VISIBLE
                 }
+
+                currentAvatarId = snapshot.child("avatar").getValue(String::class.java).orEmpty()
+                com.sapotlokal.util.AvatarUi.bind(binding.ivAvatar, binding.tvAvatarInitials, currentAvatarId)
 
                 // Read unlocked badges
                 val badgesSnapshot = snapshot.child("unlockedBadges")
@@ -165,13 +174,18 @@ class CustomerProfileActivity : AppCompatActivity() {
     private fun updatePointsUi(lifetimeEarned: Int, spendableBalance: Int) {
         val tier = CustomerTier.fromLifetimePoints(lifetimeEarned)
 
+        // Member since (from the account's creation date)
+        auth.currentUser?.metadata?.creationTimestamp?.takeIf { it > 0L }?.let { created ->
+            val month = java.text.SimpleDateFormat("MMMM yyyy", Locale.getDefault()).format(java.util.Date(created))
+            binding.tvMemberSince.text = getString(com.sapotlokal.R.string.k_member_since, month)
+        }
+
         // Tier pill
-        binding.tvTierPill.text = "${tier.emoji} ${tier.title} · ${tier.multiplier}x Multiplier"
+        binding.tvTierPill.text = getString(com.sapotlokal.R.string.k_tier_pill, tier.title, tier.ordinal + 1, tier.multiplier)
 
         // Dual points metrics
         val formattedLifetime = NumberFormat.getNumberInstance(Locale.US).format(lifetimeEarned)
-        val formattedSpendable = NumberFormat.getNumberInstance(Locale.US).format(spendableBalance)
-        binding.tvSpendablePoints.text = formattedSpendable
+        binding.tvSpendablePoints.text = formattedLifetime
         binding.tvLifetimePoints.text = formattedLifetime
 
         // Progress bar to next tier
@@ -179,9 +193,9 @@ class CustomerProfileActivity : AppCompatActivity() {
         if (nextTier == null) {
             // Max tier reached
             binding.progressLevel.progress = 100
-            binding.tvNextTierBadge.text = "🏆 Max Tier"
-            binding.tvProgressLabel.text = "Highest Rank: ${tier.title} ${tier.emoji}"
-            binding.tvProgressCount.text = "$formattedLifetime pts"
+            binding.tvNextTierBadge.text = getString(com.sapotlokal.R.string.k_top_level)
+            binding.tvProgressLabel.text = getString(com.sapotlokal.R.string.k_highest_level, tier.title)
+            binding.tvProgressCount.text = formattedLifetime
             binding.tvMaxLevelNotice.visibility = View.VISIBLE
         } else {
             val tierSpan = nextTier.minPoints - tier.minPoints
@@ -195,9 +209,9 @@ class CustomerProfileActivity : AppCompatActivity() {
             val formattedNext = NumberFormat.getNumberInstance(Locale.US).format(nextTier.minPoints)
 
             binding.progressLevel.progress = pct
-            binding.tvNextTierBadge.text = "Next: ${nextTier.title} ${nextTier.emoji}"
-            binding.tvProgressLabel.text = "$ptsNeeded pts to ${nextTier.title} ${nextTier.emoji}"
-            binding.tvProgressCount.text = "$formattedLifetime / $formattedNext pts"
+            binding.tvNextTierBadge.text = getString(com.sapotlokal.R.string.k_next_tier, nextTier.title)
+            binding.tvProgressLabel.text = getString(com.sapotlokal.R.string.hu_level_to_next, ptsNeeded, nextTier.title)
+            binding.tvProgressCount.text = "$formattedLifetime / $formattedNext"
             binding.tvMaxLevelNotice.visibility = View.GONE
         }
     }
@@ -207,16 +221,35 @@ class CustomerProfileActivity : AppCompatActivity() {
             finish()
         }
 
-        binding.btnViewLeaderboard.setOnClickListener {
-            startActivity(Intent(this, LeaderboardActivity::class.java))
-        }
+        binding.btnViewLeaderboard.setOnClickListener { HowPoints.show(this) }
 
         binding.btnEditProfile.setOnClickListener {
-            showEditNameDialog()
+            MaterialAlertDialogBuilder(this)
+                .setTitle(getString(com.sapotlokal.R.string.k_edit_profile))
+                .setItems(arrayOf(getString(com.sapotlokal.R.string.k_change_name), getString(com.sapotlokal.R.string.k_choose_avatar))) { _, which ->
+                    if (which == 0) showEditNameDialog() else pickAvatar()
+                }
+                .show()
         }
+        // Tapping the picture opens the avatar picker too.
+        binding.ivAvatar.setOnClickListener { pickAvatar() }
+        binding.tvAvatarInitials.setOnClickListener { pickAvatar() }
 
         binding.btnSignOut.setOnClickListener {
             showSignOutConfirmation()
+        }
+        binding.rowChangePassword.setOnClickListener { com.sapotlokal.util.AccountActions.showChangePassword(this) }
+        binding.rowDeleteAccount.setOnClickListener { com.sapotlokal.util.AccountActions.showDeleteAccount(this) }
+    }
+
+    private var currentAvatarId: String = ""
+
+    private fun pickAvatar() {
+        val uid = auth.currentUser?.uid ?: return
+        com.sapotlokal.util.AvatarUi.showPicker(this, currentAvatarId) { chosen ->
+            com.sapotlokal.util.AvatarUi.save(uid, chosen) { ok ->
+                if (!ok) android.widget.Toast.makeText(this, getString(com.sapotlokal.R.string.k_avatar_save_failed), android.widget.Toast.LENGTH_SHORT).show()
+            }
         }
     }
 
@@ -224,31 +257,31 @@ class CustomerProfileActivity : AppCompatActivity() {
         val input = EditText(this).apply {
             setText(currentUserName)
             setSelection(text.length)
-            setHint("Enter your name")
+            setHint(getString(com.sapotlokal.R.string.k_enter_your_name))
             setSingleLine(true)
             setPadding(48, 36, 48, 36)
         }
 
         MaterialAlertDialogBuilder(this)
-            .setTitle("Edit Profile Name")
+            .setTitle(getString(com.sapotlokal.R.string.k_edit_name_title))
             .setView(input)
-            .setPositiveButton("Save") { _, _ ->
+            .setPositiveButton(getString(com.sapotlokal.R.string.k_save)) { _, _ ->
                 val newName = input.text.toString().trim()
                 if (newName.isNotBlank()) {
                     FirebaseDatabase.getInstance(AppConfig.DATABASE_URL)
                         .reference.child("users").child(currentUserId).child("userName")
                         .setValue(newName)
                         .addOnSuccessListener {
-                            Toast.makeText(this, "Profile updated successfully!", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(this, getString(com.sapotlokal.R.string.k_profile_updated), Toast.LENGTH_SHORT).show()
                         }
                         .addOnFailureListener {
-                            Toast.makeText(this, "Failed to update profile", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(this, getString(com.sapotlokal.R.string.k_profile_update_failed), Toast.LENGTH_SHORT).show()
                         }
                 } else {
-                    Toast.makeText(this, "Name cannot be empty", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this, getString(com.sapotlokal.R.string.k_name_empty), Toast.LENGTH_SHORT).show()
                 }
             }
-            .setNegativeButton("Cancel", null)
+            .setNegativeButton(getString(com.sapotlokal.R.string.k_cancel), null)
             .show()
     }
 
@@ -259,23 +292,23 @@ class CustomerProfileActivity : AppCompatActivity() {
         dialog.setContentView(dialogBinding.root)
         dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
 
-        dialogBinding.tvBadgeTitle.text = badge.title
-        dialogBinding.tvBadgeDescription.text = badge.description
+        dialogBinding.tvBadgeTitle.text = com.sapotlokal.util.ContentText.badgeTitle(this, badge)
+        dialogBinding.tvBadgeDescription.text = com.sapotlokal.util.ContentText.badgeDescription(this, badge)
         dialogBinding.ivBadgeIcon.setImageResource(badge.iconRes)
 
         if (isUnlocked) {
             dialogBinding.ivBadgeIcon.colorFilter = null
             dialogBinding.ivBadgeLockOverlay.visibility = View.GONE
-            dialogBinding.tvBadgeStatusPill.text = "✓ UNLOCKED"
+            dialogBinding.tvBadgeStatusPill.text = getString(com.sapotlokal.R.string.k_status_unlocked_pill)
             dialogBinding.tvBadgeStatusPill.setBackgroundResource(R.drawable.bg_badge_success)
-            dialogBinding.tvBadgeStatusPill.setTextColor(ContextCompat.getColor(this, R.color.sapot_success_text))
+            dialogBinding.tvBadgeStatusPill.setTextColor(ContextCompat.getColor(this, R.color.hu_ok))
         } else {
             val matrix = ColorMatrix().apply { setSaturation(0f) }
             dialogBinding.ivBadgeIcon.colorFilter = ColorMatrixColorFilter(matrix)
             dialogBinding.ivBadgeLockOverlay.visibility = View.VISIBLE
-            dialogBinding.tvBadgeStatusPill.text = "🔒 LOCKED"
+            dialogBinding.tvBadgeStatusPill.text = getString(com.sapotlokal.R.string.k_status_locked_pill)
             dialogBinding.tvBadgeStatusPill.setBackgroundResource(R.drawable.bg_pill_gray)
-            dialogBinding.tvBadgeStatusPill.setTextColor(ContextCompat.getColor(this, R.color.sapot_text_secondary))
+            dialogBinding.tvBadgeStatusPill.setTextColor(ContextCompat.getColor(this, R.color.hu_soft))
         }
 
         dialogBinding.btnDismissBadgeDialog.setOnClickListener {
@@ -287,13 +320,13 @@ class CustomerProfileActivity : AppCompatActivity() {
 
     private fun showSignOutConfirmation() {
         MaterialAlertDialogBuilder(this)
-            .setTitle("Sign Out")
-            .setMessage("Are you sure you want to sign out of SapotLokal?")
-            .setPositiveButton("Sign Out") { _, _ ->
-                auth.signOut()
+            .setTitle(getString(com.sapotlokal.R.string.k_sign_out))
+            .setMessage(getString(com.sapotlokal.R.string.k_sign_out_confirm))
+            .setPositiveButton(getString(com.sapotlokal.R.string.k_sign_out)) { _, _ ->
+                com.sapotlokal.util.SessionManager.signOut(this@CustomerProfileActivity)
                 goToLogin()
             }
-            .setNegativeButton("Cancel", null)
+            .setNegativeButton(getString(com.sapotlokal.R.string.k_cancel), null)
             .show()
     }
 

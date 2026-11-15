@@ -1,36 +1,39 @@
 <?xml version="1.0" encoding="utf-8"?>
 <com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_marginBottom="10dp"
     android:clickable="true"
     android:focusable="true"
     android:foreground="?attr/selectableItemBackground"
-    app:cardBackgroundColor="@color/sapot_white"
-    app:cardCornerRadius="24dp"
-    app:cardElevation="0dp">
+    app:cardBackgroundColor="@color/sapot_surface"
+    app:cardCornerRadius="14dp"
+    app:cardElevation="0dp"
+    app:strokeColor="@color/sapot_border"
+    app:strokeWidth="1dp">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center_vertical"
         android:orientation="horizontal"
-        android:padding="16dp">
+        android:padding="14dp">
 
-        <!-- Category Avatar -->
+        <!-- Category Avatar Container -->
         <FrameLayout
             android:id="@+id/avatarContainer"
-            android:layout_width="52dp"
-            android:layout_height="52dp"
-            android:background="@drawable/bg_shop_icon_croissant">
+            android:layout_width="44dp"
+            android:layout_height="44dp"
+            android:background="@drawable/bg_nav_pill_active">
 
             <ImageView
                 android:id="@+id/ivCategoryIcon"
-                android:layout_width="25dp"
-                android:layout_height="25dp"
+                android:layout_width="22dp"
+                android:layout_height="22dp"
                 android:layout_gravity="center"
-                android:src="@drawable/ic_croissant"
+                android:src="@drawable/ic_store"
                 app:tint="@color/sapot_text_primary" />
         </FrameLayout>
 
@@ -38,7 +41,7 @@
         <LinearLayout
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginStart="14dp"
+            android:layout_marginStart="12dp"
             android:layout_weight="1"
             android:orientation="vertical">
 
@@ -52,23 +55,25 @@
                     android:id="@+id/tvShopName"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Roti Pagi"
+                    android:fontFamily="@font/manrope"
                     android:textColor="@color/sapot_text_primary"
-                    android:textSize="15sp"
-                    android:textStyle="bold" />
+                    android:textSize="14sp"
+                    android:textStyle="bold"
+                    tools:text="Kopi Kita" />
 
-                <!-- Real-time Status Chip (Phase 5) -->
+                <!-- Real-time Status Chip -->
                 <TextView
                     android:id="@+id/tvShopStatus"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="8dp"
-                    android:background="@drawable/bg_status_chip_open"
-                    android:paddingHorizontal="7dp"
+                    android:layout_marginStart="6dp"
+                    android:background="@drawable/bg_nav_pill_active"
+                    android:fontFamily="@font/dm_sans"
+                    android:paddingHorizontal="6dp"
                     android:paddingVertical="2dp"
-                    android:text="● OPEN"
-                    android:textColor="#FFFFFF"
-                    android:textSize="10sp"
+                    android:text="@string/shop_detail_open_now"
+                    android:textColor="@color/sapot_text_primary"
+                    android:textSize="9sp"
                     android:textStyle="bold" />
             </LinearLayout>
 
@@ -76,10 +81,11 @@
                 android:id="@+id/tvShopSubtitle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="3dp"
-                android:text="Bakery · 350 m · Open until 6 pm"
+                android:layout_marginTop="2dp"
+                android:fontFamily="@font/dm_sans"
                 android:textColor="@color/sapot_text_secondary"
-                android:textSize="11sp" />
+                android:textSize="11sp"
+                tools:text="Café / F&amp;B · 350 m" />
         </LinearLayout>
 
         <!-- Points Badge -->
@@ -87,9 +93,17 @@
             android:id="@+id/tvShopPoints"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="85 pts"
+            android:fontFamily="@font/dm_sans"
             android:textColor="@color/sapot_text_primary"
             android:textSize="12sp"
-            android:textStyle="bold" />
+            android:textStyle="bold"
+            tools:text="85 pts" />
+
+        <ImageView
+            android:layout_width="16dp"
+            android:layout_height="16dp"
+            android:layout_marginStart="6dp"
+            android:src="@drawable/ic_arrow_right"
+            app:tint="@color/sapot_text_secondary" />
     </LinearLayout>
 </com.google.android.material.card.MaterialCardView>

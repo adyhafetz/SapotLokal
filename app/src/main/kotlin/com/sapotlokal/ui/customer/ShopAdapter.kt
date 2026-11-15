@@ -53,28 +53,22 @@ class ShopAdapter(
         RecyclerView.ViewHolder(binding.root) {
 
         fun bind(vendor: Vendor) {
-            binding.tvShopName.text = vendor.vendorName.ifBlank { "Local Merchant" }
+            binding.tvShopName.text = vendor.vendorName.ifBlank { binding.root.context.getString(com.sapotlokal.R.string.k_local_merchant) }
 
             // Category & Address subtitle
             val subtitle = if (vendor.vendorAddress.isNotBlank()) {
-                "${vendor.vendorCategory} • ${vendor.vendorAddress}"
+                "${com.sapotlokal.data.model.ShopCategory.label(binding.root.context, vendor.vendorCategory)} • ${vendor.vendorAddress}"
             } else {
-                vendor.vendorCategory.ifBlank { "Local Merchant" }
+                com.sapotlokal.data.model.ShopCategory.label(binding.root.context, vendor.vendorCategory).ifBlank { binding.root.context.getString(com.sapotlokal.R.string.k_local_merchant) }
             }
             binding.tvShopSubtitle.text = subtitle
 
             // Real-time live status chip
-            if (vendor.isOpen) {
-                binding.tvShopStatus.text = "● OPEN"
-                binding.tvShopStatus.setBackgroundResource(R.drawable.bg_status_chip_open)
-            } else {
-                binding.tvShopStatus.text = "● CLOSED"
-                binding.tvShopStatus.setBackgroundResource(R.drawable.bg_status_chip_closed)
-            }
+            com.sapotlokal.util.StatusChip.bind(binding.tvShopStatus, vendor.isOpen)
 
             // Customer points earned at this shop
             val points = perShopBalance[vendor.vendorID] ?: 0
-            binding.tvShopPoints.text = "$points pts"
+            binding.tvShopPoints.text = binding.root.context.getString(com.sapotlokal.R.string.k_n_points, points)
 
             // Category avatar & icon
             val (bgRes, iconRes) = categoryDrawables(vendor.vendorCategory)

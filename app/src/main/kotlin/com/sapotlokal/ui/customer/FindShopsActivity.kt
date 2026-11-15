@@ -3,109 +3,182 @@ package com.sapotlokal.ui.customer
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
+import android.widget.LinearLayout
 import androidx.appcompat.app.AppCompatActivity
-import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.core.widget.doAfterTextChanged
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.ValueEventListener
+import com.sapotlokal.R
+import com.sapotlokal.data.model.ShopCategory
 import com.sapotlokal.data.model.Vendor
+import com.sapotlokal.data.model.Voucher
+import com.sapotlokal.data.model.VoucherStatus
+import com.sapotlokal.data.model.VoucherUser
 import com.sapotlokal.data.repository.PointRepository
 import com.sapotlokal.data.repository.VendorRepository
+import com.sapotlokal.data.repository.VoucherRepository
 import com.sapotlokal.databinding.ActivityFindShopsBinding
 
 /**
- * FindShopsActivity — Phase 5 shop list with live status indicators and detail navigation.
- *
- * WHAT IT DOES:
- *   1. Listens to all vendors live from /vendors, displaying their real-time OPEN/CLOSED status.
- *   2. Listens to the customer's per-shop balances from /points.
- *   3. Launches ShopDetailActivity when any shop card is tapped.
+ * Shops tab (Hadiah Utama). One job: "where can I earn?"
+ * Search, a scope filter (My shops · Open now · All), category chips built from the shops that
+ * exist, then one stacked colour card per shop: points, cup stamps, open status, next reward.
+ * Shops where the customer holds points come first; ready ones first of all.
  */
 class FindShopsActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityFindShopsBinding
     private val auth = FirebaseAuth.getInstance()
 
-    private lateinit var shopAdapter: ShopAdapter
     private var vendorsListener: ValueEventListener? = null
     private var pointsListener: ValueEventListener? = null
-    private val currentVendors = mutableListOf<Vendor>()
+    private var rulesListener: ValueEventListener? = null
+    private var vouchersListener: ValueEventListener? = null
+    private var userId = ""
+
+    private var allVendors: List<Vendor> = emptyList()
+    private var perShop: Map<String, Int> = emptyMap()
+    private var rules: List<Voucher> = emptyList()
+    private var vouchers: List<VoucherUser> = emptyList()
+    private var query = ""
+    private var category = ALL
+    private var scope = Scope.ALL
+
+    private enum class Scope { MINE, OPEN, ALL }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityFindShopsBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        setSupportActionBar(binding.toolbar)
-        supportActionBar?.setDisplayHomeAsUpEnabled(true)
-        binding.toolbar.setNavigationOnClickListener { finish() }
-
-        setupRecyclerView()
-        startLiveListeners()
+        binding.btnHowPoints.setOnClickListener { HowPoints.show(this) }
+        binding.etSearch.doAfterTextChanged { query = it?.toString().orEmpty().trim(); render() }
+        userId = auth.currentUser?.uid.orEmpty()
+        buildScopeChips()
+        startListeners()
+        CustomerNav.bind(this, binding.customerNav, CustomerNav.Tab.SHOPS)
     }
 
-    private fun setupRecyclerView() {
-        shopAdapter = ShopAdapter(emptyMap()) { vendorID ->
-            openShopDetail(vendorID)
+    private fun buildScopeChips() {
+        binding.chipScope.removeAllViews()
+        listOf(
+            Scope.MINE to R.string.hu_filter_mine,
+            Scope.OPEN to R.string.hu_filter_open,
+            Scope.ALL to R.string.hu_filter_all
+        ).forEach { (s, label) ->
+            binding.chipScope.addView(HuChip.make(this, getString(label), s == scope) { scope = s; render() })
         }
-        binding.rvShops.layoutManager = LinearLayoutManager(this)
-        binding.rvShops.adapter = shopAdapter
     }
 
-    private fun startLiveListeners() {
+    private fun startListeners() {
         binding.progressBar.visibility = View.VISIBLE
-        binding.rvShops.visibility     = View.GONE
-        binding.tvEmpty.visibility     = View.GONE
-
-        val userID = auth.currentUser?.uid ?: return
-
-        // 1. Listen live to customer balances
-        pointsListener = PointRepository.listenToPointsForUser(
-            userID = userID,
-            onUpdate = { perShopBalance, _, _ ->
-                shopAdapter.updateBalances(perShopBalance)
-            },
-            onError = { _ ->
-                shopAdapter.updateBalances(emptyMap())
-            }
-        )
-
-        // 2. Listen live to all vendors (live status sync)
+        if (userId.isNotBlank()) {
+            pointsListener = PointRepository.listenToPointsForUser(
+                userID = userId,
+                onUpdate = { shopPoints, _, _ ->
+                    val first = perShop.isEmpty() && shopPoints.any { it.value > 0 }
+                    perShop = shopPoints
+                    if (first) { scope = Scope.MINE; buildScopeChips() }
+                    render()
+                },
+                onError = { render() }
+            )
+            vouchersListener = VoucherRepository.listenToVouchersForUser(
+                userID = userId, onUpdate = { vouchers = it; render() }, onError = { }
+            )
+        }
+        rulesListener = VoucherRepository.listenToAllActiveRules(onUpdate = { rules = it; render() }, onError = { })
         vendorsListener = VendorRepository.listenToAllVendors(
-            onUpdate = { vendors ->
-                currentVendors.clear()
-                currentVendors.addAll(vendors)
-
+            onUpdate = { v ->
+                allVendors = v
                 binding.progressBar.visibility = View.GONE
-                if (vendors.isEmpty()) {
-                    binding.tvEmpty.visibility = View.VISIBLE
-                    binding.rvShops.visibility = View.GONE
-                } else {
-                    binding.tvEmpty.visibility = View.GONE
-                    binding.rvShops.visibility = View.VISIBLE
-                    shopAdapter.submitList(vendors)
-                }
+                rebuildCategoryChips()
+                render()
             },
-            onError = { _ ->
+            onError = {
                 binding.progressBar.visibility = View.GONE
-                if (currentVendors.isEmpty()) {
-                    binding.tvEmpty.text = "Could not load shops. Please check your connection."
-                    binding.tvEmpty.visibility = View.VISIBLE
-                }
+                binding.tvEmpty.text = getString(R.string.k_could_not_load_shops)
+                binding.tvEmpty.visibility = View.VISIBLE
             }
         )
     }
 
-    private fun openShopDetail(vendorID: String) {
-        val intent = Intent(this, ShopDetailActivity::class.java).apply {
-            putExtra(ShopDetailActivity.EXTRA_VENDOR_ID, vendorID)
+    /** One chip per category that exists, most common first, after "All". */
+    private fun rebuildCategoryChips() {
+        val categories = allVendors.map { categoryKey(it.vendorCategory) }.filter { it.isNotBlank() }
+            .groupingBy { it.lowercase() }.eachCount().entries.sortedByDescending { it.value }
+            .map { e -> allVendors.map { categoryKey(it.vendorCategory) }.first { it.lowercase() == e.key } }
+        if (category != ALL && categories.none { it.equals(category, true) }) category = ALL
+        binding.chipGroupCategories.removeAllViews()
+        (listOf(ALL) + categories).forEach { key ->
+            val label = if (key == ALL) getString(R.string.hu_all_types) else ShopCategory.label(this, key)
+            binding.chipGroupCategories.addView(HuChip.make(this, label, key.equals(category, true)) { category = key; render() })
         }
-        startActivity(intent)
+    }
+
+    private fun render() {
+        if (allVendors.isEmpty()) return
+        val now = System.currentTimeMillis()
+        val live = vouchers.filter {
+            it.voucherStatus == VoucherStatus.ACTIVE && (it.voucherExpiryDate == 0L || it.voucherExpiryDate > now)
+        }
+        val held = live.map { it.voucherID }.toSet()
+        fun readyRule(id: String): Voucher? = rules.filter {
+            it.vendorID == id && it.voucherID !in held && it.pointsRequired > 0 && (perShop[id] ?: 0) >= it.pointsRequired
+        }.minByOrNull { it.pointsRequired }
+        fun nextRule(id: String): Voucher? = rules.filter { it.vendorID == id && it.pointsRequired > (perShop[id] ?: 0) }
+            .minByOrNull { it.pointsRequired }
+
+        val q = query.lowercase()
+        val list = allVendors.filter { v ->
+            val bal = perShop[v.vendorID] ?: 0
+            val catText = ShopCategory.label(this, v.vendorCategory)
+            (scope != Scope.MINE || bal > 0) &&
+                (scope != Scope.OPEN || v.isOpen) &&
+                (category == ALL || categoryKey(v.vendorCategory).equals(category, true)) &&
+                (q.isEmpty() || "${v.vendorName} ${v.vendorAddress} ${v.vendorCategory} $catText".lowercase().contains(q))
+        }.sortedWith(
+            compareByDescending<Vendor> { readyRule(it.vendorID) != null || live.any { l -> l.vendorID == it.vendorID } }
+                .thenByDescending { perShop[it.vendorID] ?: 0 }
+                .thenByDescending { it.isOpen }
+                .thenBy { it.vendorName.lowercase() }
+        )
+
+        val container = binding.shopCards
+        container.removeAllViews()
+        list.forEach { v ->
+            val bal = perShop[v.vendorID] ?: 0
+            val ready = readyRule(v.vendorID)
+            val isReady = ready != null || live.any { it.vendorID == v.vendorID }
+            val meta = listOf(
+                ShopCategory.label(this, v.vendorCategory).ifBlank { null },
+                getString(if (v.isOpen) R.string.hu_open else R.string.hu_closed)
+            ).filterNotNull().joinToString(" · ")
+            val card = ShopCard.inflate(container)
+            ShopCard.bind(card, v, v.vendorID, bal, isReady, nextRule(v.vendorID), readyReward = ready, meta = meta)
+            if (bal == 0 && !isReady) card.tvStatus.text = "$meta · ${getString(R.string.hu_new_to_you)}"
+            card.root.setOnClickListener {
+                startActivity(Intent(this, ShopDetailActivity::class.java).putExtra(ShopDetailActivity.EXTRA_VENDOR_ID, v.vendorID))
+            }
+            container.addView(card.root, LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT
+            ).apply { topMargin = (12 * resources.displayMetrics.density).toInt() })
+        }
+        binding.tvEmpty.text = getString(if (scope == Scope.MINE && q.isEmpty()) R.string.hu_no_shops_mine else R.string.hu_no_shops_match)
+        binding.tvEmpty.visibility = if (list.isEmpty()) View.VISIBLE else View.GONE
     }
 
     override fun onDestroy() {
         super.onDestroy()
         vendorsListener?.let { VendorRepository.removeAllVendorsListener(it) }
-        vendorsListener = null
-        pointsListener = null
+        pointsListener?.let { if (userId.isNotBlank()) PointRepository.removePointsListener(userId, it) }
+        rulesListener?.let { VoucherRepository.removeAllRulesListener(it) }
+        vouchersListener?.let { if (userId.isNotBlank()) VoucherRepository.removeVouchersListener(userId, it) }
+    }
+
+    private fun categoryKey(raw: String): String = ShopCategory.fromStored(raw)?.value ?: raw.trim()
+
+    private companion object {
+        const val ALL = "All shops"
     }
 }

@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Compact reward row: photo, reward name, cost and status, one action. -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginTop="10dp"
+    android:background="@drawable/bg_hu_card"
+    android:gravity="center_vertical"
+    android:minHeight="80dp"
+    android:orientation="horizontal"
+    android:padding="12dp">
+
+    <FrameLayout
+        android:layout_width="56dp"
+        android:layout_height="56dp"
+        android:background="@drawable/bg_hu_photo"
+        android:clipToOutline="true"
+        android:importantForAccessibility="no">
+
+        <TextView
+            android:id="@+id/tvThumbLogo"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:fontFamily="@font/figtree_extrabold"
+            android:gravity="center"
+            android:textSize="16sp"
+            tools:text="KK" />
+
+        <ImageView
+            android:id="@+id/ivThumb"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:contentDescription="@null"
+            android:scaleType="centerCrop" />
+    </FrameLayout>
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="12dp"
+        android:layout_weight="1"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/tvName"
+            style="@style/HU.Text.Title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="17sp"
+            tools:text="Free Kopi" />
+
+        <TextView
+            android:id="@+id/tvSub"
+            style="@style/HU.Text.Small"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            tools:text="10 points · Kopi Kita Cafe" />
+
+        <TextView
+            android:id="@+id/tvState"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/figtree_bold"
+            android:textColor="@color/hu_soft"
+            android:textSize="14sp"
+            tools:text="20 more points needed" />
+    </LinearLayout>
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btnAction"
+        style="@style/Widget.HU.Button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:minHeight="48dp"
+        android:paddingHorizontal="16dp"
+        android:textSize="15sp"
+        android:visibility="gone"
+        tools:text="Claim"
+        tools:visibility="visible" />
+</LinearLayout>

@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Home for a brand-new customer: what SapotLokal does and the one thing to do. -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/bg_hu_reward_card"
+    android:backgroundTint="@color/hu_accent_tint"
+    android:orientation="vertical"
+    android:padding="20dp">
+
+    <TextView
+        style="@style/HU.Text.Reward"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/hu_first_title" />
+
+    <TextView
+        style="@style/HU.Text.Body"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="6dp"
+        android:textColor="@color/hu_ink"
+        android:text="@string/hu_first_detail" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btnFirstScan"
+        style="@style/Widget.HU.Button"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text="@string/hu_scan_a_shop" />
+</LinearLayout>

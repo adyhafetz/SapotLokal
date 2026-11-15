@@ -1,515 +1,513 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- Leaderboard: follows the brand design (period toggle, podium, ranked list, your rank). -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/sapot_bg"
-    android:orientation="vertical">
+    android:background="@color/hu_bg"
+    android:orientation="vertical"
+    tools:context=".ui.customer.LeaderboardActivity">
 
-    <!-- Top App Bar -->
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="56dp"
-        android:gravity="center_vertical"
-        android:orientation="horizontal"
-        android:paddingHorizontal="16dp">
-
-        <ImageView
-            android:id="@+id/btnBack"
-            android:layout_width="36dp"
-            android:layout_height="36dp"
-            android:background="?attr/selectableItemBackgroundBorderless"
-            android:clickable="true"
-            android:contentDescription="Back"
-            android:focusable="true"
-            android:padding="6dp"
-            android:rotation="90"
-            android:src="@drawable/ic_chevron_down"
-            app:tint="@color/sapot_text_primary" />
-
-        <TextView
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
-            android:layout_weight="1"
-            android:fontFamily="@font/inter"
-            android:text="Community Leaderboard"
-            android:textColor="@color/sapot_text_primary"
-            android:textSize="20sp"
-            android:textStyle="bold" />
-
-        <ImageView
-            android:layout_width="24dp"
-            android:layout_height="24dp"
-            android:contentDescription="Leaderboard"
-            android:src="@drawable/ic_badge_raja" />
-    </LinearLayout>
-
-    <!-- Top Filter Tab: All-Time vs This Week -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:paddingHorizontal="24dp"
-        android:paddingVertical="8dp">
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingHorizontal="12dp"
+        android:paddingTop="8dp">
 
-        <com.google.android.material.button.MaterialButtonToggleGroup
-            android:id="@+id/toggleFilter"
-            android:layout_width="match_parent"
+        <ImageView
+            android:id="@+id/btnBack"
+            android:layout_width="44dp"
             android:layout_height="44dp"
-            app:checkedButton="@id/btnFilterAllTime"
-            app:selectionRequired="true"
-            app:singleSelection="true">
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="Back"
+            android:padding="10dp"
+            android:src="@drawable/ic_back"
+            app:tint="@color/hu_ink" />
 
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/btnFilterAllTime"
-                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:fontFamily="sans-serif-medium"
-                android:text="All-Time"
-                android:textAllCaps="false"
-                android:textColor="@color/sapot_text_primary"
-                android:textSize="13sp"
-                app:cornerRadius="12dp"
-                app:strokeColor="@color/sapot_border" />
-
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/btnFilterThisWeek"
-                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:fontFamily="sans-serif-medium"
-                android:text="This Week"
-                android:textAllCaps="false"
-                android:textColor="@color/sapot_text_primary"
-                android:textSize="13sp"
-                app:cornerRadius="12dp"
-                app:strokeColor="@color/sapot_border" />
-        </com.google.android.material.button.MaterialButtonToggleGroup>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="6dp"
+            android:fontFamily="@font/figtree_bold"
+            android:text="@string/customer_home_leaderboard_2"
+            android:textColor="@color/hu_ink"
+            android:textSize="24sp"
+            android:textStyle="bold" />
     </LinearLayout>
 
-    <!-- Main Content Container (Podium + 4th+ List) -->
-    <RelativeLayout
+    <com.google.android.material.button.MaterialButtonToggleGroup
+        android:id="@+id/toggleFilter"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="20dp"
+        android:layout_marginTop="10dp"
+        app:checkedButton="@+id/btnFilterAllTime"
+        app:selectionRequired="true"
+        app:singleSelection="true">
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnFilterAllTime"
+            style="?attr/materialButtonOutlinedStyle"
+            android:layout_width="0dp"
+            android:layout_height="46dp"
+            android:layout_weight="1"
+            android:text="@string/leaderboard_all_time"
+            android:textColor="@color/hu_ink" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnFilterThisWeek"
+            style="?attr/materialButtonOutlinedStyle"
+            android:layout_width="0dp"
+            android:layout_height="46dp"
+            android:layout_weight="1"
+            android:text="@string/challenges_this_week"
+            android:textColor="@color/hu_ink" />
+    </com.google.android.material.button.MaterialButtonToggleGroup>
+
+    <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1">
 
-        <androidx.core.widget.NestedScrollView
+        <ScrollView
             android:id="@+id/scrollView"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:clipToPadding="false"
             android:fillViewport="true">
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:paddingBottom="96dp">
+                android:padding="20dp">
 
-                <!-- Podium Container (Top 3) -->
+                <!-- Podium: 2nd, 1st, 3rd -->
                 <LinearLayout
                     android:id="@+id/containerPodium"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:layout_marginTop="14dp"
                     android:baselineAligned="false"
                     android:gravity="bottom"
-                    android:orientation="horizontal"
-                    android:paddingHorizontal="16dp"
-                    android:paddingTop="12dp"
-                    android:paddingBottom="4dp">
+                    android:orientation="horizontal">
 
-                    <!-- 2nd Place (Left, Medium Podium) -->
+                    <!-- 2nd -->
                     <LinearLayout
                         android:id="@+id/podium2nd"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
+                        android:layout_marginHorizontal="6dp"
                         android:layout_weight="1"
                         android:gravity="center_horizontal"
                         android:orientation="vertical">
 
-                        <ImageView
-                            android:layout_width="22dp"
-                            android:layout_height="22dp"
-                            android:layout_marginBottom="4dp"
-                            android:contentDescription="Silver Medal"
-                            android:src="@drawable/ic_medal_silver" />
+                        <com.google.android.material.card.MaterialCardView
+                            android:layout_width="68dp"
+                            android:layout_height="68dp"
+                            app:cardBackgroundColor="#EBEDF0"
+                            app:cardCornerRadius="34dp"
+                            app:cardElevation="0dp"
+                            app:cardPreventCornerOverlap="false"
+                            app:contentPadding="0dp"
+                            app:strokeColor="#D3D9DE"
+                            app:strokeWidth="2dp">
 
-                        <!-- Silver Avatar Frame -->
-                        <FrameLayout
-                            android:layout_width="56dp"
-                            android:layout_height="56dp"
-                            android:background="@drawable/bg_avatar_ring_silver">
+                            <FrameLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent">
 
-                            <ImageView
-                                android:id="@+id/ivAvatar2nd"
-                                android:layout_width="32dp"
-                                android:layout_height="32dp"
-                                android:layout_gravity="center"
-                                android:contentDescription="2nd Place Avatar"
-                                android:src="@drawable/ic_user_round"
-                                app:tint="#546E7A" />
+                                <ImageView
+                                    android:id="@+id/ivAvatar2nd"
+                                    android:layout_width="26dp"
+                                    android:layout_height="26dp"
+                                    android:layout_gravity="center"
+                                    android:contentDescription="Avatar"
+                                    android:src="@drawable/ic_user_round"
+                                    app:tint="@color/hu_soft" />
 
-                            <TextView
-                                android:id="@+id/tvInitials2nd"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_gravity="center"
-                                android:fontFamily="sans-serif-black"
-                                android:textColor="#37474F"
-                                android:textSize="18sp"
-                                android:visibility="gone"
-                                tools:text="SY" />
-                        </FrameLayout>
+                                <TextView
+                                    android:id="@+id/tvInitials2nd"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_gravity="center"
+                                    android:fontFamily="@font/figtree_bold"
+                                    android:textColor="@color/hu_soft"
+                                    android:textSize="20sp"
+                                    android:textStyle="bold"
+                                    android:visibility="gone" />
+                            </FrameLayout>
+                        </com.google.android.material.card.MaterialCardView>
 
                         <TextView
                             android:id="@+id/tvName2nd"
-                            android:layout_width="wrap_content"
+                            android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:layout_marginTop="6dp"
+                            android:layout_marginTop="10dp"
                             android:ellipsize="end"
-                            android:fontFamily="sans-serif-black"
+                            android:fontFamily="@font/figtree_bold"
                             android:gravity="center"
                             android:maxLines="1"
-                            android:textColor="@color/sapot_text_primary"
+                            android:textColor="@color/hu_ink"
                             android:textSize="13sp"
-                            tools:text="Sarah 🔥" />
+                            android:textStyle="bold" />
 
                         <TextView
                             android:id="@+id/tvTier2nd"
-                            android:layout_width="wrap_content"
+                            android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:layout_marginTop="1dp"
+                            android:fontFamily="@font/figtree_medium"
                             android:gravity="center"
-                            android:textColor="@color/sapot_text_secondary"
-                            android:textSize="10sp"
-                            tools:text="Trend Setter" />
+                            android:maxLines="1"
+                            android:textColor="@color/hu_soft"
+                            android:textSize="11sp" />
 
                         <TextView
                             android:id="@+id/tvPoints2nd"
-                            android:layout_width="wrap_content"
+                            android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="2dp"
-                            android:layout_marginBottom="6dp"
-                            android:fontFamily="sans-serif-black"
-                            android:textColor="#546E7A"
-                            android:textSize="13sp"
-                            tools:text="1,250 pts" />
+                            android:layout_marginBottom="14dp"
+                            android:fontFamily="@font/figtree_medium"
+                            android:gravity="center"
+                            android:textColor="@color/hu_ink"
+                            android:textSize="12sp"
+                            android:textStyle="bold" />
 
-                        <!-- Silver Podium Pillar -->
-                        <FrameLayout
+                        <LinearLayout
                             android:layout_width="match_parent"
-                            android:layout_height="90dp"
-                            android:layout_marginHorizontal="4dp"
-                            android:background="@drawable/bg_podium_silver">
+                            android:layout_height="110dp"
+                            android:background="@drawable/bg_podium_block"
+                            android:gravity="center"
+                            android:orientation="vertical">
 
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:layout_gravity="center_horizontal"
-                                android:layout_marginTop="12dp"
-                                android:fontFamily="sans-serif-black"
+                                android:fontFamily="@font/figtree_bold"
                                 android:text="2"
-                                android:textColor="#546E7A"
-                                android:textSize="32sp" />
-                        </FrameLayout>
+                                android:textColor="#A6A4AB"
+                                android:textSize="34sp"
+                                android:textStyle="bold" />
+
+                            <ImageView
+                                android:layout_width="22dp"
+                                android:layout_height="22dp"
+                                android:layout_marginTop="8dp"
+                                android:src="@drawable/ic_leaf"
+                                app:tint="#C0C3CB" />
+                        </LinearLayout>
                     </LinearLayout>
 
-                    <!-- 1st Place (Center, Tallest Podium) -->
+                    <!-- 1st -->
                     <LinearLayout
                         android:id="@+id/podium1st"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:layout_weight="1.15"
+                        android:layout_marginHorizontal="6dp"
+                        android:layout_weight="1"
                         android:gravity="center_horizontal"
                         android:orientation="vertical">
 
                         <ImageView
                             android:layout_width="30dp"
-                            android:layout_height="30dp"
-                            android:layout_marginBottom="4dp"
-                            android:contentDescription="Gold Crown"
+                            android:layout_height="26dp"
+                            android:layout_marginBottom="2dp"
+                            android:contentDescription="First place"
                             android:src="@drawable/ic_crown_gold" />
 
-                        <!-- Gold Avatar Frame -->
-                        <FrameLayout
+                        <com.google.android.material.card.MaterialCardView
                             android:layout_width="68dp"
                             android:layout_height="68dp"
-                            android:background="@drawable/bg_avatar_ring_gold">
+                            app:cardBackgroundColor="#EBEDF0"
+                            app:cardCornerRadius="34dp"
+                            app:cardElevation="0dp"
+                            app:cardPreventCornerOverlap="false"
+                            app:contentPadding="0dp"
+                            app:strokeColor="#F2C14E"
+                            app:strokeWidth="3dp">
 
-                            <ImageView
-                                android:id="@+id/ivAvatar1st"
-                                android:layout_width="38dp"
-                                android:layout_height="38dp"
-                                android:layout_gravity="center"
-                                android:contentDescription="1st Place Avatar"
-                                android:src="@drawable/ic_user_round"
-                                app:tint="@color/sapot_text_primary" />
+                            <FrameLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent">
 
-                            <TextView
-                                android:id="@+id/tvInitials1st"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_gravity="center"
-                                android:fontFamily="sans-serif-black"
-                                android:textColor="@color/sapot_text_primary"
-                                android:textSize="22sp"
-                                android:visibility="gone"
-                                tools:text="AF" />
-                        </FrameLayout>
+                                <ImageView
+                                    android:id="@+id/ivAvatar1st"
+                                    android:layout_width="26dp"
+                                    android:layout_height="26dp"
+                                    android:layout_gravity="center"
+                                    android:contentDescription="Avatar"
+                                    android:src="@drawable/ic_user_round"
+                                    app:tint="@color/hu_soft" />
+
+                                <TextView
+                                    android:id="@+id/tvInitials1st"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_gravity="center"
+                                    android:fontFamily="@font/figtree_bold"
+                                    android:textColor="@color/hu_soft"
+                                    android:textSize="20sp"
+                                    android:textStyle="bold"
+                                    android:visibility="gone" />
+                            </FrameLayout>
+                        </com.google.android.material.card.MaterialCardView>
 
                         <TextView
                             android:id="@+id/tvName1st"
-                            android:layout_width="wrap_content"
+                            android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:layout_marginTop="6dp"
+                            android:layout_marginTop="10dp"
                             android:ellipsize="end"
-                            android:fontFamily="sans-serif-black"
+                            android:fontFamily="@font/figtree_bold"
                             android:gravity="center"
                             android:maxLines="1"
-                            android:textColor="@color/sapot_text_primary"
-                            android:textSize="14sp"
-                            tools:text="Amirul 👑" />
+                            android:textColor="@color/hu_ink"
+                            android:textSize="13sp"
+                            android:textStyle="bold" />
 
                         <TextView
                             android:id="@+id/tvTier1st"
-                            android:layout_width="wrap_content"
+                            android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:layout_marginTop="1dp"
+                            android:fontFamily="@font/figtree_medium"
                             android:gravity="center"
-                            android:textColor="@color/sapot_text_secondary"
-                            android:textSize="11sp"
-                            tools:text="Otai Lokal" />
+                            android:maxLines="1"
+                            android:textColor="@color/hu_soft"
+                            android:textSize="11sp" />
 
                         <TextView
                             android:id="@+id/tvPoints1st"
-                            android:layout_width="wrap_content"
+                            android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="2dp"
-                            android:layout_marginBottom="6dp"
-                            android:fontFamily="sans-serif-black"
-                            android:textColor="#E65100"
-                            android:textSize="15sp"
-                            tools:text="2,650 pts" />
+                            android:layout_marginBottom="14dp"
+                            android:fontFamily="@font/figtree_medium"
+                            android:gravity="center"
+                            android:textColor="@color/hu_ink"
+                            android:textSize="12sp"
+                            android:textStyle="bold" />
 
-                        <!-- Gold Podium Pillar -->
-                        <FrameLayout
+                        <LinearLayout
                             android:layout_width="match_parent"
-                            android:layout_height="125dp"
-                            android:layout_marginHorizontal="4dp"
-                            android:background="@drawable/bg_podium_gold">
+                            android:layout_height="110dp"
+                            android:background="@drawable/bg_podium_block"
+                            android:gravity="center"
+                            android:orientation="vertical">
 
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:layout_gravity="center_horizontal"
-                                android:layout_marginTop="12dp"
-                                android:fontFamily="sans-serif-black"
+                                android:fontFamily="@font/figtree_bold"
                                 android:text="1"
-                                android:textColor="#B78103"
-                                android:textSize="38sp" />
-                        </FrameLayout>
+                                android:textColor="#A6A4AB"
+                                android:textSize="34sp"
+                                android:textStyle="bold" />
+
+                            <ImageView
+                                android:layout_width="22dp"
+                                android:layout_height="22dp"
+                                android:layout_marginTop="8dp"
+                                android:src="@drawable/ic_leaf"
+                                app:tint="#C0C3CB" />
+                        </LinearLayout>
                     </LinearLayout>
 
-                    <!-- 3rd Place (Right, Lowest Podium) -->
+                    <!-- 3rd -->
                     <LinearLayout
                         android:id="@+id/podium3rd"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
+                        android:layout_marginHorizontal="6dp"
                         android:layout_weight="1"
                         android:gravity="center_horizontal"
                         android:orientation="vertical">
 
-                        <ImageView
-                            android:layout_width="22dp"
-                            android:layout_height="22dp"
-                            android:layout_marginBottom="4dp"
-                            android:contentDescription="Bronze Medal"
-                            android:src="@drawable/ic_medal_bronze" />
+                        <com.google.android.material.card.MaterialCardView
+                            android:layout_width="68dp"
+                            android:layout_height="68dp"
+                            app:cardBackgroundColor="#EBEDF0"
+                            app:cardCornerRadius="34dp"
+                            app:cardElevation="0dp"
+                            app:cardPreventCornerOverlap="false"
+                            app:contentPadding="0dp"
+                            app:strokeColor="#D9C7BC"
+                            app:strokeWidth="2dp">
 
-                        <!-- Bronze Avatar Frame -->
-                        <FrameLayout
-                            android:layout_width="54dp"
-                            android:layout_height="54dp"
-                            android:background="@drawable/bg_avatar_ring_bronze">
+                            <FrameLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent">
 
-                            <ImageView
-                                android:id="@+id/ivAvatar3rd"
-                                android:layout_width="30dp"
-                                android:layout_height="30dp"
-                                android:layout_gravity="center"
-                                android:contentDescription="3rd Place Avatar"
-                                android:src="@drawable/ic_user_round"
-                                app:tint="#6D4C41" />
+                                <ImageView
+                                    android:id="@+id/ivAvatar3rd"
+                                    android:layout_width="26dp"
+                                    android:layout_height="26dp"
+                                    android:layout_gravity="center"
+                                    android:contentDescription="Avatar"
+                                    android:src="@drawable/ic_user_round"
+                                    app:tint="@color/hu_soft" />
 
-                            <TextView
-                                android:id="@+id/tvInitials3rd"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_gravity="center"
-                                android:fontFamily="sans-serif-black"
-                                android:textColor="#4E342E"
-                                android:textSize="17sp"
-                                android:visibility="gone"
-                                tools:text="DL" />
-                        </FrameLayout>
+                                <TextView
+                                    android:id="@+id/tvInitials3rd"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_gravity="center"
+                                    android:fontFamily="@font/figtree_bold"
+                                    android:textColor="@color/hu_soft"
+                                    android:textSize="20sp"
+                                    android:textStyle="bold"
+                                    android:visibility="gone" />
+                            </FrameLayout>
+                        </com.google.android.material.card.MaterialCardView>
 
                         <TextView
                             android:id="@+id/tvName3rd"
-                            android:layout_width="wrap_content"
+                            android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:layout_marginTop="6dp"
+                            android:layout_marginTop="10dp"
                             android:ellipsize="end"
-                            android:fontFamily="sans-serif-black"
+                            android:fontFamily="@font/figtree_bold"
                             android:gravity="center"
                             android:maxLines="1"
-                            android:textColor="@color/sapot_text_primary"
+                            android:textColor="@color/hu_ink"
                             android:textSize="13sp"
-                            tools:text="Danial 🛒" />
+                            android:textStyle="bold" />
 
                         <TextView
                             android:id="@+id/tvTier3rd"
-                            android:layout_width="wrap_content"
+                            android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:layout_marginTop="1dp"
+                            android:fontFamily="@font/figtree_medium"
                             android:gravity="center"
-                            android:textColor="@color/sapot_text_secondary"
-                            android:textSize="10sp"
-                            tools:text="Steady Buyer" />
+                            android:maxLines="1"
+                            android:textColor="@color/hu_soft"
+                            android:textSize="11sp" />
 
                         <TextView
                             android:id="@+id/tvPoints3rd"
-                            android:layout_width="wrap_content"
+                            android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="2dp"
-                            android:layout_marginBottom="6dp"
-                            android:fontFamily="sans-serif-black"
-                            android:textColor="#6D4C41"
-                            android:textSize="13sp"
-                            tools:text="890 pts" />
+                            android:layout_marginBottom="14dp"
+                            android:fontFamily="@font/figtree_medium"
+                            android:gravity="center"
+                            android:textColor="@color/hu_ink"
+                            android:textSize="12sp"
+                            android:textStyle="bold" />
 
-                        <!-- Bronze Podium Pillar -->
-                        <FrameLayout
+                        <LinearLayout
                             android:layout_width="match_parent"
-                            android:layout_height="65dp"
-                            android:layout_marginHorizontal="4dp"
-                            android:background="@drawable/bg_podium_bronze">
+                            android:layout_height="110dp"
+                            android:background="@drawable/bg_podium_block"
+                            android:gravity="center"
+                            android:orientation="vertical">
 
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:layout_gravity="center_horizontal"
-                                android:layout_marginTop="12dp"
-                                android:fontFamily="sans-serif-black"
+                                android:fontFamily="@font/figtree_bold"
                                 android:text="3"
-                                android:textColor="#6D4C41"
-                                android:textSize="28sp" />
-                        </FrameLayout>
+                                android:textColor="#A6A4AB"
+                                android:textSize="34sp"
+                                android:textStyle="bold" />
+
+                            <ImageView
+                                android:layout_width="22dp"
+                                android:layout_height="22dp"
+                                android:layout_marginTop="8dp"
+                                android:src="@drawable/ic_leaf"
+                                app:tint="#C0C3CB" />
+                        </LinearLayout>
                     </LinearLayout>
                 </LinearLayout>
 
-                <!-- Section Divider / Header -->
-                <LinearLayout
+                <!-- Ranked list (4th onwards) -->
+                <com.google.android.material.card.MaterialCardView
+                    style="@style/Widget.HU.Card"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="16dp"
-                    android:layout_marginBottom="8dp"
-                    android:paddingHorizontal="20dp">
+                    android:layout_marginTop="24dp">
 
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:fontFamily="sans-serif-medium"
-                        android:text="Community Rankings (4th onwards)"
-                        android:textColor="@color/sapot_text_secondary"
-                        android:textSize="12sp"
-                        android:textStyle="bold" />
-                </LinearLayout>
+                    <FrameLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content">
 
-                <!-- Ranked RecyclerView (4th place onwards) -->
-                <androidx.recyclerview.widget.RecyclerView
-                    android:id="@+id/rvLeaderboard"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:nestedScrollingEnabled="false"
-                    tools:itemCount="5"
-                    tools:listitem="@layout/item_leaderboard_row" />
+                        <androidx.recyclerview.widget.RecyclerView
+                            android:id="@+id/rvLeaderboard"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:nestedScrollingEnabled="false" />
 
-                <!-- Empty State Message -->
-                <TextView
-                    android:id="@+id/tvEmptyLeaderboard"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="32dp"
-                    android:gravity="center"
-                    android:text="No points recorded yet this week.\nBe the first to scan and take #1!"
-                    android:textColor="@color/sapot_text_secondary"
-                    android:textSize="13sp"
-                    android:visibility="gone" />
-
+                        <TextView
+                            android:id="@+id/tvEmptyLeaderboard"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:fontFamily="@font/figtree_medium"
+                            android:gravity="center"
+                            android:padding="24dp"
+                            android:text="@string/leaderboard_no_points_yet_this"
+                            android:textColor="@color/hu_soft"
+                            android:textSize="14sp"
+                            android:visibility="gone" />
+                    </FrameLayout>
+                </com.google.android.material.card.MaterialCardView>
             </LinearLayout>
-        </androidx.core.widget.NestedScrollView>
+        </ScrollView>
 
-        <!-- Loading Spinner -->
         <ProgressBar
             android:id="@+id/progressBar"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_centerInParent="true"
-            android:indeterminateTint="@color/sapot_primary_yellow"
+            android:layout_gravity="center"
+            android:indeterminateTint="@color/hu_ink"
             android:visibility="gone" />
+    </FrameLayout>
 
-    </RelativeLayout>
-
-    <!-- Sticky "You" Bottom Card (Pinned at bottom of layout) -->
+    <!-- Your rank -->
     <com.google.android.material.card.MaterialCardView
         android:id="@+id/cardStickyYou"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginHorizontal="16dp"
-        android:layout_marginTop="4dp"
-        android:layout_marginBottom="12dp"
-        app:cardBackgroundColor="@color/sapot_primary_light"
-        app:cardCornerRadius="20dp"
-        app:cardElevation="6dp"
-        app:strokeColor="@color/sapot_primary_yellow"
-        app:strokeWidth="2dp">
+        android:layout_margin="16dp"
+        app:cardBackgroundColor="@color/hu_accent_tint"
+        app:cardCornerRadius="17dp"
+        app:cardElevation="0dp"
+        app:strokeColor="#ECEEF2"
+        app:strokeWidth="1dp">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center_vertical"
             android:orientation="horizontal"
-            android:paddingHorizontal="16dp"
-            android:paddingVertical="12dp">
+            android:padding="14dp">
 
-            <!-- Your Rank Badge -->
-            <FrameLayout
-                android:layout_width="38dp"
-                android:layout_height="38dp"
-                android:background="@drawable/bg_primary_button">
+            <TextView
+                android:id="@+id/tvStickyRank"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/bg_status_pill"
+                android:fontFamily="@font/figtree_bold"
+                android:gravity="center"
+                android:minWidth="44dp"
+                android:paddingHorizontal="10dp"
+                android:paddingVertical="8dp"
+                android:textColor="@color/hu_ink"
+                android:textSize="14sp"
+                android:textStyle="bold" />
 
-                <TextView
-                    android:id="@+id/tvStickyRank"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:fontFamily="sans-serif-black"
-                    android:textColor="@color/sapot_text_primary"
-                    android:textSize="14sp"
-                    tools:text="#14" />
-            </FrameLayout>
-
-            <!-- Your Avatar -->
             <com.google.android.material.card.MaterialCardView
-                android:layout_width="40dp"
-                android:layout_height="40dp"
+                android:layout_width="44dp"
+                android:layout_height="44dp"
                 android:layout_marginStart="12dp"
-                app:cardBackgroundColor="@color/sapot_primary_yellow"
-                app:cardCornerRadius="20dp"
-                app:cardElevation="0dp">
+                app:cardBackgroundColor="@color/hu_bg"
+                app:cardCornerRadius="22dp"
+                app:cardElevation="0dp"
+                app:cardPreventCornerOverlap="false"
+                app:contentPadding="0dp">
 
                 <FrameLayout
                     android:layout_width="match_parent"
@@ -517,27 +515,26 @@
 
                     <ImageView
                         android:id="@+id/ivStickyAvatar"
-                        android:layout_width="24dp"
-                        android:layout_height="24dp"
+                        android:layout_width="22dp"
+                        android:layout_height="22dp"
                         android:layout_gravity="center"
-                        android:contentDescription="Your Avatar"
+                        android:contentDescription="Your avatar"
                         android:src="@drawable/ic_user_round"
-                        app:tint="@color/sapot_text_primary" />
+                        app:tint="@color/hu_soft" />
 
                     <TextView
                         android:id="@+id/tvStickyInitials"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center"
-                        android:fontFamily="sans-serif-black"
-                        android:textColor="@color/sapot_text_primary"
+                        android:fontFamily="@font/figtree_bold"
+                        android:textColor="@color/hu_ink"
                         android:textSize="15sp"
-                        android:visibility="gone"
-                        tools:text="ME" />
+                        android:textStyle="bold"
+                        android:visibility="gone" />
                 </FrameLayout>
             </com.google.android.material.card.MaterialCardView>
 
-            <!-- Your Name & Tier Badge -->
             <LinearLayout
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -547,39 +544,34 @@
 
                 <TextView
                     android:id="@+id/tvStickyName"
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:ellipsize="end"
-                    android:fontFamily="sans-serif-black"
+                    android:fontFamily="@font/figtree_bold"
                     android:maxLines="1"
-                    android:textColor="@color/sapot_text_primary"
+                    android:textColor="@color/hu_ink"
                     android:textSize="14sp"
-                    tools:text="Amirul (You) 👑" />
+                    android:textStyle="bold" />
 
                 <TextView
                     android:id="@+id/tvStickyTier"
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="1dp"
-                    android:textColor="@color/sapot_text_secondary"
-                    android:textSize="11sp"
-                    tools:text="Otai Lokal · Your Position" />
+                    android:ellipsize="end"
+                    android:fontFamily="@font/figtree_medium"
+                    android:maxLines="1"
+                    android:textColor="@color/hu_soft"
+                    android:textSize="12sp" />
             </LinearLayout>
 
-            <!-- Your Points -->
             <TextView
                 android:id="@+id/tvStickyPoints"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="8dp"
-                android:fontFamily="sans-serif-black"
-                android:textColor="@color/sapot_text_primary"
-                android:textSize="16sp"
-                tools:text="1,650 pts" />
-
+                android:fontFamily="@font/figtree_bold"
+                android:textColor="@color/hu_ink"
+                android:textSize="15sp"
+                android:textStyle="bold" />
         </LinearLayout>
-
     </com.google.android.material.card.MaterialCardView>
-
 </LinearLayout>
-

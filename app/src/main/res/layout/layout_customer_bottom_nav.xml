@@ -1,117 +1,78 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<!--
+    Customer bottom bar (Hadiah Utama): Home · Shops · Scan · Rewards · Play.
+    Scan is a raised white circle in the middle. The active tab is ink with an orange bar;
+    idle tabs are soft grey. Labels 12sp so they stay readable for older customers.
+-->
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="76dp"
-    android:background="@color/sapot_white"
-    android:baselineAligned="false"
-    android:gravity="center_vertical"
-    android:orientation="horizontal"
-    android:paddingHorizontal="10dp">
+    android:layout_height="wrap_content"
+    android:clipChildren="false"
+    android:clipToPadding="false">
 
-    <!-- Tab 1: Home (Selected) -->
     <LinearLayout
-        android:id="@+id/tabHome"
-        android:layout_width="0dp"
-        android:layout_height="match_parent"
-        android:layout_weight="1"
-        android:gravity="center"
-        android:orientation="vertical">
+        android:id="@+id/navBar"
+        android:layout_width="match_parent"
+        android:layout_height="72dp"
+        android:layout_gravity="bottom"
+        android:background="@drawable/bg_hu_nav"
+        android:baselineAligned="false"
+        android:orientation="horizontal"
+        android:paddingHorizontal="4dp">
 
-        <FrameLayout
-            android:layout_width="54dp"
-            android:layout_height="30dp"
-            android:background="@drawable/bg_primary_button">
+        <LinearLayout android:id="@+id/tabHome" style="@style/HU.NavTab">
+            <View android:id="@+id/barHome" style="@style/HU.NavBar" />
+            <ImageView android:id="@+id/iconHome" style="@style/HU.NavIcon" android:src="@drawable/ic_house" />
+            <TextView android:id="@+id/labelHome" style="@style/HU.NavLabel" android:text="@string/customer_bottom_nav_home" />
+        </LinearLayout>
 
-            <ImageView
-                android:layout_width="21dp"
-                android:layout_height="21dp"
-                android:layout_gravity="center"
-                android:src="@drawable/ic_house"
-                app:tint="@color/sapot_text_primary" />
-        </FrameLayout>
+        <LinearLayout android:id="@+id/tabShops" style="@style/HU.NavTab">
+            <View android:id="@+id/barShops" style="@style/HU.NavBar" />
+            <ImageView android:id="@+id/iconShops" style="@style/HU.NavIcon" android:src="@drawable/ic_store" />
+            <TextView android:id="@+id/labelShops" style="@style/HU.NavLabel" android:text="@string/customer_bottom_nav_shops" />
+        </LinearLayout>
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
-            android:text="Home"
-            android:textColor="@color/sapot_text_primary"
-            android:textSize="10sp"
-            android:textStyle="bold" />
+        <LinearLayout android:id="@+id/tabScan" style="@style/HU.NavTab">
+            <View android:id="@+id/barScan" style="@style/HU.NavBar" android:visibility="invisible" />
+            <Space android:layout_width="24dp" android:layout_height="24dp" />
+            <TextView android:id="@+id/labelScan" style="@style/HU.NavLabel" android:text="@string/customer_bottom_nav_scan" />
+        </LinearLayout>
+
+        <LinearLayout android:id="@+id/tabRewards" style="@style/HU.NavTab">
+            <View android:id="@+id/barRewards" style="@style/HU.NavBar" />
+            <ImageView android:id="@+id/iconRewards" style="@style/HU.NavIcon" android:src="@drawable/ic_gift" />
+            <TextView android:id="@+id/labelRewards" style="@style/HU.NavLabel" android:text="@string/customer_bottom_nav_rewards" />
+        </LinearLayout>
+
+        <LinearLayout android:id="@+id/tabPlay" style="@style/HU.NavTab">
+            <View android:id="@+id/barPlay" style="@style/HU.NavBar" />
+            <ImageView android:id="@+id/iconPlay" style="@style/HU.NavIcon" android:src="@drawable/ic_wheel" />
+            <TextView android:id="@+id/labelPlay" style="@style/HU.NavLabel" android:text="@string/customer_bottom_nav_play" />
+        </LinearLayout>
     </LinearLayout>
 
-    <!-- Tab 2: Discover -->
-    <LinearLayout
-        android:id="@+id/tabDiscover"
-        android:layout_width="0dp"
-        android:layout_height="match_parent"
-        android:layout_weight="1"
-        android:gravity="center"
-        android:orientation="vertical">
+    <!-- Raised Scan button over the bar -->
+    <FrameLayout
+        android:id="@+id/scanFab"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:layout_gravity="center_horizontal|top"
+        android:layout_marginBottom="44dp"
+        android:background="@drawable/bg_hu_scan_fab"
+        android:clickable="true"
+        android:contentDescription="@string/customer_bottom_nav_scan"
+        android:elevation="8dp"
+        android:focusable="true"
+        android:foreground="?attr/selectableItemBackgroundBorderless">
 
         <ImageView
-            android:layout_width="21dp"
-            android:layout_height="21dp"
-            android:src="@drawable/ic_compass"
-            app:tint="@color/sapot_text_secondary" />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
-            android:text="Discover"
-            android:textColor="@color/sapot_text_secondary"
-            android:textSize="10sp" />
-    </LinearLayout>
-
-    <!-- Tab 3: My shops -->
-    <LinearLayout
-        android:id="@+id/tabMyShops"
-        android:layout_width="0dp"
-        android:layout_height="match_parent"
-        android:layout_weight="1"
-        android:gravity="center"
-        android:orientation="vertical">
-
-        <ImageView
-            android:layout_width="21dp"
-            android:layout_height="21dp"
-            android:src="@drawable/ic_wallet"
-            app:tint="@color/sapot_text_secondary" />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
-            android:text="Vouchers"
-            android:textColor="@color/sapot_text_secondary"
-            android:textSize="10sp" />
-    </LinearLayout>
-
-    <!-- Tab 4: Profile -->
-    <LinearLayout
-        android:id="@+id/tabProfile"
-        android:layout_width="0dp"
-        android:layout_height="match_parent"
-        android:layout_weight="1"
-        android:gravity="center"
-        android:orientation="vertical">
-
-        <ImageView
-            android:layout_width="21dp"
-            android:layout_height="21dp"
-            android:src="@drawable/ic_user_round"
-            app:tint="@color/sapot_text_secondary" />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
-            android:text="Profile"
-            android:textColor="@color/sapot_text_secondary"
-            android:textSize="10sp" />
-    </LinearLayout>
-
-</LinearLayout>
-
+            android:id="@+id/iconScan"
+            android:layout_width="28dp"
+            android:layout_height="28dp"
+            android:layout_gravity="center"
+            android:contentDescription="@null"
+            android:src="@drawable/ic_scan"
+            app:tint="@color/hu_ink" />
+    </FrameLayout>
+</FrameLayout>

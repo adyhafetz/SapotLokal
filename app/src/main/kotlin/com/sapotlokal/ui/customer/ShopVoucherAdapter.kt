@@ -15,7 +15,9 @@ import com.sapotlokal.databinding.ItemShopVoucherBinding
  * Shows voucher details and clearly informs the customer if they have already earned
  * enough points at this shop to unlock it.
  */
-class ShopVoucherAdapter : RecyclerView.Adapter<ShopVoucherAdapter.ViewHolder>() {
+class ShopVoucherAdapter(
+    private val onRewardClick: (reward: Voucher, customerPoints: Int) -> Unit = { _, _ -> }
+) : RecyclerView.Adapter<ShopVoucherAdapter.ViewHolder>() {
 
     private val items = mutableListOf<Voucher>()
     private var customerPoints: Int = 0
@@ -41,7 +43,7 @@ class ShopVoucherAdapter : RecyclerView.Adapter<ShopVoucherAdapter.ViewHolder>()
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        holder.bind(items[position], customerPoints)
+        holder.bind(items[position], customerPoints, onRewardClick)
     }
 
     override fun getItemCount(): Int = items.size
@@ -49,18 +51,23 @@ class ShopVoucherAdapter : RecyclerView.Adapter<ShopVoucherAdapter.ViewHolder>()
     class ViewHolder(private val binding: ItemShopVoucherBinding) :
         RecyclerView.ViewHolder(binding.root) {
 
-        fun bind(voucher: Voucher, customerPoints: Int) {
+        fun bind(voucher: Voucher, customerPoints: Int, onClick: (Voucher, Int) -> Unit) {
+            // Make the whole card tappable (it previously had no click handler at all).
+            binding.root.isClickable = true
+            binding.root.isFocusable = true
+            binding.root.setOnClickListener { onClick(voucher, customerPoints) }
+
             binding.tvVoucherTitle.text = voucher.voucherName
-            binding.tvVoucherDesc.text = voucher.voucherDescription.ifBlank { "Reward at this shop." }
-            binding.tvPointsRequired.text = "${voucher.pointsRequired} pts"
+            binding.tvVoucherDesc.text = voucher.voucherDescription.ifBlank { binding.root.context.getString(com.sapotlokal.R.string.k_reward_at_shop_dot) }
+            binding.tvPointsRequired.text = binding.root.context.getString(com.sapotlokal.R.string.k_n_pts_required, voucher.pointsRequired)
 
             val context = binding.root.context
             if (customerPoints >= voucher.pointsRequired) {
-                binding.tvEligibility.text = "✓ Eligible! Redeem at checkout"
+                binding.tvEligibility.text = "✓ " + binding.root.context.getString(com.sapotlokal.R.string.k_ready_to_claim)
                 binding.tvEligibility.setTextColor(ContextCompat.getColor(context, R.color.sapot_success_text))
             } else {
                 val needed = voucher.pointsRequired - customerPoints
-                binding.tvEligibility.text = "Need $needed more pts"
+                binding.tvEligibility.text = binding.root.context.getString(com.sapotlokal.R.string.k_need_more_pts, needed)
                 binding.tvEligibility.setTextColor(ContextCompat.getColor(context, R.color.sapot_text_secondary))
             }
         }

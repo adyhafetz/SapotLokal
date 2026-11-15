@@ -5,13 +5,12 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
+import android.view.LayoutInflater
 import android.view.View
-import android.widget.Toast
+import android.widget.LinearLayout
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.widget.PopupMenu
 import androidx.core.content.ContextCompat
-import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
@@ -21,380 +20,424 @@ import com.sapotlokal.AppConfig
 import com.sapotlokal.AppConfig.CustomerTier
 import com.sapotlokal.R
 import com.sapotlokal.data.model.Vendor
-import com.sapotlokal.data.repository.ChallengeRepository
+import com.sapotlokal.data.model.Voucher
+import com.sapotlokal.data.model.VoucherStatus
+import com.sapotlokal.data.model.VoucherUser
+import com.sapotlokal.data.repository.GamesRepository
 import com.sapotlokal.data.repository.PointRepository
-import com.sapotlokal.data.repository.VendorRepository
 import com.sapotlokal.databinding.ActivityCustomerHomeBinding
+import com.sapotlokal.databinding.ViewHuFirstScanBinding
 import com.sapotlokal.service.SapotFcmService
 import com.sapotlokal.ui.auth.LoginActivity
-import com.sapotlokal.ui.games.GamesMenuActivity
-import java.text.NumberFormat
-import java.util.Locale
+import com.sapotlokal.util.VoucherClaimHelper
+import java.util.Calendar
 
 /**
- * CustomerHomeActivity — Phase 3 real implementation adapted for the new SapotLokal UI.
+ * Customer Home (Hadiah Utama). One job: "is anything ready for me?"
  *
- * WHAT IT DOES:
- * 1. Identifies the logged-in customer from FirebaseAuth.
- * 2. Attaches a live listener to /points filtered by userID.
- * 3. Computes lifetimeEarned → level + progress bar fill via AppConfig.
- * 4. Navigates to FindShopsActivity, ScanActivity, GamesMenuActivity, ChallengesActivity, or MyVouchersActivity.
- * 5. Handles bottom navigation and profile/logout menu.
- * 6. Syncs FCM registration token & prompts for push notification permissions (Phase 6).
+ * 1. Header: time-of-day greeting and name; tapping it opens Me (profile).
+ * 2. Level score with a bar ticked at each level (level score never buys rewards).
+ * 3. One big reward card: a reward to claim now (claiming spends that shop's points at claim
+ *    time via [VoucherClaimHelper]), else a claimed voucher to show, else the closest reward.
+ *    A brand-new customer sees a "Scan your first shop" card instead.
+ * 4. Up to three of the customer's shops as stacked colour cards with cup stamps.
+ * 5. Today in Play: free spin and the nearest mission, opening the Play tab.
+ *
+ * Also keeps lifetime points in /users repaired, syncs the FCM token, asks for notification
+ * permission, and raises "shop is open" alerts for shops the customer follows.
  */
 class CustomerHomeActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityCustomerHomeBinding
+    private val auth = FirebaseAuth.getInstance()
+
     private var pointsListener: ValueEventListener? = null
     private var userListener: ValueEventListener? = null
-    private val auth = FirebaseAuth.getInstance()
-    private var currentUserName: String = ""
-    private var currentUserTier: CustomerTier = CustomerTier.FRESHIE
+    private var vendorsListener: ValueEventListener? = null
+    private var missionsListener: ValueEventListener? = null
+    private var vouchersListener: ValueEventListener? = null
+    private var rulesListener: ValueEventListener? = null
+
+    private var currentUserName = ""
+    private var currentUserTier = CustomerTier.FRESHIE
+    private var currentAvatarId = ""
+
+    private var pointsLoaded = false
+    private var lastPerShop: Map<String, Int> = emptyMap()
+    private var vendorsById: Map<String, Vendor> = emptyMap()
+    private var myVouchers: List<VoucherUser> = emptyList()
+    private var allRules: List<Voucher> = emptyList()
+    private var missionLine: String? = null
+    private var spinReady: Boolean? = null
+
+    /** lifetimePoints as last read from /users/{uid}; Int.MAX_VALUE until the first read so we never "repair" blindly. */
+    private var storedLifetimePoints = Int.MAX_VALUE
+
+    /** Vendors this customer has earned points at — only their "now OPEN" alerts are shown. */
+    @Volatile private var followedVendorIds: Set<String> = emptySet()
 
     private val notifPermissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestPermission()
-    ) { isGranted ->
-        if (isGranted) {
-            auth.currentUser?.uid?.let { SapotFcmService.syncTokenForUser(it) }
-        }
-    }
+    ) { granted -> if (granted) auth.currentUser?.uid?.let { SapotFcmService.syncTokenForUser(it) } }
 
     private var shopNotificationListener: com.google.firebase.database.ChildEventListener? = null
-    private val sessionStartTime = System.currentTimeMillis()
-
-    /** Adapter for the "Around your corner" recently-visited shops list (Phase 3 Task 3.2). */
-    private val recentShopAdapter = RecentShopAdapter { vendorId ->
-        val intent = Intent(this, ShopDetailActivity::class.java).apply {
-            putExtra(ShopDetailActivity.EXTRA_VENDOR_ID, vendorId)
-        }
-        startActivity(intent)
-    }
+    private var shopNotifQuery: com.google.firebase.database.Query? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityCustomerHomeBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        val user = auth.currentUser
-        if (user == null) {
-            // Defensive: if session expired, go back to login
-            goToLogin()
-            return
-        }
+        val user = auth.currentUser ?: run { goToLogin(); return }
 
-        // Set up the recent shops RecyclerView (Phase 3 Task 3.2)
-        binding.rvRecentShops.layoutManager = LinearLayoutManager(this)
-        binding.rvRecentShops.adapter = recentShopAdapter
-
-        // Load cached user name & tier to prevent greeting flicker
         val prefs = getSharedPreferences("sapot_user_prefs", MODE_PRIVATE)
-        val cachedName = prefs.getString("cached_user_name", "") ?: ""
-        val cachedTierCode = prefs.getString("cached_user_tier", CustomerTier.FRESHIE.code)
-        currentUserTier = CustomerTier.entries.firstOrNull { it.code == cachedTierCode } ?: CustomerTier.FRESHIE
-        if (cachedName.isNotBlank()) {
-            currentUserName = cachedName
+        currentUserName = prefs.getString("cached_user_name", "").orEmpty()
+        currentAvatarId = prefs.getString("cached_user_avatar", "").orEmpty()
+        val cachedTier = prefs.getString("cached_user_tier", CustomerTier.FRESHIE.code)
+        currentUserTier = CustomerTier.entries.firstOrNull { it.code == cachedTier } ?: CustomerTier.FRESHIE
+        updateGreeting()
+
+        binding.btnMe.setOnClickListener { openMe() }
+        binding.levelBlock.setOnClickListener { startActivity(Intent(this, ChallengesActivity::class.java)) }
+        binding.btnHowPoints.setOnClickListener { HowPoints.show(this) }
+        binding.btnAllShops.setOnClickListener { startActivity(Intent(this, FindShopsActivity::class.java)) }
+        binding.tvMoreReady.setOnClickListener { openRewards() }
+        binding.playStrip.setOnClickListener { startActivity(Intent(this, ChallengesActivity::class.java)) }
+        binding.btnRetry.setOnClickListener {
+            binding.errorBlock.visibility = View.GONE
+            pointsListener?.let { PointRepository.removePointsListener(user.uid, it) }
+            startListeningToPoints(user.uid)
         }
-        updateGreeting(currentUserTier)
 
         startListeningToUser(user.uid)
         startListeningToPoints(user.uid)
-
-        // Quick Actions & Navigation
-        binding.btnScan.setOnClickListener {
-            startActivity(Intent(this, ScanActivity::class.java))
-        }
-        binding.btnGames.setOnClickListener {
-            startActivity(Intent(this, GamesMenuActivity::class.java))
-        }
-        binding.btnChallenges.setOnClickListener {
-            startActivity(Intent(this, ChallengesActivity::class.java))
-        }
-        binding.btnMyVouchers.setOnClickListener {
-            startActivity(Intent(this, MyVouchersActivity::class.java))
-        }
-        binding.btnLeaderboard.setOnClickListener {
-            startActivity(Intent(this, LeaderboardActivity::class.java))
-        }
-        binding.btnExplore.setOnClickListener {
-            startActivity(Intent(this, FindShopsActivity::class.java))
-        }
-
-        // Notification permission & FCM token synchronization (Phase 6)
         checkNotificationPermission(user.uid)
         startListeningToShopNotifications()
-        ChallengeRepository.syncUserProgress(user.uid)
         com.sapotlokal.data.repository.MissionRepository.syncUserMissions(user.uid)
 
-        // Bottom Navigation
-        binding.bottomNav.tabHome.setOnClickListener {
-            // Already on Home
-        }
-        binding.bottomNav.tabDiscover.setOnClickListener {
-            startActivity(Intent(this, FindShopsActivity::class.java))
-        }
-        binding.bottomNav.tabMyShops.setOnClickListener {
-            startActivity(Intent(this, MyVouchersActivity::class.java))
-        }
-        binding.cardRewardNudge.setOnClickListener {
-            startActivity(Intent(this, MyVouchersActivity::class.java))
-        }
-        binding.bottomNav.tabProfile.setOnClickListener {
-            startActivity(Intent(this, CustomerProfileActivity::class.java))
-        }
-
-        // Hero Points Card navigates directly to Profile & Badges showcase
-        binding.cardPointsHero.setOnClickListener {
-            startActivity(Intent(this, CustomerProfileActivity::class.java))
-        }
-
-        // Top notification bell options
-        binding.btnNotification.setOnClickListener { view ->
-            showProfileMenu(view)
-        }
+        CustomerNav.bind(this, binding.customerNav, CustomerNav.Tab.HOME)
     }
 
-    private fun showProfileMenu(anchor: View) {
-        val popup = PopupMenu(this, anchor)
-        popup.menuInflater.inflate(R.menu.menu_customer_home, popup.menu)
-        popup.setOnMenuItemClickListener { item ->
-            when (item.itemId) {
-                R.id.action_profile -> {
-                    startActivity(Intent(this, CustomerProfileActivity::class.java))
-                    true
-                }
-                R.id.action_leaderboard -> {
-                    startActivity(Intent(this, LeaderboardActivity::class.java))
-                    true
-                }
-                R.id.action_logout -> {
-                    auth.signOut()
-                    goToLogin()
-                    true
-                }
-                else -> false
+    // ── Header & level ────────────────────────────────────────────────────────
+
+    private fun updateGreeting() {
+        val hour = Calendar.getInstance().get(Calendar.HOUR_OF_DAY)
+        binding.tvGreetingTime.setText(
+            when (hour) {
+                in 5..11 -> R.string.home_greet_morning
+                in 12..14 -> R.string.home_greet_afternoon
+                in 15..18 -> R.string.home_greet_evening
+                else -> R.string.home_greet_night
             }
-        }
-        popup.show()
-    }
-
-    // ── Points listener ───────────────────────────────────────────────────────
-
-    private fun startListeningToUser(uid: String) {
-        val userRef = FirebaseDatabase.getInstance(AppConfig.DATABASE_URL)
-            .reference.child("users").child(uid)
-        userListener = object : ValueEventListener {
-            override fun onDataChange(snapshot: DataSnapshot) {
-                val name = snapshot.child("userName").getValue(String::class.java)?.trim() ?: ""
-                if (name.isNotBlank()) {
-                    currentUserName = name
-                }
-                val dbLifetime = snapshot.child("lifetimePoints").getValue(Long::class.java)?.toInt() ?: 0
-                if (dbLifetime > 0) {
-                    val tierFromLifetime = CustomerTier.fromLifetimePoints(dbLifetime)
-                    if (tierFromLifetime.ordinal >= currentUserTier.ordinal) {
-                        currentUserTier = tierFromLifetime
-                    }
-                }
-                updateGreeting(currentUserTier)
-                getSharedPreferences("sapot_user_prefs", MODE_PRIVATE).edit()
-                    .putString("cached_user_name", currentUserName)
-                    .putString("cached_user_tier", currentUserTier.code)
-                    .apply()
-            }
-
-            override fun onCancelled(error: DatabaseError) {
-                // Keep placeholder on network error
-            }
-        }
-        userRef.addValueEventListener(userListener!!)
-    }
-
-    private fun updateGreeting(tier: CustomerTier) {
-        val displayName = if (currentUserName.isNotBlank()) currentUserName else "Shopper"
-        binding.tvGreeting.text = "$displayName ${tier.emoji}"
-    }
-
-    private fun startListeningToPoints(userID: String) {
-        pointsListener = PointRepository.listenToPointsForUser(
-            userID = userID,
-            onUpdate = { perShopBalance, lifetimeEarned, spendableBalance ->
-                updateUi(lifetimeEarned, spendableBalance)
-                loadRecentShops(perShopBalance)
-            },
-            onError  = { /* keep showing last values; network error handled in ScanActivity */ }
         )
+        val name = currentUserName.ifBlank { getString(R.string.k_shopper) }
+        binding.tvGreeting.text = name
+        binding.btnMe.contentDescription = getString(R.string.hu_open_me_cd, name)
+        val avatar = com.sapotlokal.data.model.AvatarDef.fromId(currentAvatarId)
+        if (avatar != null) binding.ivAvatar.setImageResource(avatar.drawableRes)
+        else binding.ivAvatar.setImageResource(R.drawable.ic_user_round)
     }
 
-    /**
-     * Given the per-shop balance map (vendorID → balance), fetches each vendor's
-     * name and category from /vendors and submits a sorted list to the adapter.
-     *
-     * Vendors with a zero-or-negative balance are excluded (shouldn't happen in normal
-     * flow, but guards against stale data).
-     *
-     * The list is sorted descending by balance so the shop with the most points
-     * appears first — motivating the customer to keep earning.
-     */
-    private fun loadRecentShops(perShopBalance: Map<String, Int>) {
-        val visitedVendorIDs = perShopBalance.keys.filter { it.isNotBlank() && (perShopBalance[it] ?: 0) > 0 }
+    private fun bindLevel(lifetime: Int) {
+        val tier = CustomerTier.fromLifetimePoints(lifetime)
+        binding.tvLevelScore.text = java.text.NumberFormat.getIntegerInstance().format(lifetime)
+        LevelDisplay.bind(binding.levelBar, binding.tvLevelLine, lifetime)
+        binding.levelBlock.contentDescription = getString(R.string.hu_level_cd, lifetime, tier.ordinal + 1, tier.title)
+    }
 
-        if (visitedVendorIDs.isEmpty()) {
-            recentShopAdapter.submitList(emptyList())
-            binding.tvNoShops.visibility    = View.VISIBLE
-            binding.rvRecentShops.visibility = View.GONE
+    // ── Rewards logic (shared rules with Rewards and the Shop page) ───────────
+
+    private fun liveVouchers(): List<VoucherUser> {
+        val now = System.currentTimeMillis()
+        return myVouchers.filter {
+            it.voucherStatus == VoucherStatus.ACTIVE && (it.voucherExpiryDate == 0L || it.voucherExpiryDate > now)
+        }
+    }
+
+    private fun claimableRules(): List<Voucher> {
+        val held = liveVouchers().map { it.voucherID }.toSet()
+        return allRules.filter {
+            it.voucherID !in held && vendorsById.containsKey(it.vendorID) && it.pointsRequired > 0 &&
+                (lastPerShop[it.vendorID] ?: 0) >= it.pointsRequired
+        }.sortedBy { shopName(it.vendorID).lowercase() }
+    }
+
+    private fun nextRewardAt(vendorId: String): Voucher? {
+        val balance = lastPerShop[vendorId] ?: 0
+        return allRules.filter { it.vendorID == vendorId && it.pointsRequired > balance }.minByOrNull { it.pointsRequired }
+    }
+
+    private fun refreshAll() {
+        if (!pointsLoaded) return
+        bindReadyCard()
+        bindShops()
+        bindPlay()
+    }
+
+    private fun bindReadyCard() {
+        val slot = binding.readySlot
+        slot.removeAllViews()
+        val claimable = claimableRules()
+        val vouchers = liveVouchers()
+        val readyCount = claimable.size + vouchers.size
+
+        val hasAnyPoints = lastPerShop.any { it.key.isNotBlank() && it.value > 0 }
+        if (!hasAnyPoints && vouchers.isEmpty()) {
+            val first = ViewHuFirstScanBinding.inflate(LayoutInflater.from(this), slot, true)
+            first.btnFirstScan.setOnClickListener { startActivity(Intent(this, ScanActivity::class.java)) }
+            binding.tvMoreReady.visibility = View.GONE
             return
         }
 
-        // Accumulate resolved items; submit once all lookups complete.
-        val resolved = mutableListOf<RecentShopItem>()
-        var remaining = visitedVendorIDs.size
-
-        for (vendorID in visitedVendorIDs) {
-            VendorRepository.fetchVendorById(
-                vendorID = vendorID,
-                onResult = { vendor ->
-                    val balance = perShopBalance[vendorID] ?: 0
-                    if (vendor != null && balance > 0) {
-                        synchronized(resolved) {
-                            resolved.add(
-                                RecentShopItem(
-                                    vendorID  = vendorID,
-                                    shopName  = vendor.vendorName.ifBlank { "Unknown Shop" },
-                                    category  = vendor.vendorCategory.ifBlank { "Shop" },
-                                    balance   = balance,
-                                    isOpen    = vendor.isOpen
-                                )
-                            )
-                        }
-                    }
-                    synchronized(resolved) {
-                        remaining--
-                        if (remaining == 0) {
-                            // All lookups done — sort and submit on the main thread
-                            val sorted = resolved.sortedByDescending { it.balance }
-                            runOnUiThread {
-                                recentShopAdapter.submitList(sorted)
-                                binding.tvNoShops.visibility     = View.GONE
-                                binding.rvRecentShops.visibility = View.VISIBLE
-                            }
-                        }
-                    }
-                },
-                onError = { _ ->
-                    synchronized(resolved) {
-                        remaining--
-                        if (remaining == 0) {
-                            val sorted = resolved.sortedByDescending { it.balance }
-                            runOnUiThread {
-                                recentShopAdapter.submitList(sorted)
-                                binding.tvNoShops.visibility     = if (sorted.isEmpty()) View.VISIBLE else View.GONE
-                                binding.rvRecentShops.visibility = if (sorted.isEmpty()) View.GONE else View.VISIBLE
-                            }
-                        }
-                    }
+        val card = RewardCard.inflate(slot)
+        val rule = claimable.firstOrNull()
+        val voucher = vouchers.firstOrNull()
+        when {
+            rule != null -> {
+                val balance = lastPerShop[rule.vendorID] ?: 0
+                val shop = shopName(rule.vendorID)
+                RewardCard.bind(
+                    card, rule.vendorID, shop, rule.pointsRequired, rule.voucherName,
+                    getString(R.string.hu_uses_points_at, rule.pointsRequired, balance, shop),
+                    getString(R.string.hu_claim, rule.pointsRequired)
+                ) {
+                    val uid = auth.currentUser?.uid ?: return@bind
+                    VoucherClaimHelper.confirmAndClaim(this, uid, rule, shop)
                 }
-            )
+            }
+            voucher != null -> RewardCard.bind(
+                card, voucher.vendorID, shopName(voucher.vendorID), voucher.pointsRequiredSnapshot,
+                voucher.voucherTitle.ifBlank { getString(R.string.k_reward) },
+                getString(R.string.hu_voucher_detail), getString(R.string.hu_show_qr)
+            ) { openRewards() }
+            else -> {
+                val held = vouchers.map { it.voucherID }.toSet()
+                val next = allRules
+                    .filter { it.voucherID !in held && vendorsById.containsKey(it.vendorID) }
+                    .minByOrNull { (it.pointsRequired - (lastPerShop[it.vendorID] ?: 0)).coerceAtLeast(0) }
+                if (next == null) {
+                    binding.tvMoreReady.visibility = View.GONE
+                    return
+                }
+                val remaining = (next.pointsRequired - (lastPerShop[next.vendorID] ?: 0)).coerceAtLeast(1)
+                RewardCard.bind(
+                    card, next.vendorID, shopName(next.vendorID), next.pointsRequired, next.voucherName,
+                    getString(R.string.hu_next_detail, remaining), getString(R.string.hu_see_shop)
+                ) { openShop(next.vendorID) }
+                // "See shop" is a quiet outlined action; Claim stays the only orange button.
+                card.btnAction.backgroundTintList = android.content.res.ColorStateList.valueOf(getColor(R.color.hu_bg))
+                card.btnAction.setStrokeColorResource(R.color.hu_line)
+                card.btnAction.strokeWidth = dp(2)
+            }
+        }
+        slot.addView(card.root)
+
+        val more = readyCount - 1
+        if (more > 0) {
+            binding.tvMoreReady.text = getString(R.string.hu_more_ready, more)
+            binding.tvMoreReady.visibility = View.VISIBLE
+        } else {
+            binding.tvMoreReady.visibility = View.GONE
         }
     }
 
-    private fun updateUi(lifetimeEarned: Int, spendableBalance: Int) {
-        val tier = CustomerTier.fromLifetimePoints(lifetimeEarned)
-        currentUserTier = tier
-        updateGreeting(tier)
+    private fun bindShops() {
+        val container = binding.shopCards
+        container.removeAllViews()
+        val claimShops = claimableRules().map { it.vendorID }.toSet() + liveVouchers().map { it.vendorID }
+        val held = lastPerShop.filter { it.key.isNotBlank() && it.value > 0 }
+            .toList()
+            .sortedWith(compareByDescending<Pair<String, Int>> { it.first in claimShops }.thenByDescending { it.second })
+            .take(HOME_SHOP_CARDS)
+        binding.shopsHeader.visibility = if (held.isEmpty()) View.GONE else View.VISIBLE
+        held.forEachIndexed { i, (vendorId, balance) ->
+            val card = ShopCard.inflate(container)
+            val readyRule = claimableRules().firstOrNull { it.vendorID == vendorId }
+            ShopCard.bind(card, vendorsById[vendorId], vendorId, balance, vendorId in claimShops, nextRewardAt(vendorId), readyReward = readyRule)
+            card.root.setOnClickListener { openShop(vendorId) }
+            container.addView(card.root, LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT
+            ).apply { topMargin = dp(if (i == 0) 10 else 10) })
+        }
+    }
 
+    private fun bindPlay() {
+        val parts = listOfNotNull(
+            if (spinReady == true) getString(R.string.hu_spin_ready) else null,
+            missionLine
+        )
+        binding.tvPlayLine.text = parts.joinToString(" · ").ifBlank { getString(R.string.hu_play_missions) }
+    }
+
+    // ── Listeners ─────────────────────────────────────────────────────────────
+
+    private fun startListeningToPoints(uid: String) {
+        pointsListener = PointRepository.listenToPointsForUser(
+            userID = uid,
+            onUpdate = { perShop, lifetime, _ ->
+                followedVendorIds = perShop.keys.filter { it.isNotBlank() }.toSet()
+                lastPerShop = perShop
+                pointsLoaded = true
+                binding.errorBlock.visibility = View.GONE
+                onLifetime(lifetime)
+                refreshAll()
+            },
+            onError = { if (!pointsLoaded) binding.errorBlock.visibility = View.VISIBLE }
+        )
+    }
+
+    private fun onLifetime(lifetime: Int) {
+        val tier = CustomerTier.fromLifetimePoints(lifetime)
+        currentUserTier = tier
+        bindLevel(lifetime)
+        cacheUser()
+        // REPAIR ONLY: fix a stored lifetimePoints that is BEHIND the ledger (older accounts).
+        auth.currentUser?.uid?.let { uid ->
+            if (lifetime > storedLifetimePoints) {
+                storedLifetimePoints = lifetime
+                FirebaseDatabase.getInstance(AppConfig.DATABASE_URL).reference.child("users").child(uid)
+                    .updateChildren(hashMapOf<String, Any>("lifetimePoints" to lifetime, "currentTier" to tier.code))
+            }
+        }
+    }
+
+    private fun startListeningToUser(uid: String) {
+        val ref = FirebaseDatabase.getInstance(AppConfig.DATABASE_URL).reference.child("users").child(uid)
+        userListener = object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                val name = snapshot.child("userName").getValue(String::class.java)?.trim().orEmpty()
+                currentAvatarId = snapshot.child("avatar").getValue(String::class.java).orEmpty()
+                if (name.isNotBlank()) currentUserName = name
+                storedLifetimePoints = snapshot.child("lifetimePoints").getValue(Long::class.java)?.toInt() ?: 0
+                updateGreeting()
+                cacheUser()
+            }
+            override fun onCancelled(error: DatabaseError) {}
+        }
+        ref.addValueEventListener(userListener!!)
+    }
+
+    private fun cacheUser() {
         getSharedPreferences("sapot_user_prefs", MODE_PRIVATE).edit()
             .putString("cached_user_name", currentUserName)
             .putString("cached_user_tier", currentUserTier.code)
+            .putString("cached_user_avatar", currentAvatarId)
             .apply()
+    }
 
-        auth.currentUser?.uid?.let { uid ->
-            val updates = hashMapOf<String, Any>(
-                "lifetimePoints" to lifetimeEarned,
-                "currentTier" to tier.code
+    private fun startListeningToVendors() {
+        if (vendorsListener != null) return
+        vendorsListener = com.sapotlokal.data.repository.VendorRepository.listenToAllVendors(
+            onUpdate = { vendors -> vendorsById = vendors.associateBy { it.vendorID }; refreshAll() },
+            onError = { }
+        )
+    }
+
+    private fun startRewardListeners(uid: String) {
+        if (vouchersListener == null) {
+            vouchersListener = com.sapotlokal.data.repository.VoucherRepository.listenToVouchersForUser(
+                userID = uid, onUpdate = { myVouchers = it; refreshAll() }, onError = { }
             )
-            FirebaseDatabase.getInstance(AppConfig.DATABASE_URL).reference
-                .child("users").child(uid).updateChildren(updates)
         }
-
-        // 1. Spendable Balance Metric
-        binding.tvSpendablePoints.text = spendableBalance.toString()
-        binding.tvSpendableLabel.text = "pts available"
-        binding.tvLifetimePoints.text = lifetimeEarned.toString()
-
-        // 2. Lifetime Level Progress Metric
-        val formattedLifetime = NumberFormat.getNumberInstance(Locale.US).format(lifetimeEarned)
-        binding.tvLifetimeLevelProgress.text = "Level: ${tier.title} ${tier.emoji} • $formattedLifetime Total Pts"
-        binding.chipLevel.text = "${tier.title} ${tier.emoji} · ${tier.multiplier}x Bonus"
-
-        // 3. Tier Progress Bar (Interpolate within active tier's point span)
-        val nextTier = tier.nextTier
-        if (nextTier == null) {
-            // Maximum tier reached (Sapot GOAT)
-            binding.progressLevel.progress = 100
-            binding.tvProgressLabel.text = "🏆 Max Tier Reached (${tier.title} ${tier.emoji})"
-            binding.tvProgressCount.text = "$formattedLifetime pts"
-            binding.tvMaxLevel.visibility = View.VISIBLE
-        } else {
-            val tierSpan = nextTier.minPoints - tier.minPoints
-            val earnedInTier = (lifetimeEarned - tier.minPoints).coerceAtLeast(0)
-            val pct = if (tierSpan > 0) {
-                ((earnedInTier.toDouble() / tierSpan.toDouble()) * 100).toInt().coerceIn(0, 100)
-            } else {
-                0
-            }
-            val ptsNeeded = nextTier.minPoints - lifetimeEarned
-            val formattedNext = NumberFormat.getNumberInstance(Locale.US).format(nextTier.minPoints)
-
-            binding.progressLevel.progress = pct
-            binding.tvProgressLabel.text = "$ptsNeeded pts to ${nextTier.title} ${nextTier.emoji}"
-            binding.tvProgressCount.text = "$formattedLifetime / $formattedNext pts"
-            binding.tvMaxLevel.visibility = View.GONE
+        if (rulesListener == null) {
+            rulesListener = com.sapotlokal.data.repository.VoucherRepository.listenToAllActiveRules(
+                onUpdate = { allRules = it; refreshAll() }, onError = { }
+            )
         }
     }
+
+    private fun startMissionPreview(uid: String) {
+        if (missionsListener != null) return
+        missionsListener = com.sapotlokal.data.repository.MissionRepository.listenToWeeklyMissions(
+            userId = uid,
+            onUpdate = { list ->
+                val pick = list.filter { !it.isClaimed && !it.isCompleted }
+                    .maxByOrNull { it.progress.toFloat() / it.mission.targetCount.coerceAtLeast(1) }
+                missionLine = pick?.let {
+                    getString(
+                        R.string.hu_mission_progress,
+                        com.sapotlokal.util.ContentText.missionTitle(this, it.mission),
+                        it.progress.coerceAtMost(it.mission.targetCount), it.mission.targetCount
+                    )
+                }
+                bindPlay()
+            },
+            onError = { }
+        )
+    }
+
+    // ── Navigation ────────────────────────────────────────────────────────────
+
+    private fun shopName(vendorId: String): String =
+        vendorsById[vendorId]?.vendorName?.ifBlank { null } ?: getString(R.string.k_shop)
+
+    private fun openRewards() = startActivity(Intent(this, MyVouchersActivity::class.java))
+
+    private fun openMe() = startActivity(Intent(this, CustomerProfileActivity::class.java))
+
+    private fun openShop(vendorId: String) = startActivity(
+        Intent(this, ShopDetailActivity::class.java).putExtra(ShopDetailActivity.EXTRA_VENDOR_ID, vendorId)
+    )
 
     // ── Lifecycle ─────────────────────────────────────────────────────────────
 
-    override fun onStop() {
-        super.onStop()
-        val uid = auth.currentUser?.uid ?: return
-        pointsListener?.let { PointRepository.removePointsListener(uid, it) }
-        pointsListener = null
-        userListener?.let {
-            FirebaseDatabase.getInstance(AppConfig.DATABASE_URL).reference
-                .child("users").child(uid).removeEventListener(it)
-        }
-        userListener = null
-    }
-
     override fun onStart() {
         super.onStart()
+        startListeningToVendors()
         val uid = auth.currentUser?.uid ?: return
-        if (pointsListener == null) {
-            startListeningToPoints(uid)
-        }
-        if (userListener == null) {
-            startListeningToUser(uid)
-        }
-        ChallengeRepository.syncUserProgress(uid)
+        startMissionPreview(uid)
+        startRewardListeners(uid)
+        if (pointsListener == null) startListeningToPoints(uid)
+        if (userListener == null) startListeningToUser(uid)
         com.sapotlokal.data.repository.MissionRepository.syncUserMissions(uid)
     }
 
     override fun onResume() {
         super.onResume()
-        updateGreeting(currentUserTier)
+        updateGreeting()
+        auth.currentUser?.uid?.let { uid ->
+            GamesRepository.fetchStatus(uid) { status ->
+                if (isFinishing || isDestroyed) return@fetchStatus
+                spinReady = status?.canSpinToday
+                bindPlay()
+            }
+        }
     }
 
-    private fun checkNotificationPermission(userID: String) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            val isGranted = ContextCompat.checkSelfPermission(
-                this, Manifest.permission.POST_NOTIFICATIONS
-            ) == PackageManager.PERMISSION_GRANTED
+    override fun onStop() {
+        super.onStop()
+        vendorsListener?.let { com.sapotlokal.data.repository.VendorRepository.removeAllVendorsListener(it) }
+        vendorsListener = null
+        val uid = auth.currentUser?.uid
+        missionsListener?.let { if (uid != null) com.sapotlokal.data.repository.MissionRepository.removeListener(uid, it) }
+        missionsListener = null
+        vouchersListener?.let { if (uid != null) com.sapotlokal.data.repository.VoucherRepository.removeVouchersListener(uid, it) }
+        vouchersListener = null
+        rulesListener?.let { com.sapotlokal.data.repository.VoucherRepository.removeAllRulesListener(it) }
+        rulesListener = null
+        if (uid == null) return
+        pointsListener?.let { PointRepository.removePointsListener(uid, it) }
+        pointsListener = null
+        userListener?.let {
+            FirebaseDatabase.getInstance(AppConfig.DATABASE_URL).reference.child("users").child(uid).removeEventListener(it)
+        }
+        userListener = null
+    }
 
-            if (!isGranted) {
-                notifPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
-            } else {
-                SapotFcmService.syncTokenForUser(userID)
-            }
+    override fun onDestroy() {
+        super.onDestroy()
+        shopNotificationListener?.let { shopNotifQuery?.removeEventListener(it) }
+        shopNotificationListener = null
+        shopNotifQuery = null
+    }
+
+    // ── Notifications ─────────────────────────────────────────────────────────
+
+    private fun checkNotificationPermission(userID: String) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU &&
+            ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED
+        ) {
+            notifPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
         } else {
             SapotFcmService.syncTokenForUser(userID)
         }
@@ -402,53 +445,49 @@ class CustomerHomeActivity : AppCompatActivity() {
 
     private fun startListeningToShopNotifications() {
         if (shopNotificationListener != null) return
-        val notifRef = com.google.firebase.database.FirebaseDatabase
-            .getInstance(AppConfig.DATABASE_URL)
-            .reference
-            .child("shopNotifications")
-
+        val query = FirebaseDatabase.getInstance(AppConfig.DATABASE_URL).reference
+            .child("shopNotifications").limitToLast(10)
+        // Replayed child events arrive before the first value event, so this flag marks the end of
+        // the replay without relying on the phone's clock.
+        var replayFinished = false
+        val initialLoad = object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) { replayFinished = true }
+            override fun onCancelled(error: DatabaseError) { replayFinished = true }
+        }
         val listener = object : com.google.firebase.database.ChildEventListener {
-            override fun onChildAdded(snapshot: com.google.firebase.database.DataSnapshot, previousChildName: String?) {
-                val timestamp = snapshot.child("timestamp").getValue(Long::class.java) ?: 0L
-                if (timestamp < sessionStartTime) return // Only notify for real-time events during this session
-
-                val isOpen = snapshot.child("isOpen").getValue(Boolean::class.java) ?: false
-                if (!isOpen) return
-
+            override fun onChildAdded(snapshot: DataSnapshot, previousChildName: String?) {
+                if (!replayFinished) return
                 val vendorId = snapshot.child("vendorId").getValue(String::class.java)
                     ?: snapshot.child("vendorID").getValue(String::class.java).orEmpty()
-                val vendorName = snapshot.child("vendorName").getValue(String::class.java).orEmpty().ifBlank { "A shop you follow" }
-
-                SapotFcmService.showShopStatusNotification(this@CustomerHomeActivity, vendorId, vendorName)
+                if (vendorId.isBlank()) return
+                if (vendorId !in followedVendorIds &&
+                    vendorId !in com.sapotlokal.util.FollowedShops.all(this@CustomerHomeActivity)
+                ) return
+                val isOpen = snapshot.child("isOpen").getValue(Boolean::class.java) ?: true
+                val vendorName = snapshot.child("vendorName").getValue(String::class.java).orEmpty()
+                    .ifBlank { "A shop you follow" }
+                SapotFcmService.showShopStatusNotification(this@CustomerHomeActivity, vendorId, vendorName, isOpen)
             }
-
-            override fun onChildChanged(snapshot: com.google.firebase.database.DataSnapshot, previousChildName: String?) {}
-            override fun onChildRemoved(snapshot: com.google.firebase.database.DataSnapshot) {}
-            override fun onChildMoved(snapshot: com.google.firebase.database.DataSnapshot, previousChildName: String?) {}
-            override fun onCancelled(error: com.google.firebase.database.DatabaseError) {}
+            override fun onChildChanged(snapshot: DataSnapshot, previousChildName: String?) {}
+            override fun onChildRemoved(snapshot: DataSnapshot) {}
+            override fun onChildMoved(snapshot: DataSnapshot, previousChildName: String?) {}
+            override fun onCancelled(error: DatabaseError) {}
         }
-
-        notifRef.limitToLast(10).addChildEventListener(listener)
+        query.addChildEventListener(listener)
+        query.addListenerForSingleValueEvent(initialLoad)
+        shopNotifQuery = query
         shopNotificationListener = listener
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
-        shopNotificationListener?.let {
-            com.google.firebase.database.FirebaseDatabase
-                .getInstance(AppConfig.DATABASE_URL)
-                .reference
-                .child("shopNotifications")
-                .removeEventListener(it)
-        }
-        shopNotificationListener = null
+    private fun goToLogin() {
+        startActivity(Intent(this, LoginActivity::class.java).apply {
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+        })
     }
 
-    private fun goToLogin() {
-        startActivity(
-            Intent(this, LoginActivity::class.java).apply {
-                flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-            }
-        )
+    private fun dp(v: Int): Int = (v * resources.displayMetrics.density).toInt()
+
+    private companion object {
+        const val HOME_SHOP_CARDS = 3
     }
 }

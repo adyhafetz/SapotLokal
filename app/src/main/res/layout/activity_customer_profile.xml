@@ -1,427 +1,407 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- Customer Profile — follows the brand design: profile card, account actions, badges, member note. -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/sapot_bg"
-    android:orientation="vertical">
+    android:background="@color/hu_bg"
+    android:orientation="vertical"
+    tools:context=".ui.customer.CustomerProfileActivity">
 
-    <!-- Top App Bar -->
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="56dp"
-        android:gravity="center_vertical"
-        android:orientation="horizontal"
-        android:paddingHorizontal="16dp">
-
-        <ImageView
-            android:id="@+id/btnBack"
-            android:layout_width="36dp"
-            android:layout_height="36dp"
-            android:background="?attr/selectableItemBackgroundBorderless"
-            android:clickable="true"
-            android:contentDescription="Back"
-            android:focusable="true"
-            android:padding="6dp"
-            android:rotation="90"
-            android:src="@drawable/ic_chevron_down"
-            app:tint="@color/sapot_text_primary" />
-
-        <TextView
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
-            android:layout_weight="1"
-            android:fontFamily="@font/inter"
-            android:text="My Profile"
-            android:textColor="@color/sapot_text_primary"
-            android:textSize="20sp"
-            android:textStyle="bold" />
-    </LinearLayout>
-
-    <androidx.core.widget.NestedScrollView
+    <ScrollView
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
+        android:clipToPadding="false"
         android:fillViewport="true">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:paddingHorizontal="20dp"
-            android:paddingTop="8dp"
-            android:paddingBottom="32dp">
+            android:padding="20dp">
 
-            <!-- Profile Header -->
+            <!-- Me opens from Home and Play, so it gets a back arrow instead of the bottom bar. -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:gravity="center_horizontal"
-                android:orientation="vertical"
-                android:paddingVertical="12dp">
+                android:layout_marginStart="-12dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
 
-                <com.google.android.material.card.MaterialCardView
-                    android:layout_width="84dp"
-                    android:layout_height="84dp"
-                    app:cardBackgroundColor="@color/sapot_primary_yellow"
-                    app:cardCornerRadius="42dp"
-                    app:cardElevation="0dp"
-                    app:strokeColor="@color/sapot_border"
-                    app:strokeWidth="2dp">
-
-                    <FrameLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent">
-
-                        <ImageView
-                            android:id="@+id/ivAvatar"
-                            android:layout_width="48dp"
-                            android:layout_height="48dp"
-                            android:layout_gravity="center"
-                            android:contentDescription="User Avatar"
-                            android:src="@drawable/ic_user_round"
-                            app:tint="@color/sapot_text_primary" />
-
-                        <TextView
-                            android:id="@+id/tvAvatarInitials"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_gravity="center"
-                            android:fontFamily="sans-serif-black"
-                            android:textColor="@color/sapot_text_primary"
-                            android:textSize="28sp"
-                            android:visibility="gone"
-                            tools:text="AF" />
-                    </FrameLayout>
-                </com.google.android.material.card.MaterialCardView>
+                <ImageButton
+                    android:id="@+id/btnBack"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:contentDescription="@string/hu_back"
+                    android:src="@drawable/ic_arrow_back_hu" />
 
                 <TextView
-                    android:id="@+id/tvUserName"
+                    style="@style/HU.Text.Screen"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="12dp"
-                    android:fontFamily="sans-serif-black"
-                    android:text="Shopper"
-                    android:textColor="@color/sapot_text_primary"
-                    android:textSize="22sp" />
-
-                <TextView
-                    android:id="@+id/tvUserEmail"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="2dp"
-                    android:text="shopper@sapotlokal.com"
-                    android:textColor="@color/sapot_text_secondary"
-                    android:textSize="13sp" />
-
-                <!-- Current Tier Pill -->
-                <TextView
-                    android:id="@+id/tvTierPill"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="10dp"
-                    android:background="@drawable/bg_pill_yellow"
-                    android:paddingHorizontal="14dp"
-                    android:paddingVertical="6dp"
-                    android:text="🔰 Freshie · 1.0x Multiplier"
-                    android:textColor="@color/sapot_text_primary"
-                    android:textSize="13sp"
-                    android:textStyle="bold" />
+                    android:layout_marginStart="4dp"
+                    android:accessibilityHeading="true"
+                    android:text="@string/customer_bottom_nav_profile" />
             </LinearLayout>
 
-            <!-- Dual Points Metric Card -->
+            <!-- Profile card -->
             <com.google.android.material.card.MaterialCardView
+                style="@style/Widget.HU.Card"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
-                app:cardBackgroundColor="@color/sapot_primary_yellow"
-                app:cardCornerRadius="24dp"
-                app:cardElevation="0dp">
+                android:layout_marginTop="16dp">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:gravity="center_horizontal"
                     android:orientation="vertical"
-                    android:padding="20dp">
+                    android:padding="24dp">
+
+                    <com.google.android.material.card.MaterialCardView
+                        android:layout_width="96dp"
+                        android:layout_height="96dp"
+                        app:cardBackgroundColor="@color/hu_accent_tint"
+                        app:cardCornerRadius="48dp"
+                        app:cardElevation="0dp"
+                        app:cardPreventCornerOverlap="false"
+                        app:contentPadding="0dp"
+                        app:strokeColor="#F0F5FC"
+                        app:strokeWidth="5dp">
+
+                        <FrameLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent">
+
+                            <ImageView
+                                android:id="@+id/ivAvatar"
+                                android:layout_width="44dp"
+                                android:layout_height="44dp"
+                                android:layout_gravity="center"
+                                android:contentDescription="Avatar"
+                                android:src="@drawable/ic_user_round"
+                                app:tint="@color/hu_ink" />
+
+                            <TextView
+                                android:id="@+id/tvAvatarInitials"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_gravity="center"
+                                android:fontFamily="@font/figtree_bold"
+                                android:textColor="@color/hu_ink"
+                                android:textSize="36sp"
+                                android:textStyle="bold"
+                                android:visibility="gone"
+                                tools:text="C" />
+                        </FrameLayout>
+                    </com.google.android.material.card.MaterialCardView>
+
+                    <TextView
+                        android:id="@+id/tvUserName"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="16dp"
+                        android:fontFamily="@font/figtree_bold"
+                        android:textColor="@color/hu_ink"
+                        android:textSize="22sp"
+                        android:textStyle="bold"
+                        tools:text="Customer One" />
+
+                    <TextView
+                        android:id="@+id/tvUserEmail"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp"
+                        android:fontFamily="@font/figtree_medium"
+                        android:textColor="@color/hu_soft"
+                        android:textSize="13sp"
+                        tools:text="customer@example.com" />
+
+                    <TextView
+                        android:id="@+id/tvTierPill"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="14dp"
+                        android:background="@drawable/bg_hu_icon_tile"
+                        android:fontFamily="@font/figtree_medium"
+                        android:paddingHorizontal="12dp"
+                        android:paddingVertical="6dp"
+                        android:textColor="@color/hu_ink"
+                        android:textSize="12sp"
+                        android:textStyle="bold"
+                        tools:text="Freshie · Level 1" />
+
+                    <TextView
+                        android:id="@+id/tvSpendablePoints"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="20dp"
+                        android:fontFamily="@font/figtree_bold"
+                        android:text="0"
+                        android:textColor="@color/hu_ink"
+                        android:textSize="40sp"
+                        android:textStyle="bold" />
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:letterSpacing="0.06"
-                        android:text="POINTS DUAL LEDGER"
-                        android:textColor="@color/sapot_text_secondary"
-                        android:textSize="11sp"
-                        android:textStyle="bold" />
+                        android:fontFamily="@font/figtree_medium"
+                        android:text="@string/customer_home_level_points"
+                        android:textColor="@color/hu_soft"
+                        android:textSize="13sp" />
 
-                    <LinearLayout
+                    <TextView
+                        android:id="@+id/tvLifetimePoints"
+                        android:layout_width="0dp"
+                        android:layout_height="0dp"
+                        android:visibility="gone" />
+
+                    <RelativeLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="12dp"
-                        android:baselineAligned="false"
-                        android:orientation="horizontal">
-
-                        <!-- Left Column: Spendable Points -->
-                        <LinearLayout
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:orientation="vertical">
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="SPENDABLE"
-                                android:textColor="@color/sapot_text_secondary"
-                                android:textSize="11sp"
-                                android:textStyle="bold" />
-
-                            <TextView
-                                android:id="@+id/tvSpendablePoints"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginTop="2dp"
-                                android:fontFamily="sans-serif-black"
-                                android:text="0"
-                                android:textColor="@color/sapot_text_primary"
-                                android:textSize="32sp" />
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="pts available"
-                                android:textColor="@color/sapot_text_primary"
-                                android:textSize="12sp"
-                                android:textStyle="bold" />
-                        </LinearLayout>
-
-                        <!-- Vertical Divider -->
-                        <View
-                            android:layout_width="1.5dp"
-                            android:layout_height="match_parent"
-                            android:layout_marginHorizontal="12dp"
-                            android:background="@color/sapot_border" />
-
-                        <!-- Right Column: Lifetime Points -->
-                        <LinearLayout
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:orientation="vertical">
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="LIFETIME"
-                                android:textColor="@color/sapot_text_secondary"
-                                android:textSize="11sp"
-                                android:textStyle="bold" />
-
-                            <TextView
-                                android:id="@+id/tvLifetimePoints"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginTop="2dp"
-                                android:fontFamily="sans-serif-black"
-                                android:text="0"
-                                android:textColor="@color/sapot_text_primary"
-                                android:textSize="32sp" />
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="pts accumulated"
-                                android:textColor="@color/sapot_text_primary"
-                                android:textSize="12sp"
-                                android:textStyle="bold" />
-                        </LinearLayout>
-                    </LinearLayout>
-                </LinearLayout>
-            </com.google.android.material.card.MaterialCardView>
-
-            <!-- Tier Level Progress Section -->
-            <com.google.android.material.card.MaterialCardView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
-                style="@style/Widget.SapotLokal.Card">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical">
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:gravity="center_vertical"
-                        android:orientation="horizontal">
-
-                        <TextView
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:text="Tier Level Progression"
-                            android:textColor="@color/sapot_text_primary"
-                            android:textSize="14sp"
-                            android:textStyle="bold" />
+                        android:layout_marginTop="22dp">
 
                         <TextView
                             android:id="@+id/tvNextTierBadge"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:background="@drawable/bg_pill_gray"
-                            android:paddingHorizontal="8dp"
-                            android:paddingVertical="3dp"
-                            android:text="Next: Steady Buyer 🛒"
-                            android:textColor="@color/sapot_text_secondary"
-                            android:textSize="11sp"
-                            android:textStyle="bold" />
-                    </LinearLayout>
-
-                    <ProgressBar
-                        android:id="@+id/progressLevel"
-                        style="?android:attr/progressBarStyleHorizontal"
-                        android:layout_width="match_parent"
-                        android:layout_height="8dp"
-                        android:layout_marginTop="12dp"
-                        android:max="100"
-                        android:progress="0"
-                        android:progressDrawable="@drawable/progress_points" />
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="8dp"
-                        android:orientation="horizontal">
-
-                        <TextView
-                            android:id="@+id/tvProgressLabel"
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:text="200 pts to Steady Buyer 🛒"
-                            android:textColor="@color/sapot_text_secondary"
+                            android:fontFamily="@font/figtree_medium"
+                            android:textColor="@color/hu_soft"
                             android:textSize="12sp" />
 
                         <TextView
                             android:id="@+id/tvProgressCount"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="0 / 200 pts"
-                            android:textColor="@color/sapot_text_primary"
+                            android:layout_alignParentEnd="true"
+                            android:fontFamily="@font/figtree_medium"
+                            android:textColor="@color/hu_ink"
                             android:textSize="12sp"
                             android:textStyle="bold" />
-                    </LinearLayout>
+                    </RelativeLayout>
+
+                    <ProgressBar
+                        android:id="@+id/progressLevel"
+                        style="?android:attr/progressBarStyleHorizontal"
+                        android:layout_width="match_parent"
+                        android:layout_height="6dp"
+                        android:layout_marginTop="8dp"
+                        android:max="100"
+                        android:progress="0"
+                        android:progressDrawable="@drawable/bg_hu_progress" />
+
+                    <TextView
+                        android:id="@+id/tvProgressLabel"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:fontFamily="@font/figtree_medium"
+                        android:textColor="@color/hu_soft"
+                        android:textSize="12sp" />
 
                     <TextView
                         android:id="@+id/tvMaxLevelNotice"
-                        android:layout_width="match_parent"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="4dp"
-                        android:text="🏆 Highest rank achieved! Enjoy 2.0x bonus points."
-                        android:textColor="@color/sapot_text_secondary"
-                        android:textSize="11sp"
+                        android:fontFamily="@font/figtree_medium"
+                        android:text="@string/customer_home_top_level_reached"
+                        android:textColor="@color/hu_ink"
+                        android:textSize="12sp"
+                        android:textStyle="bold"
                         android:visibility="gone" />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnEditProfile"
+                        style="@style/Widget.HU.Button"
+                        android:layout_width="match_parent"
+                        android:layout_height="52dp"
+                        android:layout_marginTop="20dp"
+                        android:text="@string/customer_profile_edit_profile"
+                        app:icon="@drawable/ic_edit"
+                        app:iconGravity="textStart"
+                        app:iconSize="18dp" />
+
+                    <!-- Account actions, separated by a line (brand design) -->
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:layout_marginTop="20dp"
+                        android:background="@color/hu_line" />
+
+                    <TextView
+                        android:id="@+id/btnViewLeaderboard"
+                        android:layout_width="match_parent"
+                        android:layout_height="48dp"
+                        android:background="?attr/selectableItemBackground"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:fontFamily="@font/figtree_medium"
+                        android:gravity="center"
+                        android:text="@string/hu_how_points_work"
+                        android:textColor="@color/hu_ink"
+                        android:textSize="14sp" />
+
+                    <TextView
+                        android:id="@+id/rowChangePassword"
+                        android:layout_width="match_parent"
+                        android:layout_height="48dp"
+                        android:background="?attr/selectableItemBackground"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:fontFamily="@font/figtree_medium"
+                        android:gravity="center"
+                        android:text="@string/customer_profile_change_password"
+                        android:textColor="@color/hu_ink"
+                        android:textSize="14sp" />
+
+                    <TextView
+                        android:id="@+id/btnSignOut"
+                        android:layout_width="match_parent"
+                        android:layout_height="48dp"
+                        android:background="?attr/selectableItemBackground"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:fontFamily="@font/figtree_medium"
+                        android:gravity="center"
+                        android:text="@string/customer_profile_log_out"
+                        android:textColor="@color/hu_ink"
+                        android:textSize="14sp" />
+
+                    <TextView
+                        android:id="@+id/rowDeleteAccount"
+                        android:layout_width="match_parent"
+                        android:layout_height="44dp"
+                        android:background="?attr/selectableItemBackground"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:fontFamily="@font/figtree_medium"
+                        android:gravity="center"
+                        android:text="@string/customer_profile_delete_account"
+                        android:textColor="@color/hu_danger"
+                        android:textSize="12sp" />
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
-            <!-- Badges Showcase Section -->
-            <LinearLayout
+            <!-- Badges -->
+            <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="24dp"
-                android:gravity="center_vertical"
-                android:orientation="horizontal">
+                android:layout_marginTop="26dp">
 
                 <TextView
-                    android:layout_width="0dp"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:fontFamily="@font/inter"
-                    android:text="Badges Showcase"
-                    android:textColor="@color/sapot_text_primary"
-                    android:textSize="16sp"
+                    android:fontFamily="@font/figtree_bold"
+                    android:text="@string/customer_profile_badges"
+                    android:textColor="@color/hu_ink"
+                    android:textSize="17sp"
                     android:textStyle="bold" />
 
                 <TextView
                     android:id="@+id/tvBadgesUnlockedCount"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:background="@drawable/bg_pill_gray"
+                    android:layout_alignParentEnd="true"
+                    android:background="@drawable/bg_hu_icon_tile"
+                    android:fontFamily="@font/figtree_medium"
                     android:paddingHorizontal="10dp"
                     android:paddingVertical="4dp"
-                    android:text="0 / 8 Unlocked"
-                    android:textColor="@color/sapot_text_secondary"
+                    android:textColor="@color/hu_ink"
                     android:textSize="11sp"
                     android:textStyle="bold" />
-            </LinearLayout>
+            </RelativeLayout>
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="2dp"
-                android:text="Tap any badge to inspect unlock criteria."
-                android:textColor="@color/sapot_text_secondary"
-                android:textSize="12sp" />
-
-            <!-- Badges Grid RecyclerView -->
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/rvBadges"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="12dp"
+                android:layout_marginTop="10dp"
                 android:nestedScrollingEnabled="false"
-                tools:itemCount="8"
-                tools:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
-                tools:listitem="@layout/item_badge_showcase"
-                tools:spanCount="4" />
+                tools:listitem="@layout/item_badge_showcase" />
 
-            <!-- Actions Section -->
-            <LinearLayout
+            <!-- Member since -->
+            <com.google.android.material.card.MaterialCardView
+                style="@style/Widget.HU.Card"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="28dp"
-                android:orientation="vertical">
+                android:layout_marginTop="14dp"
+                app:cardBackgroundColor="@color/hu_accent_tint"
+                app:strokeColor="#ECEEF2">
 
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/btnViewLeaderboard"
-                    style="@style/Widget.SapotLokal.Button.Outlined"
+                <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="12dp"
-                    android:text="View Community Leaderboard"
-                    app:icon="@drawable/ic_badge_raja"
-                    app:iconGravity="textStart"
-                    app:iconTint="@color/sapot_text_primary" />
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:padding="18dp">
 
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/btnEditProfile"
-                    style="@style/Widget.SapotLokal.Button.Outlined"
+                    <FrameLayout
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:background="@drawable/bg_status_pill">
+
+                        <ImageView
+                            android:layout_width="20dp"
+                            android:layout_height="20dp"
+                            android:layout_gravity="center"
+                            android:src="@drawable/ic_heart"
+                            app:tint="@color/hu_ink" />
+                    </FrameLayout>
+
+                    <TextView
+                        android:id="@+id/tvMemberSince"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="14dp"
+                        android:layout_weight="1"
+                        android:fontFamily="@font/figtree_bold"
+                        android:textColor="@color/hu_ink"
+                        android:textSize="15sp"
+                        android:textStyle="bold" />
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Language -->
+            <com.google.android.material.card.MaterialCardView
+                style="@style/Widget.HU.Card"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp">
+
+                <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Edit Profile Name"
-                    app:icon="@drawable/ic_edit"
-                    app:iconGravity="textStart"
-                    app:iconTint="@color/sapot_text_primary" />
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:padding="18dp">
 
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/btnSignOut"
-                    style="@style/Widget.SapotLokal.Button.Outlined"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="12dp"
-                    android:text="Sign Out"
-                    android:textColor="@color/sapot_error_text"
-                    app:icon="@drawable/ic_logout"
-                    app:iconGravity="textStart"
-                    app:iconTint="@color/sapot_error_text"
-                    app:strokeColor="@color/sapot_error_text" />
-            </LinearLayout>
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:fontFamily="@font/figtree_bold"
+                        android:text="@string/customer_profile_language"
+                        android:textColor="@color/hu_ink"
+                        android:textSize="15sp"
+                        android:textStyle="bold" />
 
+                    <include
+                        android:id="@+id/languageToggle"
+                        layout="@layout/layout_language_toggle" />
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="8dp" />
         </LinearLayout>
-    </androidx.core.widget.NestedScrollView>
+    </ScrollView>
 
+    <include
+        android:id="@+id/customerNav"
+        layout="@layout/layout_customer_bottom_nav" />
 </LinearLayout>
-

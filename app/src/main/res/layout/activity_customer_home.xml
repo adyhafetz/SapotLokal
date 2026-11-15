@@ -1,485 +1,283 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<!--
+    Customer Home (Hadiah Utama) — one job: "is anything ready for me?"
+    Header (name opens Me) → level score with ticked bar → one big reward card
+    → more-ready link → your top shops → Today in Play → bottom bar.
+-->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/sapot_bg">
+    android:background="@color/hu_bg"
+    android:orientation="vertical"
+    tools:context=".ui.customer.CustomerHomeActivity">
 
     <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_marginBottom="76dp"
-        android:fillViewport="true">
+        android:layout_height="0dp"
+        android:layout_weight="1">
 
         <LinearLayout
+            android:id="@+id/content"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:paddingHorizontal="24dp"
+            android:paddingHorizontal="20dp"
             android:paddingTop="16dp"
             android:paddingBottom="24dp">
 
-            <!-- Top Location & Notification Bar -->
-            <RelativeLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content">
-
-                <LinearLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_alignParentStart="true"
-                    android:gravity="center_vertical"
-                    android:orientation="horizontal">
-
-                    <ImageView
-                        android:layout_width="16dp"
-                        android:layout_height="16dp"
-                        android:src="@drawable/ic_map_pin"
-                        app:tint="@color/sapot_text_primary" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="6dp"
-                        android:text="Bangsar, Kuala Lumpur"
-                        android:textColor="@color/sapot_text_primary"
-                        android:textSize="12sp"
-                        android:textStyle="bold" />
-
-                    <ImageView
-                        android:layout_width="14dp"
-                        android:layout_height="14dp"
-                        android:layout_marginStart="4dp"
-                        android:src="@drawable/ic_chevron_down"
-                        app:tint="@color/sapot_text_primary" />
-                </LinearLayout>
-
-                <ImageView
-                    android:id="@+id/btnNotification"
-                    android:layout_width="21dp"
-                    android:layout_height="21dp"
-                    android:layout_alignParentEnd="true"
-                    android:src="@drawable/ic_bell"
-                    app:tint="@color/sapot_text_primary" />
-            </RelativeLayout>
-
-            <!-- Greeting Header -->
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="20dp"
-                android:letterSpacing="0.06"
-                android:text="A LITTLE LOCAL GOES A LONG WAY"
-                android:textColor="@color/sapot_text_secondary"
-                android:textSize="12sp" />
-
-            <TextView
-                android:id="@+id/tvGreeting"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="6dp"
-                android:fontFamily="sans-serif-black"
-                tools:text="Shopper 🔰"
-                android:textColor="@color/sapot_text_primary"
-                android:textSize="28sp" />
-
-            <!-- Shop Points Card -->
-            <com.google.android.material.card.MaterialCardView
-                android:id="@+id/cardPointsHero"
+            <!-- Header: greeting + name, opens Me -->
+            <LinearLayout
+                android:id="@+id/btnMe"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
+                android:background="?attr/selectableItemBackground"
                 android:clickable="true"
                 android:focusable="true"
-                android:foreground="?attr/selectableItemBackground"
-                app:cardBackgroundColor="@color/sapot_primary_yellow"
-                app:cardCornerRadius="24dp"
-                app:cardElevation="0dp">
+                android:gravity="center_vertical"
+                android:minHeight="56dp"
+                android:orientation="horizontal">
+
+                <ImageView
+                    android:id="@+id/ivAvatar"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:layout_marginEnd="12dp"
+                    android:background="@drawable/bg_hu_logo"
+                    android:backgroundTint="@color/hu_fill"
+                    android:contentDescription="@null"
+                    android:importantForAccessibility="no"
+                    android:padding="2dp" />
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:importantForAccessibility="no"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/tvGreetingTime"
+                        style="@style/HU.Text.Small"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        tools:text="Selamat pagi" />
+
+                    <TextView
+                        android:id="@+id/tvGreeting"
+                        style="@style/HU.Text.Screen"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:drawableEnd="@drawable/ic_chevron_right_small"
+                        android:drawablePadding="4dp"
+                        android:ellipsize="end"
+                        android:maxLines="1"
+                        android:textSize="24sp"
+                        tools:text="Farah Hassan" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <!-- Level score -->
+            <LinearLayout
+                android:id="@+id/levelBlock"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="18dp"
+                android:background="?attr/selectableItemBackground"
+                android:clickable="true"
+                android:focusable="true"
+                android:orientation="vertical">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:padding="20dp">
+                    android:baselineAligned="true"
+                    android:importantForAccessibility="no"
+                    android:orientation="horizontal">
 
-                    <LinearLayout
-                        android:layout_width="match_parent"
+                    <TextView
+                        android:id="@+id/tvLevelScore"
+                        style="@style/HU.Text.Big"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        tools:text="530" />
+
+                    <TextView
+                        style="@style/HU.Text.Small"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="8dp"
+                        android:fontFamily="@font/figtree_bold"
+                        android:text="@string/hu_level_score"
+                        android:textSize="15sp"
+                        app:fontFamily="@font/figtree_bold" />
+
+                    <Space
+                        android:layout_width="0dp"
+                        android:layout_height="1dp"
+                        android:layout_weight="1" />
+
+                    <TextView
+                        android:id="@+id/btnHowPoints"
+                        style="@style/HU.Text.Link"
+                        android:layout_width="wrap_content"
+                        android:layout_height="48dp"
+                        android:background="?attr/selectableItemBackground"
                         android:gravity="center_vertical"
-                        android:orientation="horizontal">
-
-                        <FrameLayout
-                            android:layout_width="40dp"
-                            android:layout_height="40dp"
-                            android:background="@drawable/bg_shop_icon_coffee">
-
-                            <ImageView
-                                android:layout_width="20dp"
-                                android:layout_height="20dp"
-                                android:layout_gravity="center"
-                                android:src="@drawable/ic_gift"
-                                app:tint="@color/sapot_text_primary" />
-                        </FrameLayout>
-
-                        <LinearLayout
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_marginStart="12dp"
-                            android:layout_weight="1"
-                            android:orientation="vertical">
-
-                            <TextView
-                                android:id="@+id/tvPointsCardHeader"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="Loyalty Rewards"
-                                android:textColor="@color/sapot_text_primary"
-                                android:textSize="16sp"
-                                android:textStyle="bold" />
-
-                            <TextView
-                                android:id="@+id/chipLevel"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="Freshie 🔰 · 1.0x Bonus"
-                                android:textColor="@color/sapot_text_primary"
-                                android:textSize="11sp" />
-                        </LinearLayout>
-
-                        <ImageView
-                            android:layout_width="19dp"
-                            android:layout_height="19dp"
-                            android:src="@drawable/ic_arrow_up_right"
-                            app:tint="@color/sapot_text_primary" />
-                    </LinearLayout>
-
-                    <!-- Spendable Balance Metric -->
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="16dp"
-                        android:baselineAligned="true"
-                        android:gravity="bottom"
-                        android:orientation="horizontal">
-
-                        <TextView
-                            android:id="@+id/tvSpendablePoints"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:fontFamily="sans-serif-black"
-                            android:text="0"
-                            android:textColor="@color/sapot_text_primary"
-                            android:textSize="40sp" />
-
-                        <TextView
-                            android:id="@+id/tvSpendableLabel"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginStart="8dp"
-                            android:text="pts available"
-                            android:textColor="@color/sapot_text_primary"
-                            android:textSize="14sp"
-                            android:textStyle="bold" />
-
-                        <!-- Hidden compatibility field -->
-                        <TextView
-                            android:id="@+id/tvLifetimePoints"
-                            android:layout_width="0dp"
-                            android:layout_height="0dp"
-                            android:visibility="gone" />
-                    </LinearLayout>
-
-                    <!-- Lifetime Level Progress Metric -->
-                    <TextView
-                        android:id="@+id/tvLifetimeLevelProgress"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="4dp"
-                        android:text="Level: Freshie 🔰 • 0 Total Pts"
-                        android:textColor="@color/sapot_text_primary"
-                        android:textSize="13sp"
-                        android:textStyle="bold" />
-
-                    <!-- Tier Points Progress Bar (Interpolated within active tier span) -->
-                    <ProgressBar
-                        android:id="@+id/progressLevel"
-                        style="?android:attr/progressBarStyleHorizontal"
-                        android:layout_width="match_parent"
-                        android:layout_height="7dp"
-                        android:layout_marginTop="10dp"
-                        android:max="100"
-                        android:progress="0"
-                        android:progressDrawable="@drawable/progress_points" />
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="8dp"
-                        android:orientation="horizontal">
-
-                        <TextView
-                            android:id="@+id/tvProgressLabel"
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:text="200 pts to Steady Buyer 🛒"
-                            android:textColor="@color/sapot_text_primary"
-                            android:textSize="12sp" />
-
-                        <TextView
-                            android:id="@+id/tvProgressCount"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="0 / 200 pts"
-                            android:textColor="@color/sapot_text_primary"
-                            android:textSize="12sp"
-                            android:textStyle="bold" />
-                    </LinearLayout>
-
-                    <TextView
-                        android:id="@+id/tvMaxLevel"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="6dp"
-                        android:text="🏆 You've reached the top level!"
-                        android:textColor="@color/sapot_text_primary"
-                        android:textSize="12sp"
-                        android:textStyle="bold"
-                        android:visibility="gone" />
+                        android:importantForAccessibility="yes"
+                        android:text="@string/hu_how_points_work" />
                 </LinearLayout>
-            </com.google.android.material.card.MaterialCardView>
 
-            <!-- Reminder Callout -->
+                <com.sapotlokal.ui.customer.HuTickBar
+                    android:id="@+id/levelBar"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:importantForAccessibility="no" />
+
+                <TextView
+                    android:id="@+id/tvLevelLine"
+                    style="@style/HU.Text.Small"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:importantForAccessibility="no"
+                    tools:text="Level 2 Steady Buyer · 70 to Trend Setter" />
+            </LinearLayout>
+
+            <!-- The one big reward card (or first-scan card) -->
+            <FrameLayout
+                android:id="@+id/readySlot"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="22dp" />
+
+            <TextView
+                android:id="@+id/tvMoreReady"
+                style="@style/HU.Text.Link"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:background="?attr/selectableItemBackground"
+                android:gravity="center"
+                android:visibility="gone"
+                tools:text="2 more ready · See Rewards"
+                tools:visibility="visible" />
+
+            <!-- Load error -->
             <LinearLayout
+                android:id="@+id/errorBlock"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="12dp"
+                android:background="@drawable/bg_hu_card"
+                android:orientation="vertical"
+                android:padding="16dp"
+                android:visibility="gone">
+
+                <TextView
+                    style="@style/HU.Text"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/hu_load_error" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnRetry"
+                    style="@style/Widget.HU.Button.Outlined"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:text="@string/hu_try_again" />
+            </LinearLayout>
+
+            <!-- Your shops -->
+            <LinearLayout
+                android:id="@+id/shopsHeader"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="22dp"
                 android:gravity="center_vertical"
                 android:orientation="horizontal">
 
-                <ImageView
-                    android:layout_width="14dp"
-                    android:layout_height="14dp"
-                    android:src="@drawable/ic_info"
-                    app:tint="@color/sapot_text_secondary" />
-
                 <TextView
+                    style="@style/HU.Text.Title"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="8dp"
                     android:layout_weight="1"
-                    android:text="Your points stay with the shop where you earn them."
-                    android:textColor="@color/sapot_text_secondary"
-                    android:textSize="11sp" />
-            </LinearLayout>
+                    android:accessibilityHeading="true"
+                    android:text="@string/hu_your_shops" />
 
-            <!-- Quick Actions: Scan QR & Play Games -->
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
-                android:orientation="horizontal">
-
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/btnScan"
-                    android:layout_width="0dp"
-                    android:layout_height="52dp"
-                    android:layout_weight="1"
-                    android:layout_marginEnd="6dp"
-                    android:backgroundTint="@color/sapot_primary_yellow"
-                    android:text="Scan QR"
-                    android:textAllCaps="false"
-                    android:textColor="@color/sapot_text_primary"
-                    android:textSize="14sp"
-                    android:textStyle="bold"
-                    app:cornerRadius="16dp"
-                    app:icon="@android:drawable/ic_menu_camera"
-                    app:iconGravity="textStart"
-                    app:iconTint="@color/sapot_text_primary" />
-
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/btnGames"
-                    android:layout_width="0dp"
-                    android:layout_height="52dp"
-                    android:layout_weight="1"
-                    android:layout_marginStart="6dp"
-                    android:backgroundTint="@color/sapot_white"
-                    android:text="Mini Games"
-                    android:textAllCaps="false"
-                    android:textColor="@color/sapot_text_primary"
-                    android:textSize="14sp"
-                    android:textStyle="bold"
-                    app:cornerRadius="16dp"
-                    app:icon="@android:drawable/ic_media_play"
-                    app:iconGravity="textStart"
-                    app:iconTint="@color/sapot_text_primary" />
+                <TextView
+                    android:id="@+id/btnAllShops"
+                    style="@style/HU.Text.Link"
+                    android:layout_width="wrap_content"
+                    android:layout_height="48dp"
+                    android:background="?attr/selectableItemBackground"
+                    android:gravity="center_vertical"
+                    android:text="@string/hu_all_shops" />
             </LinearLayout>
 
             <LinearLayout
+                android:id="@+id/shopCards"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="10dp"
-                android:orientation="horizontal">
+                android:orientation="vertical" />
 
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/btnChallenges"
-                    android:layout_width="0dp"
-                    android:layout_height="52dp"
-                    android:layout_weight="1"
-                    android:layout_marginEnd="6dp"
-                    android:backgroundTint="@color/sapot_white"
-                    android:text="Challenges"
-                    android:textAllCaps="false"
-                    android:textColor="@color/sapot_text_primary"
-                    android:textSize="14sp"
-                    android:textStyle="bold"
-                    app:cornerRadius="16dp"
-                    app:icon="@drawable/ic_gift"
-                    app:iconGravity="textStart"
-                    app:iconTint="@color/sapot_text_primary" />
-
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/btnMyVouchers"
-                    android:layout_width="0dp"
-                    android:layout_height="52dp"
-                    android:layout_weight="1"
-                    android:layout_marginStart="6dp"
-                    android:backgroundTint="@color/sapot_white"
-                    android:text="My Vouchers"
-                    android:textAllCaps="false"
-                    android:textColor="@color/sapot_text_primary"
-                    android:textSize="14sp"
-                    android:textStyle="bold"
-                    app:cornerRadius="16dp"
-                    app:icon="@drawable/ic_wallet"
-                    app:iconGravity="textStart"
-                    app:iconTint="@color/sapot_text_primary" />
-            </LinearLayout>
-
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/btnLeaderboard"
-                android:layout_width="match_parent"
-                android:layout_height="52dp"
-                android:layout_marginTop="10dp"
-                android:backgroundTint="@color/sapot_primary_light"
-                android:text="Community Leaderboard 🏆"
-                android:textAllCaps="false"
-                android:textColor="@color/sapot_text_primary"
-                android:textSize="14sp"
-                android:textStyle="bold"
-                app:cornerRadius="16dp"
-                app:icon="@drawable/ic_badge_raja"
-                app:iconGravity="textStart"
-                app:iconTint="@color/sapot_text_primary"
-                app:strokeColor="@color/sapot_primary_yellow"
-                app:strokeWidth="1dp" />
-
-            <!-- Section: Around your corner -->
-            <RelativeLayout
+            <!-- Today in Play -->
+            <LinearLayout
+                android:id="@+id/playStrip"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="24dp">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Around your corner"
-                    android:textColor="@color/sapot_text_primary"
-                    android:textSize="18sp"
-                    android:textStyle="bold" />
-
-                <TextView
-                    android:id="@+id/btnExplore"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_alignParentEnd="true"
-                    android:text="Explore →"
-                    android:textColor="@color/sapot_text_primary"
-                    android:textSize="12sp"
-                    android:textStyle="bold" />
-            </RelativeLayout>
-
-            <!-- Dynamic list of recently visited shops (Phase 3 Task 3.2) -->
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/rvRecentShops"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="12dp"
-                android:nestedScrollingEnabled="false"
-                tools:listitem="@layout/item_shop_card" />
-
-            <TextView
-                android:id="@+id/tvNoShops"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
-                android:gravity="center"
-                android:text="Scan a shop QR to start earning points!"
-                android:textColor="@color/sapot_text_secondary"
-                android:textSize="13sp"
-                android:visibility="gone" />
-
-            <!-- Reward Nudge Banner -->
-            <com.google.android.material.card.MaterialCardView
-                android:id="@+id/cardRewardNudge"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="14dp"
+                android:layout_marginTop="22dp"
+                android:background="@drawable/bg_hu_card"
                 android:clickable="true"
                 android:focusable="true"
-                app:cardBackgroundColor="@color/sapot_primary_light"
-                app:cardCornerRadius="24dp"
-                app:cardElevation="0dp">
+                android:foreground="?attr/selectableItemBackground"
+                android:gravity="center_vertical"
+                android:minHeight="64dp"
+                android:orientation="horizontal"
+                android:padding="16dp">
+
+                <ImageView
+                    android:layout_width="28dp"
+                    android:layout_height="28dp"
+                    android:contentDescription="@null"
+                    android:src="@drawable/ic_wheel"
+                    app:tint="@color/hu_accent_text" />
 
                 <LinearLayout
-                    android:layout_width="match_parent"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:gravity="center_vertical"
-                    android:orientation="horizontal"
-                    android:padding="16dp">
+                    android:layout_marginStart="14dp"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
 
-                    <ImageView
-                        android:layout_width="26dp"
-                        android:layout_height="26dp"
-                        android:src="@drawable/ic_gift"
-                        app:tint="@color/sapot_text_primary" />
-
-                    <LinearLayout
-                        android:layout_width="0dp"
+                    <TextView
+                        style="@style/HU.Text.Title"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginStart="12dp"
-                        android:layout_weight="1"
-                        android:orientation="vertical">
+                        android:text="@string/hu_today_in_play"
+                        android:textSize="16sp" />
 
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="A little treat is waiting"
-                            android:textColor="@color/sapot_text_primary"
-                            android:textSize="14sp"
-                            android:textStyle="bold" />
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="2dp"
-                            android:text="Get RM5 off at Kopi Lorong for 200 shop points."
-                            android:textColor="@color/sapot_text_primary"
-                            android:textSize="12sp" />
-                    </LinearLayout>
+                    <TextView
+                        android:id="@+id/tvPlayLine"
+                        style="@style/HU.Text.Small"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        tools:text="Free spin ready · Loyal Supporter 1 of 2" />
                 </LinearLayout>
-            </com.google.android.material.card.MaterialCardView>
 
+                <ImageView
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:contentDescription="@null"
+                    android:src="@drawable/ic_chevron_right_small"
+                    app:tint="@color/hu_soft" />
+            </LinearLayout>
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
 
-    <!-- Bottom Navigation Bar -->
     <include
-        android:id="@+id/bottomNav"
-        layout="@layout/layout_customer_bottom_nav"
-        android:layout_width="match_parent"
-        android:layout_height="76dp"
-        android:layout_gravity="bottom" />
-
-</androidx.coordinatorlayout.widget.CoordinatorLayout>
+        android:id="@+id/customerNav"
+        layout="@layout/layout_customer_bottom_nav" />
+</LinearLayout>

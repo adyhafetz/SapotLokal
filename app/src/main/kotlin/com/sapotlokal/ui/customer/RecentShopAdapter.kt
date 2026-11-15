@@ -40,17 +40,11 @@ class RecentShopAdapter(
 
         fun bind(item: RecentShopItem) {
             binding.tvShopName.text    = item.shopName
-            binding.tvShopSubtitle.text = item.category
+            binding.tvShopSubtitle.text = com.sapotlokal.data.model.ShopCategory.label(binding.root.context, item.category)
             binding.tvShopPoints.text  = "${item.balance} pts"
 
             // Status chip
-            if (item.isOpen) {
-                binding.tvShopStatus.text = "● OPEN"
-                binding.tvShopStatus.setBackgroundResource(R.drawable.bg_status_chip_open)
-            } else {
-                binding.tvShopStatus.text = "● CLOSED"
-                binding.tvShopStatus.setBackgroundResource(R.drawable.bg_status_chip_closed)
-            }
+            com.sapotlokal.util.StatusChip.bind(binding.tvShopStatus, item.isOpen)
 
             // Category icon: map known category keywords to the existing drawables;
             // fall back to the generic croissant drawable for unknown categories.

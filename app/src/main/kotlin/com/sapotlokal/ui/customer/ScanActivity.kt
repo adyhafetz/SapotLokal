@@ -28,7 +28,6 @@ import com.sapotlokal.AppConfig
 import com.sapotlokal.data.repository.QrCodeRepository
 import com.sapotlokal.data.repository.PointRepository
 import com.sapotlokal.data.repository.VendorRepository
-import com.sapotlokal.data.repository.VoucherRepository
 import com.sapotlokal.util.isNetworkAvailable
 import com.sapotlokal.databinding.ActivityScanBinding
 import java.util.concurrent.ExecutorService
@@ -73,7 +72,7 @@ class ScanActivity : AppCompatActivity() {
         if (granted) {
             startCamera()
         } else {
-            showError("Camera permission is required to scan QR codes.")
+            showError(getString(com.sapotlokal.R.string.error_camera_permission))
         }
     }
 
@@ -83,6 +82,7 @@ class ScanActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityScanBinding.inflate(layoutInflater)
         setContentView(binding.root)
+        CustomerNav.bind(this, binding.customerNav, CustomerNav.Tab.SCAN)
 
         cameraExecutor = Executors.newSingleThreadExecutor()
 
@@ -133,15 +133,28 @@ class ScanActivity : AppCompatActivity() {
 
             try {
                 cameraProvider.unbindAll()
-                cameraProvider.bindToLifecycle(
+                val camera = cameraProvider.bindToLifecycle(
                     this,
                     CameraSelector.DEFAULT_BACK_CAMERA,
                     preview,
                     imageAnalyzer
                 )
+                binding.tvScanStatus.text = getString(com.sapotlokal.R.string.k_camera_active)
+                var torchOn = false
+                if (camera.cameraInfo.hasFlashUnit()) {
+                    binding.btnFlash.setOnClickListener {
+                        torchOn = !torchOn
+                        camera.cameraControl.enableTorch(torchOn)
+                        binding.btnFlash.alpha = if (torchOn) 1f else 0.6f
+                    }
+                    binding.btnFlash.alpha = 0.6f
+                } else {
+                    binding.btnFlash.visibility = android.view.View.INVISIBLE
+                }
             } catch (e: Exception) {
+                binding.tvScanStatus.text = getString(com.sapotlokal.R.string.k_camera_unavailable)
                 Log.e("ScanActivity", "Camera bind failed", e)
-                showError("Could not start camera. Please try again.")
+                showError(getString(com.sapotlokal.R.string.k_could_not_start_camera))
             }
 
         }, ContextCompat.getMainExecutor(this))
@@ -207,7 +220,7 @@ class ScanActivity : AppCompatActivity() {
                 isProcessing = false
             },
             onError = { _ ->
-                showError("Could not connect to check the code. Please try again.")
+                showError(getString(com.sapotlokal.R.string.k_could_not_check_code))
                 isProcessing = false
             }
         )
@@ -215,26 +228,40 @@ class ScanActivity : AppCompatActivity() {
 
     private fun recordPointsAndShowSuccess(vendorID: String, vendorName: String) {
         val userID = auth.currentUser?.uid ?: run {
-            showError("Not logged in. Please restart the app.")
+            showError(getString(com.sapotlokal.R.string.games_error_not_logged_in))
             isProcessing = false
             return
         }
 
+        // One point-earning scan per shop per cooldown window (AppConfig.SHOP_VISIT_COOLDOWN_MINUTES).
+        PointRepository.hasRecentShopVisit(
+            userID   = userID,
+            vendorID = vendorID,
+            onResult = { recent ->
+                if (recent) {
+                    mainHandler.post {
+                        showError(getString(com.sapotlokal.R.string.k_already_collected, vendorName))
+                        isProcessing = false
+                    }
+                } else {
+                    awardShopVisit(userID, vendorID, vendorName)
+                }
+            },
+            onError = {
+                mainHandler.post {
+                    showError(getString(com.sapotlokal.R.string.k_could_not_check_visits))
+                    isProcessing = false
+                }
+            }
+        )
+    }
+
+    private fun awardShopVisit(userID: String, vendorID: String, vendorName: String) {
         PointRepository.recordShopVisit(
             userID   = userID,
             vendorID = vendorID,
-            onResult = { success ->
+            onResult = { success, earned, bonusNote ->
                 if (success) {
-                    // Task 5.1: Immediately evaluate and auto-award vouchers for this shop visit
-                    VoucherRepository.evaluateAndAwardVouchers(
-                        userID   = userID,
-                        vendorID = vendorID,
-                        onResult = { newVouchers ->
-                            if (newVouchers.isNotEmpty()) {
-                                Log.i("ScanActivity", "Auto-awarded ${newVouchers.size} new vouchers")
-                            }
-                        }
-                    )
                     // Phase 3 Weekly Missions & Gamification Hook
                     val scanTimestamp = System.currentTimeMillis()
                     com.sapotlokal.data.repository.MissionRepository.recordShopVisitEvent(
@@ -244,6 +271,7 @@ class ScanActivity : AppCompatActivity() {
                         timestamp = scanTimestamp
                     )
 
+                    com.sapotlokal.util.FollowedShops.follow(this@ScanActivity, vendorID)
                     // Phase 6: Subscribe customer to FCM updates for this shop
                     com.google.firebase.messaging.FirebaseMessaging.getInstance()
                         .subscribeToTopic("shop_${vendorID}")
@@ -254,14 +282,12 @@ class ScanActivity : AppCompatActivity() {
                             Log.w("ScanActivity", "Could not subscribe to FCM topic: shop_${vendorID}", e)
                         }
 
-                    // Task 6.1: Sync challenge progress on shop visit
-                    com.sapotlokal.data.repository.ChallengeRepository.syncUserProgress(userID)
                     mainHandler.post {
-                        showSuccessOverlay(vendorName)
+                        showSuccessOverlay(vendorName, earned, bonusNote)
                     }
                 } else {
                     mainHandler.post {
-                        showError("Points could not be saved. Please try again.")
+                        showError(getString(com.sapotlokal.R.string.k_points_not_saved))
                         isProcessing = false
                     }
                 }
@@ -271,16 +297,18 @@ class ScanActivity : AppCompatActivity() {
 
     // ── UI helpers ────────────────────────────────────────────────────────────
 
-    private fun showSuccessOverlay(vendorName: String) {
-        binding.tvPointsAwarded.text = "+${AppConfig.POINTS_PER_SHOP_VISIT} Points!"
-        binding.tvShopName.text      = vendorName
+    private fun showSuccessOverlay(vendorName: String, earned: Int, bonusNote: String? = null) {
+        // `earned` already includes the tier multiplier (10 base × 1.0–2.0).
+        binding.tvPointsAwarded.text = getString(com.sapotlokal.R.string.points_awarded, earned)
+        binding.tvShopName.text      = if (bonusNote != null) vendorName + "\n" + bonusNote else vendorName
+        binding.tvShopName.gravity   = android.view.Gravity.CENTER
         binding.successOverlay.visibility = View.VISIBLE
 
         val anim = AnimationUtils.loadAnimation(this, android.R.anim.fade_in)
         binding.successOverlay.startAnimation(anim)
 
         // Auto-close after 2 seconds and return to CustomerHomeActivity
-        mainHandler.postDelayed({ finish() }, 2000)
+        mainHandler.postDelayed({ finish() }, if (bonusNote != null) 3000L else 2000L)
     }
 
     private fun showError(message: String) {

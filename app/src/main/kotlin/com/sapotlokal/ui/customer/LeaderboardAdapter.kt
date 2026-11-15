@@ -47,11 +47,14 @@ class LeaderboardAdapter : ListAdapter<LeaderboardMember, LeaderboardAdapter.Lea
 
             // Points formatted
             val formattedPts = NumberFormat.getNumberInstance(Locale.US).format(item.points)
-            binding.tvPoints.text = "$formattedPts pts"
+            binding.tvPoints.text = binding.root.context.getString(com.sapotlokal.R.string.k_n_pts_lb, formattedPts)
 
             // Avatar Initials
             val initials = getInitials(item.userName)
-            if (initials.isNotBlank()) {
+            val hasAvatar = com.sapotlokal.util.AvatarUi.bind(binding.ivAvatar, binding.tvInitials, item.avatar)
+            if (hasAvatar) {
+                // avatar is showing
+            } else if (initials.isNotBlank()) {
                 binding.tvInitials.text = initials
                 binding.tvInitials.visibility = View.VISIBLE
                 binding.ivAvatar.visibility = View.GONE

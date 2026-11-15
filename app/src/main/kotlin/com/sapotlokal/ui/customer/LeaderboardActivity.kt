@@ -37,8 +37,9 @@ class LeaderboardActivity : AppCompatActivity() {
 
     private var currentFilterIsAllTime = true
     private var currentUserId: String = ""
-    private var currentUserName: String = "You"
+    private var currentUserName: String = ""
     private var currentUserLifetimePoints: Int = 0
+    private var currentUserAvatar: String = ""
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -84,8 +85,9 @@ class LeaderboardActivity : AppCompatActivity() {
                 override fun onDataChange(snapshot: DataSnapshot) {
                     val user = snapshot.getValue(User::class.java)
                     if (user != null) {
-                        currentUserName = user.userName.ifBlank { "You" }
+                        currentUserName = user.userName.ifBlank { getString(com.sapotlokal.R.string.k_you) }
                         currentUserLifetimePoints = user.lifetimePoints
+                        currentUserAvatar = user.avatar
                     }
                 }
 
@@ -111,7 +113,7 @@ class LeaderboardActivity : AppCompatActivity() {
                 onError = { err ->
                     runOnUiThread {
                         binding.progressBar.visibility = View.GONE
-                        Toast.makeText(this, "Could not load rankings: $err", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(this, getString(com.sapotlokal.R.string.k_error_rankings, err), Toast.LENGTH_SHORT).show()
                     }
                 }
             )
@@ -127,7 +129,7 @@ class LeaderboardActivity : AppCompatActivity() {
                 onError = { err ->
                     runOnUiThread {
                         binding.progressBar.visibility = View.GONE
-                        Toast.makeText(this, "Could not load rankings: $err", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(this, getString(com.sapotlokal.R.string.k_error_rankings, err), Toast.LENGTH_SHORT).show()
                     }
                 }
             )
@@ -167,8 +169,8 @@ class LeaderboardActivity : AppCompatActivity() {
     private fun bind1stPlace(member: LeaderboardMember?) {
         if (member == null) {
             binding.tvName1st.text = "—"
-            binding.tvTier1st.text = "Unclaimed"
-            binding.tvPoints1st.text = "0 pts"
+            binding.tvTier1st.text = getString(com.sapotlokal.R.string.k_unclaimed)
+            binding.tvPoints1st.text = getString(com.sapotlokal.R.string.k_n_pts_lb, "0")
             binding.tvInitials1st.visibility = View.GONE
             binding.ivAvatar1st.visibility = View.VISIBLE
             return
@@ -179,10 +181,13 @@ class LeaderboardActivity : AppCompatActivity() {
 
         binding.tvName1st.text = "${member.userName} ${tier.emoji}"
         binding.tvTier1st.text = tier.title
-        binding.tvPoints1st.text = "${formatPoints(member.points)} pts"
+        binding.tvPoints1st.text = getString(com.sapotlokal.R.string.k_n_pts_lb, formatPoints(member.points))
 
         val initials = getInitials(member.userName)
-        if (initials.isNotBlank()) {
+        val hasAvatar = com.sapotlokal.util.AvatarUi.bind(binding.ivAvatar1st, binding.tvInitials1st, member.avatar, 5)
+        if (hasAvatar) {
+            // avatar is showing
+        } else if (initials.isNotBlank()) {
             binding.tvInitials1st.text = initials
             binding.tvInitials1st.visibility = View.VISIBLE
             binding.ivAvatar1st.visibility = View.GONE
@@ -195,8 +200,8 @@ class LeaderboardActivity : AppCompatActivity() {
     private fun bind2ndPlace(member: LeaderboardMember?) {
         if (member == null) {
             binding.tvName2nd.text = "—"
-            binding.tvTier2nd.text = "Unclaimed"
-            binding.tvPoints2nd.text = "0 pts"
+            binding.tvTier2nd.text = getString(com.sapotlokal.R.string.k_unclaimed)
+            binding.tvPoints2nd.text = getString(com.sapotlokal.R.string.k_n_pts_lb, "0")
             binding.tvInitials2nd.visibility = View.GONE
             binding.ivAvatar2nd.visibility = View.VISIBLE
             return
@@ -207,10 +212,13 @@ class LeaderboardActivity : AppCompatActivity() {
 
         binding.tvName2nd.text = "${member.userName} ${tier.emoji}"
         binding.tvTier2nd.text = tier.title
-        binding.tvPoints2nd.text = "${formatPoints(member.points)} pts"
+        binding.tvPoints2nd.text = getString(com.sapotlokal.R.string.k_n_pts_lb, formatPoints(member.points))
 
         val initials = getInitials(member.userName)
-        if (initials.isNotBlank()) {
+        val hasAvatar = com.sapotlokal.util.AvatarUi.bind(binding.ivAvatar2nd, binding.tvInitials2nd, member.avatar, 4)
+        if (hasAvatar) {
+            // avatar is showing
+        } else if (initials.isNotBlank()) {
             binding.tvInitials2nd.text = initials
             binding.tvInitials2nd.visibility = View.VISIBLE
             binding.ivAvatar2nd.visibility = View.GONE
@@ -223,8 +231,8 @@ class LeaderboardActivity : AppCompatActivity() {
     private fun bind3rdPlace(member: LeaderboardMember?) {
         if (member == null) {
             binding.tvName3rd.text = "—"
-            binding.tvTier3rd.text = "Unclaimed"
-            binding.tvPoints3rd.text = "0 pts"
+            binding.tvTier3rd.text = getString(com.sapotlokal.R.string.k_unclaimed)
+            binding.tvPoints3rd.text = getString(com.sapotlokal.R.string.k_n_pts_lb, "0")
             binding.tvInitials3rd.visibility = View.GONE
             binding.ivAvatar3rd.visibility = View.VISIBLE
             return
@@ -235,10 +243,13 @@ class LeaderboardActivity : AppCompatActivity() {
 
         binding.tvName3rd.text = "${member.userName} ${tier.emoji}"
         binding.tvTier3rd.text = tier.title
-        binding.tvPoints3rd.text = "${formatPoints(member.points)} pts"
+        binding.tvPoints3rd.text = getString(com.sapotlokal.R.string.k_n_pts_lb, formatPoints(member.points))
 
         val initials = getInitials(member.userName)
-        if (initials.isNotBlank()) {
+        val hasAvatar = com.sapotlokal.util.AvatarUi.bind(binding.ivAvatar3rd, binding.tvInitials3rd, member.avatar, 4)
+        if (hasAvatar) {
+            // avatar is showing
+        } else if (initials.isNotBlank()) {
             binding.tvInitials3rd.text = initials
             binding.tvInitials3rd.visibility = View.VISIBLE
             binding.ivAvatar3rd.visibility = View.GONE
@@ -258,8 +269,13 @@ class LeaderboardActivity : AppCompatActivity() {
     private fun bindStickyYouCard(userMember: LeaderboardMember?) {
         val tier = CustomerTier.fromLifetimePoints(currentUserLifetimePoints)
         val initials = getInitials(currentUserName)
+        val hasAvatar = com.sapotlokal.util.AvatarUi.bind(
+            binding.ivStickyAvatar, binding.tvStickyInitials, userMember?.avatar ?: currentUserAvatar
+        )
 
-        if (initials.isNotBlank()) {
+        if (hasAvatar) {
+            // avatar is showing
+        } else if (initials.isNotBlank()) {
             binding.tvStickyInitials.text = initials
             binding.tvStickyInitials.visibility = View.VISIBLE
             binding.ivStickyAvatar.visibility = View.GONE
@@ -270,16 +286,16 @@ class LeaderboardActivity : AppCompatActivity() {
 
         if (userMember != null) {
             binding.tvStickyRank.text = "#${userMember.rank}"
-            binding.tvStickyName.text = "${userMember.userName} (You) ${tier.emoji}"
-            binding.tvStickyTier.text = "${tier.title} · Ranked #${userMember.rank}"
-            binding.tvStickyPoints.text = "${formatPoints(userMember.points)} pts"
+            binding.tvStickyName.text = getString(com.sapotlokal.R.string.k_you_name, userMember.userName, tier.emoji)
+            binding.tvStickyTier.text = getString(com.sapotlokal.R.string.k_you_tier_rank, tier.title, userMember.rank)
+            binding.tvStickyPoints.text = formatPoints(userMember.points)
         } else {
             // Not in top 50
             binding.tvStickyRank.text = "#50+"
-            binding.tvStickyName.text = "$currentUserName (You) ${tier.emoji}"
+            binding.tvStickyName.text = getString(com.sapotlokal.R.string.k_you_name, currentUserName.ifBlank { getString(com.sapotlokal.R.string.k_you) }, tier.emoji)
             val pts = if (currentFilterIsAllTime) currentUserLifetimePoints else 0
-            binding.tvStickyTier.text = "${tier.title} · Top 50 not reached yet"
-            binding.tvStickyPoints.text = "${formatPoints(pts)} pts"
+            binding.tvStickyTier.text = getString(com.sapotlokal.R.string.k_top50_not_reached, tier.title)
+            binding.tvStickyPoints.text = formatPoints(pts)
         }
     }
 
