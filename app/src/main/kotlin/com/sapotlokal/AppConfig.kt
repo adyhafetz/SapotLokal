@@ -60,6 +60,15 @@ object AppConfig {
     /** Timezone used to decide when "a new day" starts for both games. */
     const val GAMES_RESET_TIME_ZONE: String = "Asia/Kuala_Lumpur"
 
+    // ── Shop visit cooldown ───────────────────────────────────────────────────
+
+    /**
+     * Minimum minutes between two point-earning scans of the SAME shop by the same customer.
+     * Stops one QR code being scanned over and over for points.
+     * Set to 0 to disable while testing (then set it back before release).
+     */
+    const val SHOP_VISIT_COOLDOWN_MINUTES: Int = 720
+
     // ── Shop QR Code ──────────────────────────────────────────────────────────
 
     /**
@@ -77,6 +86,17 @@ object AppConfig {
      * Placeholder: 30 days.
      */
     const val VOUCHER_EXPIRY_DAYS: Int = 30
+
+    // ── Shop bonuses ──────────────────────────────────────────────────────────
+
+    /** Extra shop points the first time a customer scans at a shop. */
+    const val FIRST_VISIT_BONUS_POINTS: Int = 20
+
+    /** Visits on this many different days in one week at the same shop earn the weekly bonus. */
+    const val WEEKLY_STREAK_VISIT_DAYS: Int = 3
+
+    /** Extra shop points for completing the weekly visit streak at a shop (once per shop per week). */
+    const val WEEKLY_STREAK_BONUS_POINTS: Int = 20
 
     // ── Tiers (Gamification Overhaul) ─────────────────────────────────────────
 

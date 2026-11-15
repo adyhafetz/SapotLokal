@@ -57,16 +57,31 @@ object GamesRepository {
             .addOnFailureListener { onResult(null) }
     }
 
-    fun recordSpin(userID: String, pointsWon: Int, attemptNumber: Int, onResult: (Boolean) -> Unit) {
-        PointRepository.awardMiniGamePoints(userID, pointsWon, GameType.SPIN_WHEEL, attemptNumber) { ok, _ ->
-            onResult(ok)
-        }
+    /** onResult(success, pointsActuallyEarned) — earned already includes the tier multiplier. */
+    fun recordSpin(userID: String, pointsWon: Int, attemptNumber: Int, onResult: (Boolean, Int) -> Unit) {
+        PointRepository.awardMiniGamePoints(userID, pointsWon, GameType.SPIN_WHEEL, attemptNumber, onResult = onResult)
     }
 
-    fun recordMemoryWin(userID: String, pointsAwarded: Int, attemptNumber: Int, onResult: (Boolean) -> Unit) {
-        PointRepository.awardMiniGamePoints(userID, pointsAwarded, GameType.MEMORY_MATCH, attemptNumber) { ok, _ ->
-            onResult(ok)
+    /**
+     * [roomToday] is the remaining daily allowance in FINAL (post-multiplier) points, so the
+     * cap can never be exceeded even for high tiers.
+     */
+    fun recordMemoryWin(
+        userID: String,
+        basePoints: Int,
+        roomToday: Int,
+        attemptNumber: Int,
+        onResult: (Boolean, Int) -> Unit
+    ) {
+        if (roomToday <= 0) {
+            // Cap reached: still log the play (0 points) but award nothing.
+            PointRepository.awardMiniGamePoints(userID, 0, GameType.MEMORY_MATCH, attemptNumber, onResult = onResult)
+            return
         }
+        PointRepository.awardMiniGamePoints(
+            userID, basePoints, GameType.MEMORY_MATCH, attemptNumber,
+            maxEarnedPoints = roomToday, onResult = onResult
+        )
     }
 }
 

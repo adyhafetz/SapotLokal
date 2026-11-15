@@ -48,19 +48,6 @@ object PointRepository {
         )
     }
 
-    /** Builds (but does not write) a ledger row for challenge points. */
-    fun newChallengePointEntry(userID: String, amount: Int): Point? {
-        val key = db.child("points").push().key ?: return null
-        return Point(
-            pointID             = key,
-            userID              = userID,
-            vendorID            = NO_VENDOR_ID,
-            pointEarnedAmount   = amount,
-            pointRedeemedAmount = 0,
-            pointSource         = PointSource.CHALLENGE
-        )
-    }
-
     /**
      * Atomically awards points with the user's current tier multiplier:
      * 1. Multiplies base points by user tier multiplier: (base * multiplier).toInt()
@@ -73,6 +60,8 @@ object PointRepository {
         basePoints: Int,
         pointSource: String,
         vendorID: String = NO_VENDOR_ID,
+        extraUpdates: Map<String, Any?> = emptyMap(),
+        applyMultiplier: Boolean = true,
         onResult: (success: Boolean, earnedPoints: Int) -> Unit = { _, _ -> }
     ) {
         if (userID.isBlank()) {
@@ -88,7 +77,7 @@ object PointRepository {
             override fun onDataChange(snapshot: DataSnapshot) {
                 val currentLifetime = snapshot.child("lifetimePoints").getValue(Long::class.java)?.toInt() ?: 0
                 val tier = CustomerTier.fromLifetimePoints(currentLifetime)
-                val earnedPoints = (basePoints * tier.multiplier).toInt().coerceAtLeast(1)
+                val earnedPoints = if (applyMultiplier) (basePoints * tier.multiplier).toInt().coerceAtLeast(1) else basePoints
                 val newLifetime = currentLifetime + earnedPoints
                 val newTier = CustomerTier.fromLifetimePoints(newLifetime)
 
@@ -108,11 +97,14 @@ object PointRepository {
                     timestamp          = System.currentTimeMillis()
                 )
 
-                val updates = hashMapOf<String, Any>(
+                // extraUpdates (e.g. a "claimed" flag) ride in the SAME atomic write, so a reward
+                // can never be marked claimed without its points being recorded (or vice-versa).
+                val updates = hashMapOf<String, Any?>(
                     "points/$pointID" to pointRow,
                     "users/$userID/lifetimePoints" to ServerValue.increment(earnedPoints.toLong()),
                     "users/$userID/currentTier" to newTier.code
                 )
+                updates.putAll(extraUpdates)
 
                 db.updateChildren(updates)
                     .addOnSuccessListener {
@@ -130,22 +122,125 @@ object PointRepository {
     }
 
     /**
-     * Appends a new earned-points ledger row for a shop visit with tier multiplier.
-     * Called by ScanActivity after a QR code is validated.
+     * Records a shop visit (with the tier multiplier) and then any shop bonuses it unlocks:
+     *   - first visit to this shop: +AppConfig.FIRST_VISIT_BONUS_POINTS
+     *   - visits on AppConfig.WEEKLY_STREAK_VISIT_DAYS different days this week: +WEEKLY_STREAK_BONUS_POINTS
+     *     (once per shop per week)
+     * Bonuses are shop points (they carry this shop's vendorID) and are not multiplied.
+     * [onResult] gets the TOTAL earned and a short note such as "First visit bonus +20" (or null).
      */
     fun recordShopVisit(
         userID: String,
         vendorID: String,
-        onResult: (success: Boolean) -> Unit
+        onResult: (success: Boolean, earnedPoints: Int, bonusNote: String?) -> Unit
     ) {
-        addPoints(
-            userID = userID,
-            basePoints = AppConfig.POINTS_PER_SHOP_VISIT,
-            pointSource = PointSource.SHOP_VISIT,
-            vendorID = vendorID
-        ) { success, _ ->
-            onResult(success)
+        // Look at the customer's history at this shop BEFORE writing today's visit.
+        db.child("points").orderByChild("userID").equalTo(userID)
+            .addListenerForSingleValueEvent(object : ValueEventListener {
+                override fun onDataChange(snapshot: DataSnapshot) {
+                    val zone = ZoneId.of(AppConfig.GAMES_RESET_TIME_ZONE)
+                    val weekStart = com.sapotlokal.util.MissionDateUtils.getWeekStartMillis()
+                    val here = snapshot.children.mapNotNull { it.getValue(Point::class.java) }
+                        .filter { it.vendorID == vendorID }
+                    val visits = here.filter { it.pointSource == PointSource.SHOP_VISIT }
+                    val isFirstVisit = visits.isEmpty()
+                    val today = LocalDate.now(zone)
+                    val daysThisWeek = visits.filter { it.timestamp >= weekStart }
+                        .map { java.time.Instant.ofEpochMilli(it.timestamp).atZone(zone).toLocalDate() }
+                        .toMutableSet().apply { add(today) }
+                    val streakAlreadyPaid = here.any {
+                        it.pointSource == PointSource.STREAK_BONUS && it.timestamp >= weekStart
+                    }
+                    val streakEarned = !streakAlreadyPaid && daysThisWeek.size >= AppConfig.WEEKLY_STREAK_VISIT_DAYS
+
+                    addPoints(
+                        userID = userID,
+                        basePoints = AppConfig.POINTS_PER_SHOP_VISIT,
+                        pointSource = PointSource.SHOP_VISIT,
+                        vendorID = vendorID
+                    ) { ok, visitPoints ->
+                        if (!ok) {
+                            onResult(false, 0, null)
+                            return@addPoints
+                        }
+                        val notes = mutableListOf<String>()
+                        var total = visitPoints
+                        fun finish() = onResult(true, total, notes.joinToString(" · ").ifEmpty { null })
+                        fun awardStreak() {
+                            if (!streakEarned) { finish(); return }
+                            addPoints(
+                                userID = userID,
+                                basePoints = AppConfig.WEEKLY_STREAK_BONUS_POINTS,
+                                pointSource = PointSource.STREAK_BONUS,
+                                vendorID = vendorID,
+                                applyMultiplier = false
+                            ) { bonusOk, bonus ->
+                                if (bonusOk && bonus > 0) {
+                                    total += bonus
+                                    notes.add("Weekly streak bonus +$bonus")
+                                }
+                                finish()
+                            }
+                        }
+                        if (isFirstVisit) {
+                            addPoints(
+                                userID = userID,
+                                basePoints = AppConfig.FIRST_VISIT_BONUS_POINTS,
+                                pointSource = PointSource.FIRST_VISIT_BONUS,
+                                vendorID = vendorID,
+                                applyMultiplier = false
+                            ) { bonusOk, bonus ->
+                                if (bonusOk && bonus > 0) {
+                                    total += bonus
+                                    notes.add("First visit bonus +$bonus")
+                                }
+                                awardStreak()
+                            }
+                        } else {
+                            awardStreak()
+                        }
+                    }
+                }
+
+                override fun onCancelled(error: DatabaseError) {
+                    onResult(false, 0, null)
+                }
+            })
+    }
+
+    /**
+     * True when [userID] already earned a shop-visit reward at [vendorID] inside the cooldown
+     * window (AppConfig.SHOP_VISIT_COOLDOWN_MINUTES), judged from the live ledger.
+     * A cooldown of 0 disables the check (useful while testing).
+     */
+    fun hasRecentShopVisit(
+        userID: String,
+        vendorID: String,
+        onResult: (recent: Boolean) -> Unit,
+        onError: (String) -> Unit
+    ) {
+        val cooldownMs = AppConfig.SHOP_VISIT_COOLDOWN_MINUTES * 60_000L
+        if (cooldownMs <= 0L) {
+            onResult(false)
+            return
         }
+        db.child("points").orderByChild("userID").equalTo(userID)
+            .addListenerForSingleValueEvent(object : ValueEventListener {
+                override fun onDataChange(snapshot: DataSnapshot) {
+                    val cutoff = System.currentTimeMillis() - cooldownMs
+                    val recent = snapshot.children.any { child ->
+                        val p = child.getValue(Point::class.java) ?: return@any false
+                        p.pointSource == PointSource.SHOP_VISIT &&
+                            p.vendorID == vendorID &&
+                            p.timestamp >= cutoff
+                    }
+                    onResult(recent)
+                }
+
+                override fun onCancelled(error: DatabaseError) {
+                    onError(error.message)
+                }
+            })
     }
 
     /**
@@ -156,6 +251,7 @@ object PointRepository {
         basePoints: Int,
         gameType: String,
         attemptNumber: Int,
+        maxEarnedPoints: Int = Int.MAX_VALUE,
         onResult: (success: Boolean, earnedPoints: Int) -> Unit
     ) {
         if (userID.isBlank()) {
@@ -180,10 +276,7 @@ object PointRepository {
                 gamePlayedAt = System.currentTimeMillis()
             )
             db.child("games").child(gameID).setValue(game)
-                .addOnSuccessListener {
-                    ChallengeRepository.syncUserProgress(userID)
-                    onResult(true, 0)
-                }
+                .addOnSuccessListener { onResult(true, 0) }
                 .addOnFailureListener { onResult(false, 0) }
             return
         }
@@ -192,7 +285,9 @@ object PointRepository {
             override fun onDataChange(snapshot: DataSnapshot) {
                 val currentLifetime = snapshot.child("lifetimePoints").getValue(Long::class.java)?.toInt() ?: 0
                 val tier = CustomerTier.fromLifetimePoints(currentLifetime)
+                // maxEarnedPoints enforces the daily cap AFTER the tier multiplier is applied.
                 val earnedPoints = (basePoints * tier.multiplier).toInt().coerceAtLeast(1)
+                    .coerceAtMost(maxEarnedPoints.coerceAtLeast(1))
                 val newLifetime = currentLifetime + earnedPoints
                 val newTier = CustomerTier.fromLifetimePoints(newLifetime)
 
@@ -232,10 +327,7 @@ object PointRepository {
                 )
 
                 db.updateChildren(updates)
-                    .addOnSuccessListener {
-                        ChallengeRepository.syncUserProgress(userID)
-                        onResult(true, earnedPoints)
-                    }
+                    .addOnSuccessListener { onResult(true, earnedPoints) }
                     .addOnFailureListener {
                         onResult(false, 0)
                     }
@@ -327,16 +419,21 @@ object PointRepository {
     fun listenToPointsForUser(
         userID: String,
         onUpdate: (perShopBalance: Map<String, Int>, lifetimeEarned: Int, spendableBalance: Int) -> Unit,
-        onError: (String) -> Unit
+        onError: (String) -> Unit,
+        onWeekly: ((earnedThisWeek: Int) -> Unit)? = null
     ): ValueEventListener {
         val listener = object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
                 val perShop = mutableMapOf<String, Int>()
                 var lifetimeEarned = 0
+                var weekly = 0
+                val weekStart = com.sapotlokal.util.MissionDateUtils.getWeekStartMillis()
+
                 var totalRedeemed = 0
 
                 for (child in snapshot.children) {
                     val p = child.getValue(Point::class.java) ?: continue
+                    if (p.timestamp >= weekStart) weekly += p.pointEarnedAmount
                     lifetimeEarned += p.pointEarnedAmount
                     totalRedeemed += p.pointRedeemedAmount
                     if (p.vendorID.isNotBlank()) {
@@ -347,6 +444,7 @@ object PointRepository {
                 }
 
                 val spendableBalance = (lifetimeEarned - totalRedeemed).coerceAtLeast(0)
+                onWeekly?.invoke(weekly)
                 onUpdate(perShop, lifetimeEarned, spendableBalance)
             }
 

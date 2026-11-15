@@ -29,7 +29,8 @@ data class User(
     val role: String = "",           // "customer" or "vendor"
     val lifetimePoints: Int = 0,
     val currentTier: String = CustomerTier.FRESHIE.code,
-    val unlockedBadges: Map<String, Boolean> = emptyMap()
+    val unlockedBadges: Map<String, Boolean> = emptyMap(),
+    val avatar: String = ""          // optional profile avatar id (see AvatarDef); empty = none
 )
 
 // ── VENDOR ────────────────────────────────────────────────────────────────────
@@ -104,7 +105,8 @@ data class LeaderboardMember(
     val userName: String = "",
     val points: Int = 0,
     val currentTier: String = CustomerTier.FRESHIE.code,
-    val rank: Int = 0
+    val rank: Int = 0,
+    val avatar: String = ""
 )
 
 
@@ -114,6 +116,8 @@ object PointSource {
     const val MEMORY_MATCH  = "memory_match"
     const val CHALLENGE     = "challenge"
     const val REDEMPTION    = "redemption"  // When a voucher is redeemed
+    const val FIRST_VISIT_BONUS = "first_visit_bonus"
+    const val STREAK_BONUS      = "streak_bonus"
 }
 
 // ── VOUCHER (reward rule) ──────────────────────────────────────────────────────
@@ -135,7 +139,12 @@ data class Voucher(
     val voucherName: String = "",       // e.g. "Free Cake"
     val voucherDescription: String = "",
     val pointsRequired: Int = 0,
-    val isActive: Boolean = true        // ERD addition — see erd-changes.md
+    // Without @PropertyName Firebase would store this as "active" (it strips the "is" prefix of a
+    // Kotlin Boolean getter), while setRuleActive() writes "isActive" — the two never matched, so
+    // switching a reward on/off could not work. Same fix Vendor.isOpen already uses.
+    @get:PropertyName("isActive")
+    @set:PropertyName("isActive")
+    var isActive: Boolean = true        // ERD addition — see erd-changes.md
 )
 
 // ── VOUCHER_USER (customer voucher) ───────────────────────────────────────────
@@ -161,7 +170,11 @@ data class VoucherUser(
     val voucherExpiryDate: Long = 0L,   // Unix epoch ms
     val pointsRequiredSnapshot: Int = 0, // ERD addition — see erd-changes.md
     val voucherTitle: String = "",       // Snapshot of rule voucherName
-    val createdAt: Long = 0L             // Unix epoch ms
+    val createdAt: Long = 0L,            // Unix epoch ms
+    /** true = the points were spent when the customer claimed it (nothing more is deducted at redeem). */
+    val pointsDeducted: Boolean = false,
+    /** The points-ledger row that recorded the spend at claim time. */
+    val claimPointID: String = ""
 )
 
 object VoucherStatus {
@@ -190,56 +203,6 @@ object GameType {
     const val MEMORY_MATCH = "memory_match"
 }
 
-// ── CHALLENGE ─────────────────────────────────────────────────────────────────
-/**
- * Stored at: /challenges/{challengeID}
- * Defined once by admin; used by many users.
- */
-data class Challenge(
-    val challengeID: String = "",
-    val challengeTitle: String = "",
-    val challengeDescription: String = "",
-    val challengeTargetValue: Int = 0,
-    val challengeRewardPoint: Int = 0,
-    val isActive: Boolean = true
-)
-
-// ── USER_CHALLENGE ────────────────────────────────────────────────────────────
-/**
- * Stored at: /userChallenges/{userChallengeID}
- * Tracks a single user's progress on a single challenge.
- * userChallengeStatus: "in_progress" or "completed"
- */
-data class UserChallenge(
-    val userChallengeID: String = "",
-    val userID: String = "",            // FK → users/{userID}
-    val challengeID: String = "",       // FK → challenges/{challengeID}
-    val currentValue: Int = 0,
-    val userChallengeStatus: String = UserChallengeStatus.IN_PROGRESS
-)
-
-object UserChallengeStatus {
-    const val IN_PROGRESS = "in_progress"
-    const val COMPLETED   = "completed"
-    const val CLAIMED     = "claimed"
-}
-
-data class ChallengeWithProgress(
-    val challenge: Challenge,
-    val userChallenge: UserChallenge?
-) {
-    val progress: Int
-        get() = userChallenge?.currentValue ?: 0
-
-    val isCompleted: Boolean
-        get() = progress >= challenge.challengeTargetValue ||
-                userChallenge?.userChallengeStatus == UserChallengeStatus.COMPLETED ||
-                userChallenge?.userChallengeStatus == UserChallengeStatus.CLAIMED
-
-    val isClaimed: Boolean
-        get() = userChallenge?.userChallengeStatus == UserChallengeStatus.CLAIMED
-}
-
 // ── VENDOR STATS (Phase 6) ───────────────────────────────────────────────────
 data class VendorStats(
     val vendorID: String = "",
@@ -250,3 +213,13 @@ data class VendorStats(
     val recentPoints: List<Point> = emptyList()
 )
 
+
+/** Fields written when an account is created; leaves out the optional avatar so it can be validated later. */
+fun User.toSignUpMap(): Map<String, Any> = mapOf(
+    "userID" to userID,
+    "userName" to userName,
+    "userEmail" to userEmail,
+    "role" to role,
+    "lifetimePoints" to lifetimePoints,
+    "currentTier" to currentTier
+)

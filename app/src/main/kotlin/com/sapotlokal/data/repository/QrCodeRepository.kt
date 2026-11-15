@@ -126,6 +126,16 @@ object QrCodeRepository {
      * @param onSuccess    Called with the new QrCode on success
      * @param onError      Called with a readable message on failure
      */
+    /**
+     * Removes [qrId] so it can no longer be scanned. Used when the vendor leaves the QR screen —
+     * the code must NOT stay valid while the screen isn't visible. Failures are only logged:
+     * the code still expires by itself after QR_ROTATION_SECONDS.
+     */
+    fun deleteCode(qrId: String) {
+        db.child("qrcodes").child(qrId).removeValue()
+            .addOnFailureListener { Log.w(TAG, "Could not delete QR code $qrId", it) }
+    }
+
     fun publishNewCode(
         vendorID: String,
         previousQrId: String?,
@@ -148,12 +158,13 @@ object QrCodeRepository {
         )
 
         // Build the multi-location update map
-        val updates = mutableMapOf<String, Any>()
+        val updates = mutableMapOf<String, Any?>()
         updates["qrcodes/$newId"] = newCode
 
-        // Deactivate the previous code if we know its ID
+        // DELETE the previous code (null = remove). Besides invalidating it instantly, this stops
+        // the /qrcodes node growing by one row per minute forever.
         if (previousQrId != null) {
-            updates["qrcodes/$previousQrId/isActive"] = false
+            updates["qrcodes/$previousQrId"] = null
         }
 
         db.root.updateChildren(updates)

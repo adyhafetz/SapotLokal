@@ -129,7 +129,8 @@ class SapotFcmService : FirebaseMessagingService() {
         fun showShopStatusNotification(
             context: android.content.Context,
             vendorId: String,
-            vendorName: String
+            vendorName: String,
+            isOpen: Boolean = true
         ) {
             ensureChannels(context)
 
@@ -143,8 +144,10 @@ class SapotFcmService : FirebaseMessagingService() {
                 }
             }
 
-            val title = "$vendorName is now OPEN! 🟢"
-            val body = "$vendorName is now OPEN! Drop by today to earn your loyalty points."
+            val title = if (isOpen) context.getString(com.sapotlokal.R.string.notif_shop_open_title, vendorName)
+            else context.getString(com.sapotlokal.R.string.notif_shop_closed_title, vendorName)
+            val body = if (isOpen) context.getString(com.sapotlokal.R.string.notif_shop_open_body, vendorName)
+            else context.getString(com.sapotlokal.R.string.notif_shop_closed_body, vendorName)
 
             val intent = if (vendorId.isNotBlank()) {
                 android.content.Intent(context, com.sapotlokal.ui.customer.ShopDetailActivity::class.java).apply {
@@ -240,7 +243,8 @@ class SapotFcmService : FirebaseMessagingService() {
             return
         }
 
-        FirebaseDatabase.getInstance()
+        // Must use the regional URL — the default instance fails with "Database lives in a different region".
+        FirebaseDatabase.getInstance(com.sapotlokal.AppConfig.DATABASE_URL)
             .getReference("users/$uid/fcmToken")
             .setValue(token)
             .addOnSuccessListener {

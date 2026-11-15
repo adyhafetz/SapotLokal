@@ -208,6 +208,12 @@ object VendorRepository {
         }
 
         val notifRef = db.child("shopNotifications").push()
+        val title = if (isOpen) "$vendorName is now OPEN! 🟢" else "$vendorName is now CLOSED 🔴"
+        val body = if (isOpen) {
+            "$vendorName is now OPEN! Drop by today to earn your loyalty points."
+        } else {
+            "$vendorName has just closed. We'll let you know when it opens again."
+        }
         val payload = mapOf(
             "notificationId" to (notifRef.key ?: ""),
             "vendorID" to vendorID,
@@ -216,8 +222,8 @@ object VendorRepository {
             "type" to "shop_status",
             "isOpen" to isOpen,
             "topic" to "shop_$vendorID",
-            "title" to "$vendorName is now OPEN! 🟢",
-            "body" to "$vendorName is now OPEN! Drop by today to earn your loyalty points.",
+            "title" to title,
+            "body" to body,
             "timestamp" to com.google.firebase.database.ServerValue.TIMESTAMP
         )
 
@@ -230,6 +236,46 @@ object VendorRepository {
                 android.util.Log.w("VendorRepository", "FCM topic broadcast logging failed", e)
                 onComplete(false)
             }
+    }
+
+    /**
+     * Live numbers for the vendor Overview (visits today/this month, hourly + weekly charts,
+     * points issued, vouchers redeemed). Updates by itself when a customer scans.
+     */
+    fun listenToAnalytics(
+        vendorID: String,
+        onUpdate: (com.sapotlokal.util.VendorAnalytics) -> Unit,
+        onError: (String) -> Unit
+    ): ValueEventListener {
+        val listener = object : ValueEventListener {
+            override fun onDataChange(pointsSnap: DataSnapshot) {
+                val points = pointsSnap.children.mapNotNull {
+                    it.getValue(com.sapotlokal.data.model.Point::class.java)
+                }
+                db.child("voucherUsers").orderByChild("vendorID").equalTo(vendorID)
+                    .addListenerForSingleValueEvent(object : ValueEventListener {
+                        override fun onDataChange(vSnap: DataSnapshot) {
+                            val used = vSnap.children.count {
+                                it.child("voucherStatus").getValue(String::class.java)
+                                    .equals(com.sapotlokal.data.model.VoucherStatus.USED, ignoreCase = true)
+                            }
+                            onUpdate(com.sapotlokal.util.VendorAnalyticsCalculator.compute(points, used))
+                        }
+
+                        override fun onCancelled(error: DatabaseError) {
+                            onUpdate(com.sapotlokal.util.VendorAnalyticsCalculator.compute(points, 0))
+                        }
+                    })
+            }
+
+            override fun onCancelled(error: DatabaseError) = onError(error.message)
+        }
+        db.child("points").orderByChild("vendorID").equalTo(vendorID).addValueEventListener(listener)
+        return listener
+    }
+
+    fun removeAnalyticsListener(vendorID: String, listener: ValueEventListener) {
+        db.child("points").orderByChild("vendorID").equalTo(vendorID).removeEventListener(listener)
     }
 
     /**

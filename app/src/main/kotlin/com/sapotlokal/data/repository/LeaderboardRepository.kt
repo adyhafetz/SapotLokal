@@ -51,6 +51,7 @@ object LeaderboardRepository {
                                 userName = name,
                                 points = user.lifetimePoints,
                                 currentTier = tier.code,
+                                avatar = user.avatar,
                                 rank = 0
                             )
                         )
@@ -136,6 +137,7 @@ object LeaderboardRepository {
                                 userName = name,
                                 points = weeklyPts,
                                 currentTier = tier.code,
+                                avatar = user.avatar,
                                 rank = 0
                             )
                         }.toMutableList()

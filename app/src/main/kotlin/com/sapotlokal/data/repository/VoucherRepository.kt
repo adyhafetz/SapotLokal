@@ -85,6 +85,32 @@ object VoucherRepository {
         return listener
     }
 
+    /**
+     * Listens live to EVERY active reward rule across all shops — the "reward catalogue" shown on
+     * the customer's Vouchers page so they can see what is available without opening each shop.
+     */
+    fun listenToAllActiveRules(
+        onUpdate: (List<Voucher>) -> Unit,
+        onError: (String) -> Unit
+    ): ValueEventListener {
+        val listener = object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                onUpdate(snapshot.children.mapNotNull { it.getValue(Voucher::class.java) }
+                    .filter { it.isActive })
+            }
+            override fun onCancelled(error: DatabaseError) {
+                Log.e(TAG, "listenToAllActiveRules cancelled: ${error.message}")
+                onError(error.message)
+            }
+        }
+        db.child("vouchers").addValueEventListener(listener)
+        return listener
+    }
+
+    fun removeAllRulesListener(listener: ValueEventListener) {
+        db.child("vouchers").removeEventListener(listener)
+    }
+
     fun removeRulesListener(vendorID: String, listener: ValueEventListener) {
         db.child("vouchers")
             .orderByChild("vendorID")
@@ -167,138 +193,108 @@ object VoucherRepository {
         return "SAPOT-$randomPart"
     }
 
+    /** Why a claim did not go through, in words a customer can read. */
+    sealed class ClaimResult {
+        data class Success(val voucher: VoucherUser) : ClaimResult()
+        data class Failed(val reason: String) : ClaimResult()
+    }
+
     /**
-     * Evaluates active reward rules for [vendorID] against [userID]'s current balance.
-     * If the customer's balance meets or exceeds a rule's pointsRequired, and the customer
-     * does not already hold an active (unused, unexpired) voucher for that rule,
-     * a new VoucherUser record is automatically created.
+     * Claims a reward: the customer spends [Voucher.pointsRequired] of THEIR points at that shop and
+     * gets a voucher (own code + QR) that is valid for [AppConfig.VOUCHER_EXPIRY_DAYS] days.
      *
-     * Triggered client-side after points are earned (e.g. ScanActivity shop visit).
+     * The voucher and the "redemption" points row are written in ONE updateChildren(), so a customer
+     * never gets a voucher without paying, or pays without getting a voucher.
+     * Checks first: enough points at this shop, and no live voucher for this reward already held.
      */
-    fun evaluateAndAwardVouchers(
+    fun claimVoucher(
         userID: String,
-        vendorID: String,
-        onResult: (newlyAwarded: List<VoucherUser>) -> Unit = {}
+        rule: Voucher,
+        onResult: (ClaimResult) -> Unit
     ) {
-        if (userID.isBlank() || vendorID.isBlank()) {
-            onResult(emptyList())
+        if (userID.isBlank() || rule.vendorID.isBlank() || rule.voucherID.isBlank()) {
+            onResult(ClaimResult.Failed("This reward cannot be claimed right now."))
             return
         }
-
-        // 1. Fetch points to compute balance at this shop
-        db.child("points")
-            .orderByChild("userID")
-            .equalTo(userID)
+        db.child("points").orderByChild("userID").equalTo(userID)
             .addListenerForSingleValueEvent(object : ValueEventListener {
                 override fun onDataChange(pointSnap: DataSnapshot) {
                     var balance = 0
                     for (child in pointSnap.children) {
                         val p = child.getValue(Point::class.java) ?: continue
-                        if (p.vendorID == vendorID) {
-                            balance += p.pointEarnedAmount - p.pointRedeemedAmount
-                        }
+                        if (p.vendorID == rule.vendorID) balance += p.pointEarnedAmount - p.pointRedeemedAmount
                     }
-
-                    if (balance <= 0) {
-                        onResult(emptyList())
+                    if (balance < rule.pointsRequired) {
+                        onResult(ClaimResult.Failed("You need ${rule.pointsRequired - balance} more points at this shop."))
                         return
                     }
-
-                    // 2. Query all active reward rules for this vendor
-                    db.child("vouchers")
-                        .orderByChild("vendorID")
-                        .equalTo(vendorID)
+                    db.child("voucherUsers").orderByChild("userID").equalTo(userID)
                         .addListenerForSingleValueEvent(object : ValueEventListener {
-                            override fun onDataChange(voucherSnap: DataSnapshot) {
-                                val qualifyingRules = voucherSnap.children
-                                    .mapNotNull { it.getValue(Voucher::class.java) }
-                                    .filter { it.isActive && balance >= it.pointsRequired }
-
-                                if (qualifyingRules.isEmpty()) {
-                                    onResult(emptyList())
+                            override fun onDataChange(vuSnap: DataSnapshot) {
+                                val nowMs = System.currentTimeMillis()
+                                val alreadyHeld = vuSnap.children.mapNotNull { it.getValue(VoucherUser::class.java) }
+                                    .any { vu ->
+                                        vu.voucherID == rule.voucherID &&
+                                            vu.voucherStatus == VoucherStatus.ACTIVE &&
+                                            (vu.voucherExpiryDate == 0L || vu.voucherExpiryDate > nowMs)
+                                    }
+                                if (alreadyHeld) {
+                                    onResult(ClaimResult.Failed("You already hold this voucher."))
                                     return
                                 }
-
-                                // 3. Query existing voucherUsers for this customer
-                                db.child("voucherUsers")
-                                    .orderByChild("userID")
-                                    .equalTo(userID)
-                                    .addListenerForSingleValueEvent(object : ValueEventListener {
-                                        override fun onDataChange(userVoucherSnap: DataSnapshot) {
-                                            val nowMs = System.currentTimeMillis()
-                                            val activeVoucherRuleIds = userVoucherSnap.children
-                                                .mapNotNull { it.getValue(VoucherUser::class.java) }
-                                                .filter { vu ->
-                                                    vu.vendorID == vendorID &&
-                                                    vu.voucherStatus == VoucherStatus.ACTIVE &&
-                                                    (vu.voucherExpiryDate == 0L || vu.voucherExpiryDate > nowMs)
-                                                }
-                                                .map { it.voucherID }
-                                                .toSet()
-
-                                            val newVouchers = mutableListOf<VoucherUser>()
-                                            val updates = mutableMapOf<String, Any>()
-
-                                            for (rule in qualifyingRules) {
-                                                if (rule.voucherID !in activeVoucherRuleIds) {
-                                                    val ref = db.child("voucherUsers").push()
-                                                    val vuId = ref.key ?: continue
-                                                    val expiry = nowMs + (AppConfig.VOUCHER_EXPIRY_DAYS * 24L * 60 * 60 * 1000L)
-                                                    val code = generateVoucherCode()
-
-                                                    val vu = VoucherUser(
-                                                        voucherUserID          = vuId,
-                                                        userID                 = userID,
-                                                        voucherID              = rule.voucherID,
-                                                        vendorID               = vendorID,
-                                                        voucherCode            = code,
-                                                        voucherStatus          = VoucherStatus.ACTIVE,
-                                                        voucherExpiryDate      = expiry,
-                                                        pointsRequiredSnapshot = rule.pointsRequired,
-                                                        voucherTitle           = rule.voucherName,
-                                                        createdAt              = nowMs
-                                                    )
-                                                    newVouchers.add(vu)
-                                                    updates["voucherUsers/$vuId"] = vu
-                                                }
-                                            }
-
-                                            if (updates.isEmpty()) {
-                                                onResult(emptyList())
-                                                return
-                                            }
-
-                                            db.root.updateChildren(updates)
-                                                .addOnSuccessListener {
-                                                    Log.i(TAG, "Auto-created ${newVouchers.size} vouchers for user $userID at vendor $vendorID")
-                                                    onResult(newVouchers)
-                                                }
-                                                .addOnFailureListener { e ->
-                                                    Log.e(TAG, "Failed to auto-create vouchers", e)
-                                                    onResult(emptyList())
-                                                }
-                                        }
-
-                                        override fun onCancelled(error: DatabaseError) {
-                                            Log.e(TAG, "userVouchers query cancelled: ${error.message}")
-                                            onResult(emptyList())
-                                        }
-                                    })
+                                val vuRef = db.child("voucherUsers").push()
+                                val pointRef = db.child("points").push()
+                                val vuId = vuRef.key
+                                val pointId = pointRef.key
+                                if (vuId == null || pointId == null) {
+                                    onResult(ClaimResult.Failed("Could not claim right now. Please try again."))
+                                    return
+                                }
+                                val voucher = VoucherUser(
+                                    voucherUserID = vuId,
+                                    userID = userID,
+                                    voucherID = rule.voucherID,
+                                    vendorID = rule.vendorID,
+                                    voucherCode = generateVoucherCode(),
+                                    voucherStatus = VoucherStatus.ACTIVE,
+                                    voucherExpiryDate = nowMs + AppConfig.VOUCHER_EXPIRY_DAYS * 24L * 60 * 60 * 1000L,
+                                    pointsRequiredSnapshot = rule.pointsRequired,
+                                    voucherTitle = rule.voucherName,
+                                    createdAt = nowMs,
+                                    pointsDeducted = true,
+                                    claimPointID = pointId
+                                )
+                                val spend = Point(
+                                    pointID = pointId,
+                                    userID = userID,
+                                    vendorID = rule.vendorID,
+                                    pointEarnedAmount = 0,
+                                    pointRedeemedAmount = rule.pointsRequired,
+                                    pointSource = PointSource.REDEMPTION,
+                                    timestamp = nowMs
+                                )
+                                db.root.updateChildren(
+                                    mapOf<String, Any>("voucherUsers/$vuId" to voucher, "points/$pointId" to spend)
+                                )
+                                    .addOnSuccessListener { onResult(ClaimResult.Success(voucher)) }
+                                    .addOnFailureListener { e ->
+                                        Log.e(TAG, "claimVoucher failed", e)
+                                        onResult(ClaimResult.Failed("Could not claim right now. Please try again."))
+                                    }
                             }
 
                             override fun onCancelled(error: DatabaseError) {
-                                Log.e(TAG, "vouchers query cancelled: ${error.message}")
-                                onResult(emptyList())
+                                onResult(ClaimResult.Failed("Could not claim right now. Please try again."))
                             }
                         })
                 }
 
                 override fun onCancelled(error: DatabaseError) {
-                    Log.e(TAG, "points query cancelled: ${error.message}")
-                    onResult(emptyList())
+                    onResult(ClaimResult.Failed("Could not claim right now. Please try again."))
                 }
             })
     }
+
 
     /**
      * Listens live to all vouchers for [userID].
@@ -397,12 +393,29 @@ object VoucherRepository {
                         return
                     }
 
-                    // Step 5: check customer balance at this shop
-                    checkBalanceAndFetchRuleName(vu, vendorID, onValid, onInvalid, onError)
+                    // Step 5: a CLAIMED voucher is already paid for, so no balance check. Older vouchers
+                    // (issued before Claim existed) still check the balance at the shop.
+                    if (vu.pointsDeducted) {
+                        fetchRuleName(vu, onValid)
+                    } else {
+                        checkBalanceAndFetchRuleName(vu, vendorID, onValid, onInvalid, onError)
+                    }
                 }
                 override fun onCancelled(error: DatabaseError) {
                     Log.e(TAG, "validateVoucher cancelled: ${error.message}")
                     onError("Could not verify voucher: ${error.message}")
+                }
+            })
+    }
+
+    private fun fetchRuleName(vu: VoucherUser, onValid: (VoucherUser, String) -> Unit) {
+        db.child("vouchers").child(vu.voucherID)
+            .addListenerForSingleValueEvent(object : ValueEventListener {
+                override fun onDataChange(ruleSnap: DataSnapshot) {
+                    onValid(vu, ruleSnap.getValue(Voucher::class.java)?.voucherName ?: vu.voucherTitle.ifBlank { "the reward" })
+                }
+                override fun onCancelled(error: DatabaseError) {
+                    onValid(vu, vu.voucherTitle.ifBlank { "the reward" })
                 }
             })
     }
@@ -475,23 +488,22 @@ object VoucherRepository {
         voucherUser: VoucherUser,
         onResult: (success: Boolean) -> Unit
     ) {
-        val pointRef = db.child("points").push()
-        val pointID  = pointRef.key ?: return onResult(false)
-
-        val pointRow = Point(
-            pointID             = pointID,
-            userID              = voucherUser.userID,
-            vendorID            = voucherUser.vendorID,
-            pointEarnedAmount   = 0,
-            pointRedeemedAmount = voucherUser.pointsRequiredSnapshot,
-            pointSource         = PointSource.REDEMPTION,
-            timestamp           = System.currentTimeMillis()
+        val updates = mutableMapOf<String, Any>(
+            "voucherUsers/${voucherUser.voucherUserID}/voucherStatus" to VoucherStatus.USED
         )
-
-        val updates = mapOf<String, Any>(
-            "voucherUsers/${voucherUser.voucherUserID}/voucherStatus" to VoucherStatus.USED,
-            "points/$pointID" to pointRow
-        )
+        // A claimed voucher was paid for when it was claimed. Older vouchers still deduct here.
+        if (!voucherUser.pointsDeducted) {
+            val pointID = db.child("points").push().key ?: return onResult(false)
+            updates["points/$pointID"] = Point(
+                pointID             = pointID,
+                userID              = voucherUser.userID,
+                vendorID            = voucherUser.vendorID,
+                pointEarnedAmount   = 0,
+                pointRedeemedAmount = voucherUser.pointsRequiredSnapshot,
+                pointSource         = PointSource.REDEMPTION,
+                timestamp           = System.currentTimeMillis()
+            )
+        }
 
         db.root.updateChildren(updates)
             .addOnSuccessListener {

@@ -124,7 +124,7 @@ object MissionRepository {
             override fun onDataChange(snapshot: DataSnapshot) {
                 val progressMap = mutableMapOf<String, UserMission>()
                 for (child in snapshot.children) {
-                    val um = child.getValue(UserMission::class.java) ?: continue
+                    val um = UserMission.fromSnapshot(child) ?: continue
                     if (um.weekYearKey == weekKey) {
                         progressMap[um.missionId] = um
                     }
@@ -162,8 +162,15 @@ object MissionRepository {
         return listener
     }
 
-    fun removeListener(listener: ValueEventListener) {
-        db.child("userMissions").removeEventListener(listener)
+    /**
+     * Detaches a listener from the SAME query it was attached to. Firebase only removes a
+     * listener when asked on the identical query, so removing from the bare path would leak it.
+     */
+    fun removeListener(userId: String, listener: ValueEventListener) {
+        db.child("userMissions")
+            .orderByChild("userId")
+            .equalTo(userId)
+            .removeEventListener(listener)
     }
 
     /**
@@ -215,7 +222,7 @@ object MissionRepository {
                             override fun onDataChange(missionsSnap: DataSnapshot) {
                                 val existingMap = mutableMapOf<String, UserMission>()
                                 for (c in missionsSnap.children) {
-                                    val um = c.getValue(UserMission::class.java) ?: continue
+                                    val um = UserMission.fromSnapshot(c) ?: continue
                                     if (um.weekYearKey == weekKey) {
                                         existingMap[um.missionId] = um
                                     }
@@ -237,21 +244,30 @@ object MissionRepository {
                                     }
 
                                     val progress = maxOf(existing?.currentProgress ?: 0, calculated)
-                                    val isClaimed = existing?.isClaimed ?: false
                                     val isCompleted = progress >= mission.targetCount || (existing?.isCompleted == true)
 
                                     val recordKey = "${userId}_${mission.missionId}_${weekKey}"
-                                    val record = UserMission(
-                                        userMissionId = recordKey,
-                                        userId = userId,
-                                        missionId = mission.missionId,
-                                        weekYearKey = weekKey,
-                                        currentProgress = progress,
-                                        isCompleted = isCompleted,
-                                        isClaimed = isClaimed,
-                                        lastUpdated = now
-                                    )
-                                    updates["userMissions/$recordKey"] = record
+                                    if (existing == null) {
+                                        updates["userMissions/$recordKey"] = UserMission(
+                                            userMissionId = recordKey,
+                                            userId = userId,
+                                            missionId = mission.missionId,
+                                            weekYearKey = weekKey,
+                                            currentProgress = progress,
+                                            isCompleted = isCompleted,
+                                            isClaimed = false,
+                                            lastUpdated = now
+                                        ).toMap()
+                                    } else if (existing.currentProgress != progress ||
+                                        existing.isCompleted != isCompleted
+                                    ) {
+                                        // Touch ONLY the progress fields of an existing record. Never
+                                        // rewrite isClaimed here: a stale read could otherwise un-claim
+                                        // a reward that was claimed a moment ago (double-claim).
+                                        updates["userMissions/$recordKey/currentProgress"] = progress
+                                        updates["userMissions/$recordKey/isCompleted"] = isCompleted
+                                        updates["userMissions/$recordKey/lastUpdated"] = now
+                                    }
                                 }
 
                                 if (updates.isNotEmpty()) {
@@ -367,13 +383,14 @@ object MissionRepository {
         activity: Activity?,
         userId: String,
         pointsWon: Int,
+        segmentPoints: Int = pointsWon,
         timestamp: Long = System.currentTimeMillis()
     ) {
         if (userId.isBlank()) return
 
-        // Check max segment badge (50 pts)
+        // Max-segment badge is judged on the wheel segment (base), not the multiplied award.
         val maxSegment = AppConfig.SPIN_WHEEL_SEGMENTS.maxOrNull() ?: 50
-        if (pointsWon >= maxSegment && activity != null) {
+        if (segmentPoints >= maxSegment && activity != null) {
             BadgeRepository.unlockBadge(activity, userId, BadgeDef.NASIB_BAIK)
         }
 
@@ -487,51 +504,74 @@ object MissionRepository {
         val weekKey = userMission.weekYearKey.ifBlank { MissionDateUtils.getWeekYearKey() }
         val recordKey = "${userId}_${mission.missionId}_${weekKey}"
 
-        val updated = userMission.copy(
-            userMissionId = recordKey,
-            userId = userId,
-            missionId = mission.missionId,
-            weekYearKey = weekKey,
-            currentProgress = mission.targetCount,
-            isCompleted = true,
-            isClaimed = true,
-            lastUpdated = System.currentTimeMillis()
-        )
+        // A second tap while the first claim is still being saved is ignored.
+        if (!claiming.add(recordKey)) {
+            onResult(false, "Reward already claimed")
+            return
+        }
+        fun finish(ok: Boolean, message: String?) {
+            claiming.remove(recordKey)
+            onResult(ok, message)
+        }
 
-        // 1. Mark isClaimed = true
-        db.child("userMissions").child(recordKey).setValue(updated)
-            .addOnSuccessListener {
-                // 2. Add points using dual ledger
-                PointRepository.addPoints(
-                    userID = userId,
-                    basePoints = mission.rewardPoints,
-                    pointSource = PointSource.CHALLENGE
-                ) { success, earnedPoints ->
-                    if (success) {
-                        // 3. Audio FX
-                        SoundManager.getInstance(activity).playKaching()
+        // The screen may be showing an out-of-date card, so check what is really saved before paying out.
+        db.child("userMissions").child(recordKey)
+            .addListenerForSingleValueEvent(object : ValueEventListener {
+                override fun onDataChange(snapshot: DataSnapshot) {
+                    if (UserMission.fromSnapshot(snapshot)?.isClaimed == true) {
+                        finish(false, "Reward already claimed")
+                        return
+                    }
 
-                        // 4. Unlock attached badge if present
-                        mission.rewardBadgeKey?.let { badgeId ->
-                            BadgeDef.fromId(badgeId)?.let { badgeDef ->
-                                BadgeRepository.unlockBadge(activity, userId, badgeDef)
+                    val updated = userMission.copy(
+                        userMissionId = recordKey,
+                        userId = userId,
+                        missionId = mission.missionId,
+                        weekYearKey = weekKey,
+                        currentProgress = mission.targetCount,
+                        isCompleted = true,
+                        isClaimed = true,
+                        lastUpdated = System.currentTimeMillis()
+                    )
+
+                    // The "claimed" flag and the points ledger row are written in ONE atomic update
+                    // (PointRepository.addPoints → extraUpdates). If it fails, nothing is claimed and the
+                    // user can simply tap Claim again — no reward is ever lost. The security rules also
+                    // refuse to write "isClaimed" a second time, so the same reward can't pay twice.
+                    PointRepository.addPoints(
+                        userID = userId,
+                        basePoints = mission.rewardPoints,
+                        pointSource = PointSource.CHALLENGE,
+                        extraUpdates = mapOf("userMissions/$recordKey" to updated.toMap())
+                    ) { success, _ ->
+                        if (success) {
+                            SoundManager.getInstance(activity).playKaching()
+
+                            mission.rewardBadgeKey?.let { badgeId ->
+                                BadgeDef.fromId(badgeId)?.let { badgeDef ->
+                                    BadgeRepository.unlockBadge(activity, userId, badgeDef)
+                                }
                             }
+
+                            // All 6 weekly missions done ➔ unlock raja_sapot
+                            checkAllMissionsCompleted(activity, userId, weekKey)
+
+                            finish(true, null)
+                        } else {
+                            Log.e(TAG, "Atomic mission claim failed for $recordKey")
+                            finish(false, "Could not claim reward. Please try again.")
                         }
-
-                        // 5. Check if all 6 weekly missions are completed ➔ unlock raja_sapot
-                        checkAllMissionsCompleted(activity, userId, weekKey)
-
-                        onResult(true, null)
-                    } else {
-                        onResult(false, "Could not award mission points")
                     }
                 }
-            }
-            .addOnFailureListener { e ->
-                Log.e(TAG, "Failed to update userMission status", e)
-                onResult(false, e.message)
-            }
+
+                override fun onCancelled(error: DatabaseError) {
+                    finish(false, "Could not claim reward. Please try again.")
+                }
+            })
     }
+
+    /** Missions whose claim is being saved right now (stops a double tap from paying twice). */
+    private val claiming = mutableSetOf<String>()
 
     /**
      * Checks if all 6 weekly missions for the specified week are completed.
@@ -543,7 +583,7 @@ object MissionRepository {
                 override fun onDataChange(snapshot: DataSnapshot) {
                     val completedMissionIds = mutableSetOf<String>()
                     for (c in snapshot.children) {
-                        val um = c.getValue(UserMission::class.java) ?: continue
+                        val um = UserMission.fromSnapshot(c) ?: continue
                         if (um.weekYearKey == weekKey && (um.isCompleted || um.isClaimed)) {
                             completedMissionIds.add(um.missionId)
                         }
