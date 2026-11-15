@@ -47,13 +47,13 @@ class AddEditRuleActivity : AppCompatActivity() {
 
         if (ruleID.isNotEmpty()) {
             // EDIT mode — pre-fill the form
-            supportActionBar?.title = "Edit Reward Rule"
+            supportActionBar?.title = getString(com.sapotlokal.R.string.kv_edit_reward_rule)
             binding.etRuleName.setText(intent.getStringExtra(EXTRA_RULE_NAME) ?: "")
             binding.etRuleDesc.setText(intent.getStringExtra(EXTRA_RULE_DESC) ?: "")
             val pts = intent.getIntExtra(EXTRA_RULE_PTS, 0)
             binding.etPoints.setText(if (pts > 0) pts.toString() else "")
         } else {
-            supportActionBar?.title = "Add Reward Rule"
+            supportActionBar?.title = getString(com.sapotlokal.R.string.kv_add_reward_rule)
         }
 
         binding.btnSaveRule.setOnClickListener { onSave() }
@@ -66,14 +66,14 @@ class AddEditRuleActivity : AppCompatActivity() {
 
         // Input validation
         if (name.isEmpty()) {
-            binding.tilRuleName.error = "Reward name is required"
+            binding.tilRuleName.error = getString(com.sapotlokal.R.string.kv_reward_name_required)
             return
         }
         binding.tilRuleName.error = null
 
         val points = ptsStr.toIntOrNull()
         if (points == null || points <= 0) {
-            binding.tilPoints.error = "Enter a valid point amount (e.g. 100)"
+            binding.tilPoints.error = getString(com.sapotlokal.R.string.kv_enter_valid_points)
             return
         }
         binding.tilPoints.error = null
@@ -107,7 +107,7 @@ class AddEditRuleActivity : AppCompatActivity() {
             if (success) {
                 finish()  // Go back to RewardRulesActivity, live listener will update the list
             } else {
-                Toast.makeText(this, "Could not save rule. Please try again.", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, getString(com.sapotlokal.R.string.kv_could_not_save_rule), Toast.LENGTH_SHORT).show()
             }
         }
     }

@@ -1,237 +1,201 @@
 package com.sapotlokal.ui.vendor
 
 import android.content.Intent
+import android.content.res.ColorStateList
 import android.os.Bundle
-import android.view.MenuItem
+import android.view.View
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
+import androidx.lifecycle.Lifecycle
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.database.DataSnapshot
-import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.ValueEventListener
-import com.sapotlokal.AppConfig
+import com.sapotlokal.R
+import com.sapotlokal.data.model.Vendor
 import com.sapotlokal.data.repository.VendorRepository
 import com.sapotlokal.databinding.ActivityVendorHomeBinding
+import com.sapotlokal.service.SapotFcmService
 import com.sapotlokal.ui.auth.LoginActivity
+import com.sapotlokal.util.StatusChip
+import com.sapotlokal.util.VendorAnalytics
 
 /**
- * VendorHomeActivity — Phase 4 real implementation (replaces the Phase 2 placeholder).
- *
- * WHAT IT DOES:
- * 1. Identifies the logged-in vendor via FirebaseAuth uid → VendorRepository.
- * 2. Stores the vendorID as a companion-object value so other activities can use it
- *    without re-querying (within the same session).
- * 3. Navigation: Show QR Code, Reward Rules, Scan to Redeem.
- * 4. Log out clears the session.
- *
- * WHY STORE vendorID HERE: Every vendor screen needs the vendorID. Fetching it once
- * here and passing it via Intent extras avoids repeated database round-trips and
- * keeps the other activities simple.
+ * VendorHomeActivity — the vendor "Overview" tab, the first screen after a shop owner logs in.
+ * Shows shop status (with the open/closed switch), the numbers that matter today, the live
+ * rotating shop QR code and two simple charts. Other tabs are reached from the bottom bar.
  */
 class VendorHomeActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityVendorHomeBinding
     private val auth = FirebaseAuth.getInstance()
 
-    // Holds the vendor record for this session (set after the DB lookup)
     private var vendorID: String = ""
-    private var currentVendor: com.sapotlokal.data.model.Vendor? = null
+    private var currentVendor: Vendor? = null
     private var vendorListener: ValueEventListener? = null
-    private var isProgrammaticUpdate: Boolean = false
+    private var analyticsListener: ValueEventListener? = null
+    private var qr: VendorQrController? = null
+    private var isProgrammaticUpdate = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityVendorHomeBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        setSupportActionBar(binding.toolbar)
-
         val user = auth.currentUser
-        if (user == null) { goToLogin(); return }
-
-        setupStatusSwitch()
-        refreshVendorProfile()
-        user.let { com.sapotlokal.service.SapotFcmService.syncTokenForUser(it.uid) }
-
-        binding.btnLogOut.setOnClickListener {
-            auth.signOut()
+        if (user == null) {
             goToLogin()
+            return
         }
+
+        VendorNav.bind(this, binding.vendorNav, VendorNav.Tab.OVERVIEW) { vendorID }
+        setupStatusSwitch()
+        binding.btnRefreshQr.setOnClickListener { qr?.refreshNow() }
+        SapotFcmService.syncTokenForUser(user.uid)
+
+        loadVendor(user.uid)
     }
 
-    override fun onResume() {
-        super.onResume()
-        refreshVendorProfile()
+    override fun onStart() {
+        super.onStart()
+        qr?.start()
+    }
+
+    override fun onStop() {
+        super.onStop()
+        // Nothing is scannable while the owner is not looking at the QR.
+        qr?.stop()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        if (vendorID.isNotBlank()) {
+            vendorListener?.let { VendorRepository.removeVendorListener(vendorID, it) }
+            analyticsListener?.let { VendorRepository.removeAnalyticsListener(vendorID, it) }
+        }
+        vendorListener = null
+        analyticsListener = null
+    }
+
+    // ── Loading ───────────────────────────────────────────────────────────────
+
+    private fun loadVendor(uid: String) {
+        VendorRepository.fetchVendorByUserId(
+            userID = uid,
+            onResult = { vendor ->
+                if (vendor == null) {
+                    binding.tvShopName.text = getString(com.sapotlokal.R.string.kv_shop_not_found)
+                    return@fetchVendorByUserId
+                }
+                vendorID = vendor.vendorID
+                bindVendor(vendor)
+                attachListeners(vendor.vendorID)
+
+                qr = VendorQrController(vendorID, binding.ivQrCode, binding.tvCountdown, binding.tvQrValue)
+                if (lifecycle.currentState.isAtLeast(Lifecycle.State.STARTED)) qr?.start()
+            },
+            onError = { err -> binding.tvShopName.text = getString(com.sapotlokal.R.string.kv_could_not_load_shop_n, err) }
+        )
+    }
+
+    private fun attachListeners(id: String) {
+        vendorListener = VendorRepository.listenToVendor(
+            vendorID = id,
+            onUpdate = { updated -> if (updated != null) bindVendor(updated) },
+            onError = { }
+        )
+        analyticsListener = VendorRepository.listenToAnalytics(
+            vendorID = id,
+            onUpdate = { bindAnalytics(it) },
+            onError = { }
+        )
+    }
+
+    // ── Shop header + status ──────────────────────────────────────────────────
+
+    private fun bindVendor(vendor: Vendor) {
+        currentVendor = vendor
+        binding.tvShopName.text = vendor.vendorName.ifBlank { getString(com.sapotlokal.R.string.kv_your_shop) }
+        binding.tvShopMeta.text = listOf(com.sapotlokal.data.model.ShopCategory.label(this, vendor.vendorCategory), vendor.vendorAddress)
+            .filter { it.isNotBlank() }.joinToString(" · ")
+        updateStatusUi(vendor.isOpen, vendor.operatingHours)
     }
 
     private fun setupStatusSwitch() {
         binding.switchStoreStatus.setOnCheckedChangeListener { _, isChecked ->
             if (isProgrammaticUpdate) return@setOnCheckedChangeListener
-            val currentId = vendorID
-            if (currentId.isBlank()) return@setOnCheckedChangeListener
+            val id = vendorID
+            if (id.isBlank()) return@setOnCheckedChangeListener
 
-            // Immediately provide responsive local UI feedback
-            updateStatusCardUi(isChecked, currentVendor?.operatingHours.orEmpty())
+            updateStatusUi(isChecked, currentVendor?.operatingHours.orEmpty())
 
-            VendorRepository.updateVendorStatus(currentId, isChecked) { success, errorMsg ->
+            VendorRepository.updateVendorStatus(id, isChecked) { success, errorMsg ->
                 if (success) {
-                    val vendorName = currentVendor?.vendorName.orEmpty().ifBlank { "Your shop" }
-                    if (isChecked) {
-                        VendorRepository.broadcastShopStatus(currentId, vendorName, isOpen = true)
-                        android.widget.Toast.makeText(
-                            this,
-                            "$vendorName is now OPEN! Customers notified. ✓",
-                            android.widget.Toast.LENGTH_SHORT
-                        ).show()
-                    } else {
-                        android.widget.Toast.makeText(
-                            this,
-                            "Store status updated to CLOSED.",
-                            android.widget.Toast.LENGTH_SHORT
-                        ).show()
-                    }
-                } else {
-                    android.widget.Toast.makeText(
+                    val name = currentVendor?.vendorName.orEmpty().ifBlank { getString(com.sapotlokal.R.string.kv_your_shop) }
+                    // Customers who follow the shop are told about both open and closed.
+                    VendorRepository.broadcastShopStatus(id, name, isOpen = isChecked)
+                    Toast.makeText(
                         this,
-                        "Failed to update status: ${errorMsg ?: "Network error"}",
-                        android.widget.Toast.LENGTH_SHORT
+                        if (isChecked) getString(com.sapotlokal.R.string.kv_shop_is_open) else getString(com.sapotlokal.R.string.kv_shop_is_closed),
+                        Toast.LENGTH_SHORT
                     ).show()
-                    // Revert switch to actual vendor state
-                    currentVendor?.let {
-                        updateStatusCardUi(it.isOpen, it.operatingHours)
-                    }
+                } else {
+                    Toast.makeText(this, getString(com.sapotlokal.R.string.kv_could_not_update_n, errorMsg ?: getString(com.sapotlokal.R.string.kv_network_error)), Toast.LENGTH_SHORT).show()
+                    currentVendor?.let { updateStatusUi(it.isOpen, it.operatingHours) }
                 }
             }
         }
     }
 
-    private fun updateStatusCardUi(isOpen: Boolean, operatingHours: String) {
+    private fun updateStatusUi(isOpen: Boolean, hours: String) {
         isProgrammaticUpdate = true
         binding.switchStoreStatus.isChecked = isOpen
         isProgrammaticUpdate = false
 
-        if (isOpen) {
-            binding.cardStoreStatus.strokeColor = androidx.core.content.ContextCompat.getColor(
-                this,
-                com.sapotlokal.R.color.status_open
-            )
-            binding.tvStatusBadge.text = getString(com.sapotlokal.R.string.store_status_open_badge)
-            binding.tvStatusBadge.setBackgroundResource(com.sapotlokal.R.drawable.bg_status_chip_open)
-            binding.tvStatusDescription.text = getString(com.sapotlokal.R.string.store_status_open_desc)
+        StatusChip.bind(binding.tvStatusBadge, isOpen)
+
+        // Primary (cocoa) when open, disabled grey when closed.
+        val track = ContextCompat.getColor(this, if (isOpen) R.color.sapot_primary else R.color.sapot_neutral)
+        binding.switchStoreStatus.trackTintList = ColorStateList.valueOf(track)
+        binding.switchStoreStatus.thumbTintList =
+            ColorStateList.valueOf(ContextCompat.getColor(this, R.color.sapot_surface))
+        binding.cardStoreStatus.strokeColor =
+            ContextCompat.getColor(this, if (isOpen) R.color.sapot_primary else R.color.sapot_border)
+
+        binding.tvStatusDescription.text =
+            getString(if (isOpen) R.string.store_status_open_desc else R.string.store_status_closed_desc)
+
+        if (hours.isNotBlank()) {
+            binding.tvOperatingHoursHint.text = getString(com.sapotlokal.R.string.kv_hours_n, hours)
+            binding.tvOperatingHoursHint.visibility = View.VISIBLE
         } else {
-            binding.cardStoreStatus.strokeColor = androidx.core.content.ContextCompat.getColor(
-                this,
-                com.sapotlokal.R.color.status_closed
-            )
-            binding.tvStatusBadge.text = getString(com.sapotlokal.R.string.store_status_closed_badge)
-            binding.tvStatusBadge.setBackgroundResource(com.sapotlokal.R.drawable.bg_status_chip_closed)
-            binding.tvStatusDescription.text = getString(com.sapotlokal.R.string.store_status_closed_desc)
+            binding.tvOperatingHoursHint.visibility = View.GONE
+        }
+    }
+
+    // ── Numbers and charts ────────────────────────────────────────────────────
+
+    private fun bindAnalytics(a: VendorAnalytics) {
+        binding.tvStatToday.text = a.todayVisits.toString()
+        binding.tvStatTodayDelta.text = when {
+            a.todayVisits > a.yesterdayVisits -> getString(com.sapotlokal.R.string.kv_vs_yesterday_more, a.todayVisits - a.yesterdayVisits)
+            a.todayVisits < a.yesterdayVisits -> getString(com.sapotlokal.R.string.kv_vs_yesterday_less, a.yesterdayVisits - a.todayVisits)
+            else -> getString(com.sapotlokal.R.string.kv_same_yesterday)
         }
 
-        if (operatingHours.isNotBlank()) {
-            binding.tvOperatingHoursHint.text = "Hours: $operatingHours"
-            binding.tvOperatingHoursHint.visibility = android.view.View.VISIBLE
+        binding.tvStatMonth.text = a.monthVisits.toString()
+        binding.tvStatMonthDelta.text = if (a.lastMonthVisits > 0) {
+            val pct = (a.monthVisits - a.lastMonthVisits) * 100 / a.lastMonthVisits
+            getString(com.sapotlokal.R.string.kv_vs_last_month, if (pct >= 0) "+$pct%" else "$pct%")
         } else {
-            binding.tvOperatingHoursHint.visibility = android.view.View.GONE
+            ""
         }
-    }
 
-    private fun refreshVendorProfile() {
-        val user = auth.currentUser ?: return
+        binding.tvStatPoints.text = java.text.NumberFormat.getInstance().format(a.totalPointsIssued)
+        binding.tvStatVouchers.text = a.vouchersRedeemed.toString()
 
-        // Look up the vendor record for this user
-        VendorRepository.fetchVendorByUserId(
-            userID   = user.uid,
-            onResult = { vendor ->
-                if (vendor == null) {
-                    binding.tvShopName.text = "Shop details not found"
-                    return@fetchVendorByUserId
-                }
-                currentVendor = vendor
-                vendorID = vendor.vendorID
-                binding.tvWelcome.text  = "Welcome back, ${vendor.vendorName}!"
-                binding.tvShopName.text = "${vendor.vendorCategory} · ${vendor.vendorAddress}"
-
-                updateStatusCardUi(vendor.isOpen, vendor.operatingHours)
-                attachLiveVendorListener(vendor.vendorID)
-
-                // Navigation — all screens need the vendorID
-                binding.btnShowQr.setOnClickListener {
-                    startActivity(
-                        Intent(this, ShowQrActivity::class.java)
-                            .putExtra(EXTRA_VENDOR_ID, vendorID)
-                    )
-                }
-                binding.btnRewardRules.setOnClickListener {
-                    startActivity(
-                        Intent(this, RewardRulesActivity::class.java)
-                            .putExtra(EXTRA_VENDOR_ID, vendorID)
-                    )
-                }
-                binding.btnScanRedeem.setOnClickListener {
-                    startActivity(
-                        Intent(this, ScanToRedeemActivity::class.java)
-                            .putExtra(EXTRA_VENDOR_ID, vendorID)
-                    )
-                }
-                binding.btnStats.setOnClickListener {
-                    startActivity(
-                        Intent(this, VendorStatsActivity::class.java)
-                            .putExtra(EXTRA_VENDOR_ID, vendorID)
-                    )
-                }
-                binding.btnShopSettings.setOnClickListener {
-                    startActivity(
-                        Intent(this, ShopSettingsActivity::class.java)
-                            .putExtra(EXTRA_VENDOR_ID, vendorID)
-                    )
-                }
-            },
-            onError = { err ->
-                binding.tvShopName.text = "Could not load shop: $err"
-            }
-        )
-
-        binding.btnLogOut.setOnClickListener {
-            auth.signOut()
-            goToLogin()
-        }
-    }
-
-    private fun attachLiveVendorListener(targetVendorId: String) {
-        if (vendorListener != null) return
-        vendorListener = VendorRepository.listenToVendor(
-            vendorID = targetVendorId,
-            onUpdate = { updated ->
-                if (updated != null) {
-                    currentVendor = updated
-                    binding.tvShopName.text = "${updated.vendorCategory} · ${updated.vendorAddress}"
-                    updateStatusCardUi(updated.isOpen, updated.operatingHours)
-                }
-            },
-            onError = { _ -> }
-        )
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        vendorListener?.let {
-            if (vendorID.isNotBlank()) {
-                VendorRepository.removeVendorListener(vendorID, it)
-            }
-        }
-        vendorListener = null
-    }
-
-    override fun onCreateOptionsMenu(menu: android.view.Menu): Boolean {
-        menuInflater.inflate(com.sapotlokal.R.menu.menu_vendor_home, menu)
-        return true
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        return when (item.itemId) {
-            com.sapotlokal.R.id.action_logout -> { auth.signOut(); goToLogin(); true }
-            else -> super.onOptionsItemSelected(item)
-        }
+        binding.tvBusiest.text = a.busiestHourLabel?.let { getString(com.sapotlokal.R.string.kv_busiest_around, it) } ?: getString(com.sapotlokal.R.string.kv_no_visits_today)
+        binding.chartToday.setData(a.hourly, VendorAnalytics.HOUR_LABELS)
+        binding.chartMonth.setData(a.weekly, (1..4).map { getString(com.sapotlokal.R.string.kv_week_n, it) })
     }
 
     private fun goToLogin() {

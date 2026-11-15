@@ -1,75 +1,117 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.coordinatorlayout.widget.CoordinatorLayout
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/sapot_canvas"
+    android:orientation="vertical">
+
+    <androidx.coordinatorlayout.widget.CoordinatorLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_height="0dp"
+    android:layout_weight="1"
+    android:background="@color/sapot_canvas"
     tools:context=".ui.vendor.RewardRulesActivity">
 
     <com.google.android.material.appbar.AppBarLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:theme="@style/ThemeOverlay.MaterialComponents.Dark.ActionBar">
+        android:background="@color/sapot_canvas"
+        app:elevation="0dp">
 
         <com.google.android.material.appbar.MaterialToolbar
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
-            android:background="?attr/colorPrimary"
-            app:title="Reward Rules"
-            app:titleTextColor="@android:color/white"
-            app:navigationIconTint="@android:color/white" />
+            app:title="@string/customer_bottom_nav_vouchers"
+            app:titleTextAppearance="@style/TextAppearance.SapotLokal.PageTitle"
+            app:titleTextColor="@color/sapot_text_primary" />
 
     </com.google.android.material.appbar.AppBarLayout>
 
-    <!-- Empty state -->
-    <LinearLayout
-        android:id="@+id/layoutEmpty"
+    <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical"
-        android:gravity="center"
-        android:padding="32dp"
-        android:visibility="gone"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior"
-        tools:visibility="visible">
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
-        <TextView
-            android:layout_width="wrap_content"
+        <!-- Empty State Container -->
+        <LinearLayout
+            android:id="@+id/layoutEmpty"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="No reward rules yet."
-            android:textAppearance="?attr/textAppearanceSubtitle1"
-            android:gravity="center" />
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:padding="32dp"
+            android:visibility="gone"
+            tools:visibility="visible">
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:text="Tap + to add your first rule."
-            android:textAppearance="?attr/textAppearanceBody2"
-            android:gravity="center" />
+            <FrameLayout
+                android:layout_width="64dp"
+                android:layout_height="64dp"
+                android:background="@drawable/bg_nav_pill_active">
 
-    </LinearLayout>
+                <ImageView
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
+                    android:layout_gravity="center"
+                    android:src="@drawable/ic_gift"
+                    app:tint="@color/sapot_text_primary" />
+            </FrameLayout>
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/rvRewardRules"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:padding="8dp"
-        android:clipToPadding="false"
-        android:fillViewport="true"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior"
-        tools:listitem="@layout/item_reward_rule" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:fontFamily="@font/manrope"
+                android:text="@string/reward_rules_no_vouchers_yet"
+                android:textColor="@color/sapot_text_primary"
+                android:textSize="18sp"
+                android:textStyle="bold" />
 
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="6dp"
+                android:fontFamily="@font/dm_sans"
+                android:gravity="center"
+                android:text="@string/reward_rules_tap_to_add_your"
+                android:textColor="@color/sapot_text_secondary"
+                android:textSize="13sp" />
+
+        </LinearLayout>
+
+        <!-- Rules list -->
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rvRewardRules"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:clipToPadding="false"
+            android:paddingHorizontal="16dp"
+            android:paddingTop="8dp"
+            android:paddingBottom="88dp"
+            tools:listitem="@layout/item_reward_rule" />
+
+    </FrameLayout>
+
+    <!-- Floating Action Button (Figma floating-add style) -->
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/fabAddRule"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"
-        android:layout_margin="16dp"
-        android:contentDescription="Add reward rule"
-        android:src="@android:drawable/ic_input_add"
-        app:layout_anchorGravity="bottom|end" />
+        android:layout_margin="24dp"
+        android:contentDescription="Create Voucher"
+        app:backgroundTint="@color/sapot_primary"
+        app:tint="@color/sapot_on_primary"
+        app:elevation="4dp"
+        app:srcCompat="@android:drawable/ic_input_add" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
+
+    <include
+        android:id="@+id/vendorNav"
+        layout="@layout/layout_vendor_bottom_nav" />
+</LinearLayout>

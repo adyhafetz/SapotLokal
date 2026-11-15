@@ -78,7 +78,7 @@ class ScanToRedeemActivity : AppCompatActivity() {
         ActivityResultContracts.RequestPermission()
     ) { granted ->
         if (granted) startCamera()
-        else showError("Camera permission is required. Use manual entry below.")
+        else showError(getString(com.sapotlokal.R.string.kv_camera_permission))
     }
 
     // ── Lifecycle ─────────────────────────────────────────────────────────────
@@ -89,10 +89,11 @@ class ScanToRedeemActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         setSupportActionBar(binding.toolbar)
-        supportActionBar?.setDisplayHomeAsUpEnabled(true)
+        supportActionBar?.setDisplayHomeAsUpEnabled(false)
 
         vendorID = intent.getStringExtra(VendorHomeActivity.EXTRA_VENDOR_ID) ?: ""
         if (vendorID.isEmpty()) { finish(); return }
+        VendorNav.bind(this, binding.vendorNav, VendorNav.Tab.SCANNER) { vendorID }
 
         cameraExecutor = Executors.newSingleThreadExecutor()
 
@@ -139,7 +140,7 @@ class ScanToRedeemActivity : AppCompatActivity() {
                 provider.bindToLifecycle(this, CameraSelector.DEFAULT_BACK_CAMERA, preview, analyzer)
             } catch (e: Exception) {
                 Log.e(TAG, "Camera bind failed", e)
-                showError("Camera could not start. Use manual entry below.")
+                showError(getString(com.sapotlokal.R.string.kv_camera_failed))
             }
         }, ContextCompat.getMainExecutor(this))
     }
@@ -194,7 +195,7 @@ class ScanToRedeemActivity : AppCompatActivity() {
 
     private fun handleCode(code: String) {
         if (!isNetworkAvailable()) {
-            showError("No internet connection. Please reconnect and try again.")
+            showError(getString(com.sapotlokal.R.string.kv_no_internet))
             isProcessing = false
             return
         }
@@ -220,7 +221,7 @@ class ScanToRedeemActivity : AppCompatActivity() {
             onError = { msg ->
                 runOnUiThread {
                     showLoading(false)
-                    showError("Could not verify voucher: $msg")
+                    showError(getString(com.sapotlokal.R.string.kv_could_not_verify, msg))
                     isProcessing = false
                 }
             }
@@ -248,7 +249,7 @@ class ScanToRedeemActivity : AppCompatActivity() {
                         if (success) {
                             finish()
                         } else {
-                            showError("Redemption failed to save. Please try again.")
+                            showError(getString(com.sapotlokal.R.string.kv_redeem_failed))
                             isProcessing = false
                         }
                     }
@@ -259,8 +260,8 @@ class ScanToRedeemActivity : AppCompatActivity() {
 
     private fun showSuccessOverlay(voucherUser: VoucherUser, rewardName: String) {
         pendingVoucherUser = voucherUser
-        binding.tvSuccessReward.text = "Give: $rewardName"
-        binding.tvSuccessCode.text   = "Code: ${voucherUser.voucherCode}"
+        binding.tvSuccessReward.text = getString(com.sapotlokal.R.string.kv_give, rewardName)
+        binding.tvSuccessCode.text   = getString(com.sapotlokal.R.string.kv_code, voucherUser.voucherCode)
         binding.successOverlay.visibility = View.VISIBLE
     }
 

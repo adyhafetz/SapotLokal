@@ -17,6 +17,8 @@ import com.sapotlokal.databinding.ActivityShopSettingsBinding
 class ShopSettingsActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityShopSettingsBinding
+    /** English value of the chosen category (what gets saved). */
+    private var selectedCategory: String = ""
     private val auth = FirebaseAuth.getInstance()
     private var currentVendor: Vendor? = null
 
@@ -31,7 +33,7 @@ class ShopSettingsActivity : AppCompatActivity() {
         val user = auth.currentUser
 
         if (user == null) {
-            Toast.makeText(this, "Session expired. Please log in again.", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, getString(com.sapotlokal.R.string.kv_session_expired), Toast.LENGTH_SHORT).show()
             finish()
             return
         }
@@ -56,12 +58,12 @@ class ShopSettingsActivity : AppCompatActivity() {
                 if (vendor != null) {
                     populateFields(vendor)
                 } else {
-                    Toast.makeText(this, "Could not load shop details", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this, getString(com.sapotlokal.R.string.kv_could_not_load_shop), Toast.LENGTH_SHORT).show()
                 }
             },
             onError = { err ->
                 setLoading(false)
-                Toast.makeText(this, "Error: $err", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, getString(com.sapotlokal.R.string.kv_error_n, err), Toast.LENGTH_SHORT).show()
             }
         )
     }
@@ -75,12 +77,12 @@ class ShopSettingsActivity : AppCompatActivity() {
                 if (vendor != null) {
                     populateFields(vendor)
                 } else {
-                    Toast.makeText(this, "Could not find shop for current user", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this, getString(com.sapotlokal.R.string.kv_shop_not_found_user), Toast.LENGTH_SHORT).show()
                 }
             },
             onError = { err ->
                 setLoading(false)
-                Toast.makeText(this, "Error: $err", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, getString(com.sapotlokal.R.string.kv_error_n, err), Toast.LENGTH_SHORT).show()
             }
         )
     }
@@ -88,7 +90,11 @@ class ShopSettingsActivity : AppCompatActivity() {
     private fun populateFields(vendor: Vendor) {
         currentVendor = vendor
         binding.etShopName.setText(vendor.vendorName)
-        binding.etShopCategory.setText(vendor.vendorCategory)
+        selectedCategory = vendor.vendorCategory
+        com.sapotlokal.util.CategoryPicker.bind(this, binding.etShopCategory, vendor.vendorCategory) {
+            selectedCategory = it
+            binding.tilShopCategory.error = null
+        }
         binding.etShopAddress.setText(vendor.vendorAddress)
         binding.etShopDesc.setText(vendor.vendorDescription)
         binding.etOperatingHours.setText(vendor.operatingHours)
@@ -99,28 +105,28 @@ class ShopSettingsActivity : AppCompatActivity() {
         val vendor = currentVendor ?: return
 
         val name = binding.etShopName.text.toString().trim()
-        val category = binding.etShopCategory.text.toString().trim()
+        val category = selectedCategory.trim()
         val address = binding.etShopAddress.text.toString().trim()
         val desc = binding.etShopDesc.text.toString().trim()
         val hours = binding.etOperatingHours.text.toString().trim()
 
         var hasError = false
         if (name.isEmpty()) {
-            binding.tilShopName.error = "Shop name cannot be empty"
+            binding.tilShopName.error = getString(com.sapotlokal.R.string.kv_shop_name_empty)
             hasError = true
         } else {
             binding.tilShopName.error = null
         }
 
         if (category.isEmpty()) {
-            binding.tilShopCategory.error = "Shop category cannot be empty"
+            binding.tilShopCategory.error = getString(com.sapotlokal.R.string.kv_shop_category_empty)
             hasError = true
         } else {
             binding.tilShopCategory.error = null
         }
 
         if (address.isEmpty()) {
-            binding.tilShopAddress.error = "Shop address cannot be empty"
+            binding.tilShopAddress.error = getString(com.sapotlokal.R.string.kv_shop_address_empty)
             hasError = true
         } else {
             binding.tilShopAddress.error = null
@@ -141,11 +147,11 @@ class ShopSettingsActivity : AppCompatActivity() {
             setLoading(false)
             if (success) {
                 currentVendor = updatedVendor
-                Toast.makeText(this, "Shop profile updated successfully! ✓", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, getString(com.sapotlokal.R.string.kv_shop_updated), Toast.LENGTH_SHORT).show()
                 setResult(RESULT_OK)
                 finish()
             } else {
-                Toast.makeText(this, errorMsg ?: "Failed to update profile", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, errorMsg ?: getString(com.sapotlokal.R.string.kv_update_failed), Toast.LENGTH_SHORT).show()
             }
         }
     }
@@ -153,7 +159,7 @@ class ShopSettingsActivity : AppCompatActivity() {
     private fun setLoading(loading: Boolean) {
         binding.progressBar.visibility = if (loading) View.VISIBLE else View.GONE
         binding.btnSave.isEnabled = !loading
-        binding.btnSave.text = if (loading) "" else "Save Changes"
+        binding.btnSave.text = if (loading) "" else getString(com.sapotlokal.R.string.kv_save_changes)
     }
 }
 

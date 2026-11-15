@@ -43,10 +43,11 @@ class RewardRulesActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         setSupportActionBar(binding.toolbar)
-        supportActionBar?.setDisplayHomeAsUpEnabled(true)
+        supportActionBar?.setDisplayHomeAsUpEnabled(false)
 
         vendorID = intent.getStringExtra(VendorHomeActivity.EXTRA_VENDOR_ID) ?: ""
         if (vendorID.isEmpty()) { finish(); return }
+        VendorNav.bind(this, binding.vendorNav, VendorNav.Tab.VOUCHERS) { vendorID }
 
         setupRecyclerView()
 
@@ -80,7 +81,7 @@ class RewardRulesActivity : AppCompatActivity() {
                         if (!success) {
                             Toast.makeText(
                                 this,
-                                "Could not update rule. Please try again.",
+                                getString(com.sapotlokal.R.string.kv_could_not_update_rule),
                                 Toast.LENGTH_SHORT
                             ).show()
                         }
@@ -102,7 +103,7 @@ class RewardRulesActivity : AppCompatActivity() {
                 binding.rvRewardRules.visibility = if (isEmpty) View.GONE else View.VISIBLE
             },
             onError = { err ->
-                Toast.makeText(this, "Error loading rules: $err", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, getString(com.sapotlokal.R.string.kv_error_loading_rewards, err), Toast.LENGTH_SHORT).show()
             }
         )
     }

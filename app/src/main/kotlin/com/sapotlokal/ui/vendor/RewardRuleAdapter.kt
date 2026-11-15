@@ -36,7 +36,7 @@ class RewardRuleAdapter(
         fun bind(rule: Voucher) {
             binding.tvRuleName.text        = rule.voucherName
             binding.tvRuleDescription.text = rule.voucherDescription
-            binding.tvPointsRequired.text  = "${rule.pointsRequired} pts required"
+            binding.tvPointsRequired.text  = binding.root.context.getString(com.sapotlokal.R.string.kv_pts_required, rule.pointsRequired)
 
             // Remove listener before setting state to avoid phantom callbacks on recycle
             binding.switchActive.setOnCheckedChangeListener(null)

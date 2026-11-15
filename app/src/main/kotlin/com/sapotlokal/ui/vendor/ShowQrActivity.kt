@@ -43,6 +43,7 @@ class ShowQrActivity : AppCompatActivity() {
     private var vendorID: String = ""
     private var currentQrId: String? = null   // Key of the most recent QRCODE record
     private var countDownTimer: CountDownTimer? = null
+    private var needsFreshCode = false   // true after onStop removed the code
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -66,7 +67,7 @@ class ShowQrActivity : AppCompatActivity() {
     // ── QR publishing + countdown loop ────────────────────────────────────────
 
     private fun publishAndStartCountdown() {
-        binding.tvCountdown.text = "Generating…"
+        binding.tvCountdown.text = getString(com.sapotlokal.R.string.kv_generating)
         binding.ivQrCode.setImageBitmap(null)
 
         QrCodeRepository.publishNewCode(
@@ -84,7 +85,7 @@ class ShowQrActivity : AppCompatActivity() {
             },
             onError = { reason ->
                 runOnUiThread {
-                    binding.tvCountdown.text = "Error: $reason"
+                    binding.tvCountdown.text = getString(com.sapotlokal.R.string.kv_error_reason, reason)
                 }
             }
         )
@@ -98,7 +99,7 @@ class ShowQrActivity : AppCompatActivity() {
         ) {
             override fun onTick(millisUntilFinished: Long) {
                 val secs = (millisUntilFinished / 1_000L).toInt()
-                binding.tvCountdown.text = "Refreshes in ${secs}s"
+                binding.tvCountdown.text = getString(com.sapotlokal.R.string.kv_refreshes_in, secs)
             }
             override fun onFinish() {
                 publishAndStartCountdown()
@@ -122,7 +123,7 @@ class ShowQrActivity : AppCompatActivity() {
             }
             binding.ivQrCode.setImageBitmap(bitmap)
         } catch (e: Exception) {
-            binding.tvCountdown.text = "Could not render QR"
+            binding.tvCountdown.text = getString(com.sapotlokal.R.string.kv_could_not_render)
         }
     }
 
@@ -131,23 +132,20 @@ class ShowQrActivity : AppCompatActivity() {
     override fun onStop() {
         super.onStop()
         countDownTimer?.cancel()
-        // Deactivate the current code so it can't be scanned while the app is in the background
+        // Remove the current code so nothing is scannable while the screen is in the background.
+        // (The old version published a replacement "throwaway" code, which stayed VALID.)
         currentQrId?.let { id ->
-            QrCodeRepository.publishNewCode(
-                vendorID     = vendorID,
-                previousQrId = id,
-                // Publish a new (throwaway) code just to trigger the old-code deactivation.
-                // The new code is immediately superseded when the screen resumes.
-                onSuccess = {},
-                onError   = {}
-            )
+            QrCodeRepository.deleteCode(id)
+            currentQrId = null
+            needsFreshCode = true
         }
     }
 
     override fun onResume() {
         super.onResume()
-        // If the screen was paused and resumed, publish a fresh code
-        if (currentQrId != null) {
+        // Coming back from the background: publish a fresh code.
+        if (needsFreshCode) {
+            needsFreshCode = false
             publishAndStartCountdown()
         }
     }

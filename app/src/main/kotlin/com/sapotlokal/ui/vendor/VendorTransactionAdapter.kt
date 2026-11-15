@@ -41,8 +41,12 @@ class VendorTransactionAdapter :
                 binding.iconContainer.background = ContextCompat.getDrawable(
                     context, R.drawable.bg_pill_yellow
                 )
-                binding.tvTxTitle.text = "Customer Visit Scan"
-                binding.tvTxPoints.text = "+${point.pointEarnedAmount} pts"
+                binding.tvTxTitle.text = when (point.pointSource) {
+                    PointSource.FIRST_VISIT_BONUS -> binding.root.context.getString(com.sapotlokal.R.string.kv_tx_first_visit)
+                    PointSource.STREAK_BONUS -> binding.root.context.getString(com.sapotlokal.R.string.kv_tx_streak)
+                    else -> binding.root.context.getString(com.sapotlokal.R.string.kv_tx_visit)
+                }
+                binding.tvTxPoints.text = binding.root.context.getString(com.sapotlokal.R.string.kv_plus_pts, point.pointEarnedAmount)
                 binding.tvTxPoints.setTextColor(ContextCompat.getColor(context, R.color.colorPrimary))
             } else {
                 binding.ivTxIcon.setImageResource(R.drawable.ic_wallet)
@@ -50,11 +54,11 @@ class VendorTransactionAdapter :
                     context, R.drawable.bg_pill_bakery
                 )
                 binding.tvTxTitle.text = if (point.pointSource == PointSource.REDEMPTION) {
-                    "Voucher Redeemed"
+                    binding.root.context.getString(com.sapotlokal.R.string.kv_tx_redeemed)
                 } else {
-                    "Points Spent"
+                    binding.root.context.getString(com.sapotlokal.R.string.kv_tx_spent)
                 }
-                binding.tvTxPoints.text = "-${point.pointRedeemedAmount} pts"
+                binding.tvTxPoints.text = binding.root.context.getString(com.sapotlokal.R.string.kv_minus_pts, point.pointRedeemedAmount)
                 binding.tvTxPoints.setTextColor(ContextCompat.getColor(context, R.color.colorError))
             }
 
@@ -63,9 +67,9 @@ class VendorTransactionAdapter :
             } else if (point.userID.isNotBlank()) {
                 point.userID
             } else {
-                "Guest"
+                binding.root.context.getString(com.sapotlokal.R.string.kv_guest)
             }
-            binding.tvTxSubtitle.text = "Customer ID: $shortUser"
+            binding.tvTxSubtitle.text = binding.root.context.getString(com.sapotlokal.R.string.kv_customer_id, shortUser)
         }
     }
 

@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Vendor bottom navigation: Overview, Vouchers, Scanner, Shop profile (matches the brand design). -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="68dp"
+    android:background="@color/sapot_canvas"
+    android:baselineAligned="false"
+    android:gravity="center_vertical"
+    android:orientation="horizontal"
+    android:paddingHorizontal="12dp">
+
+    <LinearLayout
+        android:id="@+id/tabOverview"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:clickable="true"
+        android:focusable="true"
+        android:gravity="center"
+        android:orientation="vertical">
+
+        <FrameLayout
+            android:id="@+id/pillOverview"
+            android:layout_width="49dp"
+            android:layout_height="30dp">
+
+            <ImageView
+                android:id="@+id/iconOverview"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:layout_gravity="center"
+                android:src="@drawable/ic_house"
+                app:tint="@color/sapot_text_secondary" />
+        </FrameLayout>
+
+        <TextView
+            android:id="@+id/labelOverview"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="3dp"
+            android:fontFamily="@font/dm_sans"
+            android:text="@string/vendor_home_overview"
+            android:textColor="@color/sapot_text_secondary"
+            android:textSize="10sp" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/tabVouchers"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:clickable="true"
+        android:focusable="true"
+        android:gravity="center"
+        android:orientation="vertical">
+
+        <FrameLayout
+            android:id="@+id/pillVouchers"
+            android:layout_width="49dp"
+            android:layout_height="30dp">
+
+            <ImageView
+                android:id="@+id/iconVouchers"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:layout_gravity="center"
+                android:src="@drawable/ic_gift"
+                app:tint="@color/sapot_text_secondary" />
+        </FrameLayout>
+
+        <TextView
+            android:id="@+id/labelVouchers"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="3dp"
+            android:fontFamily="@font/dm_sans"
+            android:text="@string/vendor_bottom_nav_vouchers"
+            android:textColor="@color/sapot_text_secondary"
+            android:textSize="10sp" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/tabScanner"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:clickable="true"
+        android:focusable="true"
+        android:gravity="center"
+        android:orientation="vertical">
+
+        <FrameLayout
+            android:id="@+id/pillScanner"
+            android:layout_width="49dp"
+            android:layout_height="30dp">
+
+            <ImageView
+                android:id="@+id/iconScanner"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:layout_gravity="center"
+                android:src="@drawable/ic_scan"
+                app:tint="@color/sapot_text_secondary" />
+        </FrameLayout>
+
+        <TextView
+            android:id="@+id/labelScanner"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="3dp"
+            android:fontFamily="@font/dm_sans"
+            android:text="@string/vendor_bottom_nav_scanner"
+            android:textColor="@color/sapot_text_secondary"
+            android:textSize="10sp" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/tabProfile"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:clickable="true"
+        android:focusable="true"
+        android:gravity="center"
+        android:orientation="vertical">
+
+        <FrameLayout
+            android:id="@+id/pillProfile"
+            android:layout_width="49dp"
+            android:layout_height="30dp">
+
+            <ImageView
+                android:id="@+id/iconProfile"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:layout_gravity="center"
+                android:src="@drawable/ic_store"
+                app:tint="@color/sapot_text_secondary" />
+        </FrameLayout>
+
+        <TextView
+            android:id="@+id/labelProfile"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="3dp"
+            android:fontFamily="@font/dm_sans"
+            android:text="@string/vendor_bottom_nav_shop_profile"
+            android:textColor="@color/sapot_text_secondary"
+            android:textSize="10sp" />
+    </LinearLayout>
+
+</LinearLayout>
