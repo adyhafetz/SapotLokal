@@ -226,7 +226,7 @@ async function main() {
       rank: rank.level,
       ...(c.avatar ? { avatar: c.avatar } : {}),
     };
-    updates[`userStats/${uid}`] = { totalVisits, shopsVisited, weeksAllMissions: 0, vouchersUsed, lastVisitAt };
+    updates[`userStats/${uid}`] = { totalVisits, shopsVisited, weeksAllMissions: 0, lastVisitAt };
 
     // Badges the data already earns; their XP waits to be claimed in the app.
     if (totalVisits > 0) updates[`badges/${uid}/langkah_kanan`] = { unlockedAt: firstVisitAt };

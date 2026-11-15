@@ -3,6 +3,7 @@ package com.sapotlokal.data.repository
 import com.google.firebase.database.FirebaseDatabase
 import com.sapotlokal.AppConfig
 import com.sapotlokal.data.model.Game
+import com.sapotlokal.data.model.GameKind
 import com.sapotlokal.data.model.GameType
 import com.sapotlokal.data.model.XpEventKey
 import com.sapotlokal.data.model.XpSource
@@ -63,7 +64,7 @@ object GamesRepository {
 
     /** Records today's spin. [xp] is the segment the wheel landed on. onResult(success, xpPaid). */
     fun recordSpin(userID: String, xp: Int, attemptNumber: Int, topSegment: Boolean, onResult: (Boolean, Int) -> Unit) {
-        recordPlay(userID, GameType.SPIN_WHEEL, attemptNumber, xp, BadgeRepository.GameKind.SPIN, topSegment, false, onResult)
+        recordPlay(userID, GameType.SPIN_WHEEL, attemptNumber, xp, GameKind.SPIN, topSegment, false, onResult)
     }
 
     /**
@@ -72,7 +73,7 @@ object GamesRepository {
      */
     fun recordMemoryWin(userID: String, attemptNumber: Int, xpWinsLeft: Int, perfect: Boolean, onResult: (Boolean, Int) -> Unit) {
         val xp = if (xpWinsLeft > 0) AppConfig.MEMORY_WIN_XP else 0
-        recordPlay(userID, GameType.MEMORY_MATCH, attemptNumber, xp, BadgeRepository.GameKind.MEMORY_WIN, false, perfect, onResult)
+        recordPlay(userID, GameType.MEMORY_MATCH, attemptNumber, xp, GameKind.MEMORY_WIN, false, perfect, onResult)
     }
 
     private fun recordPlay(
@@ -80,7 +81,7 @@ object GamesRepository {
         gameType: String,
         attemptNumber: Int,
         xp: Int,
-        kind: BadgeRepository.GameKind,
+        kind: GameKind,
         topSegment: Boolean,
         perfect: Boolean,
         onResult: (Boolean, Int) -> Unit

@@ -54,7 +54,6 @@
     <string name="hu_got_it">Faham</string>
     <string name="hu_history">Sudah digunakan dan tamat tempoh</string>
     <string name="hu_hours">Waktu: %1$s</string>
-    <string name="hu_how_points_title">Cara ia berfungsi</string>
     <string name="hu_how_points_work">Cara ia berfungsi</string>
     <string name="hu_level_score">XP</string>
     <string name="hu_load_error">Mata anda tidak dapat dimuatkan. Semak sambungan anda.</string>
@@ -123,7 +122,6 @@
     <string name="k_enter_your_name">Masukkan nama anda</string>
     <string name="k_error_loading_shop">Tidak dapat memuatkan kedai: %1$s</string>
     <string name="k_hours_not_specified">Waktu operasi tidak dinyatakan</string>
-    <string name="k_local_merchant">Kedai tempatan</string>
     <string name="k_local_shop">Kedai tempatan</string>
     <string name="k_member_since">Ahli sejak %1$s</string>
     <string name="k_name_empty">Nama tidak boleh kosong</string>
@@ -143,8 +141,6 @@
     <string name="k_shop_not_available">Kedai tidak tersedia</string>
     <string name="k_shop_not_found">Kedai tidak ditemui</string>
     <string name="k_shopper">Pelanggan</string>
-    <string name="k_sign_out">Log keluar</string>
-    <string name="k_sign_out_confirm">Adakah anda pasti mahu log keluar daripada SapotLokal?</string>
     <string name="k_spin_left_today">1 putaran lagi hari ini</string>
     <string name="k_terms_heading">Terma &amp; syarat</string>
     <string name="k_valid_until">Sah sehingga %1$s</string>

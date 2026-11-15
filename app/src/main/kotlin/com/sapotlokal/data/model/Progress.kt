@@ -38,7 +38,6 @@ data class UserStats(
     val totalVisits: Int = 0,
     val shopsVisited: Map<String, Boolean> = emptyMap(),
     val weeksAllMissions: Int = 0,
-    val vouchersUsed: Int = 0,
     val lastVisitAt: Long = 0L
 )
 

@@ -48,14 +48,14 @@
     <string name="label_shop_category">Category</string>
     <string name="notif_channel_levels_desc">When you reach a new rank</string>
     <string name="notif_channel_levels_name">Rank up!</string>
-    <string name="notif_channel_rewards_desc">Alerts when you earn a new voucher or reach a reward milestone</string>
-    <string name="notif_channel_rewards_name">Rewards &amp; Vouchers</string>
-    <string name="notif_channel_shops_desc">Alerts when your favourite local shops open for business</string>
-    <string name="notif_channel_shops_name">Shop Updates &amp; Openings</string>
-    <string name="notif_shop_closed_body">%1$s has just closed. We\'ll let you know when it opens again.</string>
-    <string name="notif_shop_closed_title">%1$s is now CLOSED 🔴</string>
-    <string name="notif_shop_open_body">%1$s is now OPEN! Drop by today to earn your loyalty points.</string>
-    <string name="notif_shop_open_title">%1$s is now OPEN! 🟢</string>
+    <string name="notif_channel_rewards_desc">When a voucher or reward is ready for you</string>
+    <string name="notif_channel_rewards_name">Rewards and vouchers</string>
+    <string name="notif_channel_shops_desc">When one of your shops opens</string>
+    <string name="notif_channel_shops_name">Shops opening</string>
+    <string name="notif_shop_closed_body">We\'ll tell you when it opens again.</string>
+    <string name="notif_shop_closed_title">%1$s has closed</string>
+    <string name="notif_shop_open_body">Drop by today to earn points.</string>
+    <string name="notif_shop_open_title">%1$s is open</string>
     <string name="status_closed">Closed</string>
     <string name="status_open">Open</string>
     <string name="time_days_left">%1$d days left</string>
@@ -65,4 +65,14 @@
     <string name="time_mins_left">%1$d mins left</string>
     <string name="time_one_day_left">1 day left</string>
     <string name="time_one_hour_left">1 hour left</string>
+    <!-- Screen-reader labels -->
+    <string name="cd_avatar">Your avatar</string>
+    <string name="cd_flashlight">Flashlight</string>
+    <string name="cd_shop_photo">Shop photo</string>
+    <string name="cd_voucher_qr">Voucher QR code</string>
+    <!-- Language names stay in their own language in both locales. -->
+    <string name="lang_en_short" translatable="false">EN</string>
+    <string name="lang_en_name" translatable="false">English</string>
+    <string name="lang_ms_short" translatable="false">BM</string>
+    <string name="lang_ms_name" translatable="false">Bahasa Melayu</string>
 </resources>

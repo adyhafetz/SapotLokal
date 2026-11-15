@@ -29,7 +29,7 @@
     <string name="kv_no_internet">No internet connection. Please reconnect and try again.</string>
     <string name="kv_photo_failed">Could not save the photo. Check your connection.</string>
     <string name="kv_photo_saved">Photo saved</string>
-    <string name="kv_redeem_failed">The redemption could not be saved. Please try again.</string>
+    <string name="kv_redeem_failed">Couldn\'t mark the voucher as used. Try again.</string>
     <string name="kv_refreshes_in">New code in %1$ds</string>
     <string name="kv_reward_name_required">Reward name is required</string>
     <string name="kv_save_changes">Save changes</string>

@@ -81,7 +81,7 @@
                                 android:layout_height="44dp"
                                 android:layout_alignParentEnd="true"
                                 android:background="?attr/selectableItemBackgroundBorderless"
-                                android:contentDescription="Flashlight"
+                                android:contentDescription="@string/cd_flashlight"
                                 android:padding="11dp"
                                 android:src="@drawable/ic_flash"
                                 app:tint="@color/hu_ink" />

@@ -6,12 +6,12 @@ import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
 import com.sapotlokal.AppConfig
 import com.sapotlokal.data.model.BadgeDef
+import com.sapotlokal.data.model.BadgeRules
 import com.sapotlokal.data.model.BadgeState
+import com.sapotlokal.data.model.GameKind
 import com.sapotlokal.data.model.XpEventKey
 import com.sapotlokal.data.model.XpSource
 import com.sapotlokal.util.MissionDateUtils
-import java.time.Instant
-import java.time.ZonedDateTime
 
 /**
  * BadgeRepository — badges (REFRACTOR.md §3.5, Phase 6).
@@ -29,15 +29,6 @@ object BadgeRepository {
 
     private val db = FirebaseDatabase.getInstance(AppConfig.DATABASE_URL).reference
 
-    /** What a game play was, for the badges it can earn. */
-    enum class GameKind(val mark: String) { SPIN("spin"), MEMORY_WIN("memory") }
-
-    private fun dayKey(now: Long): String =
-        ZonedDateTime.ofInstant(Instant.ofEpochMilli(now), MissionDateUtils.KL_ZONE).toLocalDate().toString()
-
-    private fun hour(now: Long): Int =
-        ZonedDateTime.ofInstant(Instant.ofEpochMilli(now), MissionDateUtils.KL_ZONE).hour
-
     /** Reads /userStats/{uid} and /badges/{uid} once, then calls [then] with both. */
     fun readContext(uid: String, then: (stats: DataSnapshot?, badges: DataSnapshot?) -> Unit) {
         db.child("userStats").child(uid).addListenerForSingleValueEvent(object : ValueEventListener {
@@ -51,59 +42,45 @@ object BadgeRepository {
         })
     }
 
-    private fun has(badges: DataSnapshot?, def: BadgeDef) =
-        (badges?.child(def.id)?.child("unlockedAt")?.getValue(Long::class.java) ?: 0L) > 0L
+    private fun keys(snapshot: DataSnapshot?): Set<String> =
+        snapshot?.children?.mapNotNull { it.key }?.toSet() ?: emptySet()
 
-    private fun unlock(uid: String, def: BadgeDef, now: Long, badges: DataSnapshot?, into: MutableMap<String, Any>, list: MutableList<BadgeDef>) {
-        if (has(badges, def) || def in list) return
-        into["badges/$uid/${def.id}/unlockedAt"] = now
-        list += def
-    }
+    private fun owned(badges: DataSnapshot?): Set<String> =
+        badges?.children?.filter { (it.child("unlockedAt").getValue(Long::class.java) ?: 0L) > 0L }
+            ?.mapNotNull { it.key }?.toSet() ?: emptySet()
+
+    private fun unlockPaths(uid: String, now: Long, earned: List<BadgeDef>): Map<String, Any> =
+        earned.associate { "badges/$uid/${it.id}/unlockedAt" to now }
 
     /** Tracking and unlocks for a valid shop visit at [vendorID]. */
     fun visitPaths(uid: String, vendorID: String, now: Long, stats: DataSnapshot?, badges: DataSnapshot?): Pair<Map<String, Any>, List<BadgeDef>> {
-        val day = dayKey(now)
+        val day = BadgeRules.dayKey(now)
         val week = MissionDateUtils.getWeekYearKey(now)
+        val earned = BadgeRules.onVisit(
+            now = now,
+            totalVisits = stats?.child("totalVisits")?.getValue(Long::class.java) ?: 0L,
+            shopDaysThisWeek = keys(stats?.child("shopDays")?.child(week)?.child(vendorID)),
+            todayMarks = keys(stats?.child("days")?.child(day)),
+            owned = owned(badges)
+        )
         val paths = hashMapOf<String, Any>(
             "userStats/$uid/days/$day/visit" to true,
             "userStats/$uid/shopDays/$week/$vendorID/$day" to true
         )
-        val unlocked = mutableListOf<BadgeDef>()
-        val totalVisits = stats?.child("totalVisits")?.getValue(Long::class.java) ?: 0L
-        if (totalVisits == 0L) unlock(uid, BadgeDef.LANGKAH_KANAN, now, badges, paths, unlocked)
-
-        val daysHere = (stats?.child("shopDays")?.child(week)?.child(vendorID)?.children?.mapNotNull { it.key }?.toSet() ?: emptySet()) + day
-        if (daysHere.size >= BadgeDef.REGULAR_DAYS) unlock(uid, BadgeDef.REGULAR, now, badges, paths, unlocked)
-
-        if (hour(now) >= BadgeDef.NIGHT_HOUR) unlock(uid, BadgeDef.HANTU_MALAM, now, badges, paths, unlocked)
-
-        val today = stats?.child("days")?.child(day)
-        if (today?.child("spin")?.exists() == true && today.child("memory").exists()) {
-            unlock(uid, BadgeDef.COMBO, now, badges, paths, unlocked)
-        }
-        return paths to unlocked
+        paths.putAll(unlockPaths(uid, now, earned))
+        return paths to earned
     }
 
-    /**
-     * Tracking and unlocks for a game play. [topSegment]: the wheel landed on its biggest prize.
-     * [perfect]: a Memory Match win without a wrong pair.
-     */
+    /** Tracking and unlocks for a game play; see [BadgeRules.onGame]. */
     fun gamePaths(
         uid: String, kind: GameKind, now: Long, stats: DataSnapshot?, badges: DataSnapshot?,
         topSegment: Boolean = false, perfect: Boolean = false
     ): Pair<Map<String, Any>, List<BadgeDef>> {
-        val day = dayKey(now)
+        val day = BadgeRules.dayKey(now)
+        val earned = BadgeRules.onGame(kind, keys(stats?.child("days")?.child(day)), owned(badges), topSegment, perfect)
         val paths = hashMapOf<String, Any>("userStats/$uid/days/$day/${kind.mark}" to true)
-        val unlocked = mutableListOf<BadgeDef>()
-        if (kind == GameKind.SPIN && topSegment) unlock(uid, BadgeDef.NASIB_BAIK, now, badges, paths, unlocked)
-        if (kind == GameKind.MEMORY_WIN && perfect) unlock(uid, BadgeDef.OTAK_CERDAS, now, badges, paths, unlocked)
-
-        val today = stats?.child("days")?.child(day)
-        val other = if (kind == GameKind.SPIN) "memory" else "spin"
-        if (today?.child("visit")?.exists() == true && today.child(other).exists()) {
-            unlock(uid, BadgeDef.COMBO, now, badges, paths, unlocked)
-        }
-        return paths to unlocked
+        paths.putAll(unlockPaths(uid, now, earned))
+        return paths to earned
     }
 
     /** Unlocks [def] on its own write (for badges earned outside a scan or game, e.g. Belanja Diri). */

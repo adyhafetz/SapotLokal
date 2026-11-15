@@ -74,7 +74,7 @@ class ShopProfileActivity : AppCompatActivity() {
         binding.btnChangePhoto.setOnClickListener { pickPhoto.launch("image/*") }
         binding.btnSave.setOnClickListener { saveChanges() }
         binding.rowChangePassword.setOnClickListener { showChangePassword() }
-        binding.rowLogout.setOnClickListener { confirmLogout() }
+        binding.rowLogout.setOnClickListener { com.sapotlokal.util.AccountActions.confirmLogout(this) }
         binding.rowDeleteAccount.setOnClickListener { showDeleteAccount() }
 
         vendorListener = VendorRepository.listenToVendor(
@@ -224,17 +224,6 @@ class ShopProfileActivity : AppCompatActivity() {
                         ?.addOnSuccessListener { toast(getString(com.sapotlokal.R.string.k_password_changed)) }
                         ?.addOnFailureListener { toast(getString(com.sapotlokal.R.string.k_password_change_failed)) }
                 }
-            }
-            .setNegativeButton(getString(com.sapotlokal.R.string.k_cancel), null)
-            .show()
-    }
-
-    private fun confirmLogout() {
-        MaterialAlertDialogBuilder(this)
-            .setTitle(getString(com.sapotlokal.R.string.k_log_out_q))
-            .setPositiveButton(getString(com.sapotlokal.R.string.k_log_out)) { _, _ ->
-                SessionManager.signOut(this)
-                goToLogin()
             }
             .setNegativeButton(getString(com.sapotlokal.R.string.k_cancel), null)
             .show()

@@ -29,7 +29,7 @@
     <string name="kv_no_internet">Tiada sambungan internet. Sila sambung semula dan cuba lagi.</string>
     <string name="kv_photo_failed">Tidak dapat menyimpan gambar. Semak sambungan anda.</string>
     <string name="kv_photo_saved">Gambar disimpan</string>
-    <string name="kv_redeem_failed">Penebusan tidak dapat disimpan. Sila cuba lagi.</string>
+    <string name="kv_redeem_failed">Tidak dapat tandakan baucar sebagai digunakan. Cuba lagi.</string>
     <string name="kv_refreshes_in">Kod baharu dalam %1$ds</string>
     <string name="kv_reward_name_required">Nama ganjaran diperlukan</string>
     <string name="kv_save_changes">Simpan perubahan</string>

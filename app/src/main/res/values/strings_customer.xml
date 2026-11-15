@@ -54,7 +54,6 @@
     <string name="hu_got_it">Got it</string>
     <string name="hu_history">Used and expired</string>
     <string name="hu_hours">Hours: %1$s</string>
-    <string name="hu_how_points_title">How it works</string>
     <string name="hu_how_points_work">How it works</string>
     <string name="hu_level_score">XP</string>
     <string name="hu_load_error">Couldn\'t load your points. Check your connection.</string>
@@ -123,7 +122,6 @@
     <string name="k_enter_your_name">Enter your name</string>
     <string name="k_error_loading_shop">Could not load shop: %1$s</string>
     <string name="k_hours_not_specified">Hours not specified</string>
-    <string name="k_local_merchant">Local shop</string>
     <string name="k_local_shop">Local shop</string>
     <string name="k_member_since">Member since %1$s</string>
     <string name="k_name_empty">Name cannot be empty</string>
@@ -143,8 +141,6 @@
     <string name="k_shop_not_available">Shop not available</string>
     <string name="k_shop_not_found">Shop not found</string>
     <string name="k_shopper">Shopper</string>
-    <string name="k_sign_out">Log out</string>
-    <string name="k_sign_out_confirm">Are you sure you want to log out of SapotLokal?</string>
     <string name="k_spin_left_today">1 spin left today</string>
     <string name="k_terms_heading">Terms &amp; conditions</string>
     <string name="k_valid_until">Valid until %1$s</string>

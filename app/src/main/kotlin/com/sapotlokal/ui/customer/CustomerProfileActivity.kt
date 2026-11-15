@@ -166,9 +166,7 @@ class CustomerProfileActivity : AppCompatActivity() {
         binding.ivAvatar.setOnClickListener { pickAvatar() }
         binding.tvAvatarInitials.setOnClickListener { pickAvatar() }
 
-        binding.btnSignOut.setOnClickListener {
-            showSignOutConfirmation()
-        }
+        binding.btnSignOut.setOnClickListener { com.sapotlokal.util.AccountActions.confirmLogout(this) }
         binding.rowChangePassword.setOnClickListener { com.sapotlokal.util.AccountActions.showChangePassword(this) }
         binding.rowDeleteAccount.setOnClickListener { com.sapotlokal.util.AccountActions.showDeleteAccount(this) }
     }
@@ -211,19 +209,6 @@ class CustomerProfileActivity : AppCompatActivity() {
                 } else {
                     Toast.makeText(this, getString(com.sapotlokal.R.string.k_name_empty), Toast.LENGTH_SHORT).show()
                 }
-            }
-            .setNegativeButton(getString(com.sapotlokal.R.string.k_cancel), null)
-            .show()
-    }
-
-
-    private fun showSignOutConfirmation() {
-        MaterialAlertDialogBuilder(this)
-            .setTitle(getString(com.sapotlokal.R.string.k_sign_out))
-            .setMessage(getString(com.sapotlokal.R.string.k_sign_out_confirm))
-            .setPositiveButton(getString(com.sapotlokal.R.string.k_sign_out)) { _, _ ->
-                com.sapotlokal.util.SessionManager.signOut(this@CustomerProfileActivity)
-                goToLogin()
             }
             .setNegativeButton(getString(com.sapotlokal.R.string.k_cancel), null)
             .show()

@@ -114,7 +114,7 @@ class ShopDetailActivity : AppCompatActivity() {
 
     private fun render() {
         val v = vendor ?: return
-        val name = v.vendorName.ifBlank { getString(R.string.k_local_merchant) }
+        val name = v.vendorName.ifBlank { getString(R.string.k_local_shop) }
         binding.tvTitle.text = name
 
         val now = System.currentTimeMillis()

@@ -47,14 +47,14 @@
     <string name="label_shop_category">Kategori</string>
     <string name="notif_channel_levels_desc">Apabila anda mencapai pangkat baharu</string>
     <string name="notif_channel_levels_name">Naik pangkat!</string>
-    <string name="notif_channel_rewards_desc">Makluman apabila anda memperoleh baucar baharu atau mencapai pencapaian ganjaran</string>
-    <string name="notif_channel_rewards_name">Ganjaran &amp; Baucar</string>
-    <string name="notif_channel_shops_desc">Makluman apabila kedai tempatan kegemaran anda dibuka</string>
-    <string name="notif_channel_shops_name">Kemas Kini &amp; Pembukaan Kedai</string>
-    <string name="notif_shop_closed_body">%1$s baru sahaja ditutup. Kami akan maklumkan apabila ia dibuka semula.</string>
-    <string name="notif_shop_closed_title">%1$s kini DITUTUP 🔴</string>
-    <string name="notif_shop_open_body">%1$s kini DIBUKA! Singgah hari ini untuk mengumpul mata kesetiaan anda.</string>
-    <string name="notif_shop_open_title">%1$s kini DIBUKA! 🟢</string>
+    <string name="notif_channel_rewards_desc">Apabila baucar atau ganjaran sedia untuk anda</string>
+    <string name="notif_channel_rewards_name">Ganjaran dan baucar</string>
+    <string name="notif_channel_shops_desc">Apabila kedai anda dibuka</string>
+    <string name="notif_channel_shops_name">Kedai dibuka</string>
+    <string name="notif_shop_closed_body">Kami akan maklumkan apabila ia dibuka semula.</string>
+    <string name="notif_shop_closed_title">%1$s sudah ditutup</string>
+    <string name="notif_shop_open_body">Singgah hari ini untuk kumpul mata.</string>
+    <string name="notif_shop_open_title">%1$s sudah dibuka</string>
     <string name="status_closed">Ditutup</string>
     <string name="status_open">Dibuka</string>
     <string name="time_days_left">%1$d hari lagi</string>
@@ -64,4 +64,9 @@
     <string name="time_mins_left">%1$d min lagi</string>
     <string name="time_one_day_left">1 hari lagi</string>
     <string name="time_one_hour_left">1 jam lagi</string>
+    <!-- Screen-reader labels -->
+    <string name="cd_avatar">Avatar anda</string>
+    <string name="cd_flashlight">Lampu suluh</string>
+    <string name="cd_shop_photo">Foto kedai</string>
+    <string name="cd_voucher_qr">Kod QR baucar</string>
 </resources>

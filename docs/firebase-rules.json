@@ -11,16 +11,15 @@
     // Without a server a determined customer can still fake SMALL amounts. These rules make that
     // hard, bounded and visible: every XP event has a fixed key that can be written once, every
     // amount is capped, and XP / rank can only go up by a little per write.
-    //
-    // Blocks marked "OLD — removed in Phase N" keep the current screens working until the phase
-    // that replaces them; delete them in that phase's PR.
     // ─────────────────────────────────────────────────────────────────────────
 
     "users": {
-      // Readable by signed-in users because the leaderboard shows names, avatars and ranks.
-      ".read": "auth != null",
       "$userID": {
+        // Your own record. Other signed-in users (a shop owner redeeming, a name next to a visit)
+        // only see the public fields below, never the email or push token.
+        ".read": "auth != null && auth.uid === $userID",
         ".write": "auth != null && auth.uid === $userID",
+        "userName": { ".read": "auth != null" },
         "role": {
           // 'customer' or 'vendor', and once written it can never change.
           ".validate": "newData.isString() && (newData.val() === 'customer' || newData.val() === 'vendor') && (!data.exists() || data.val() === newData.val())"
@@ -30,6 +29,7 @@
           ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() % 1 === 0 && (!data.exists() || (newData.val() >= data.val() && newData.val() <= data.val() + 300))"
         },
         "rank": {
+          ".read": "auth != null",
           // 1–5, never drops (XP never goes down), and only ever one step at a time.
           ".validate": "newData.isNumber() && newData.val() >= 1 && newData.val() <= 5 && newData.val() % 1 === 0 && (!data.exists() || (newData.val() >= data.val() && newData.val() <= data.val() + 1))"
         },
@@ -38,6 +38,7 @@
           ".validate": "newData.isNumber() && newData.val() >= 1 && newData.val() <= 5 && (!data.exists() || newData.val() >= data.val())"
         },
         "avatar": {
+          ".read": "auth != null",
           ".validate": "newData.isString() && (newData.val() === '' || newData.val() === 'cat' || newData.val() === 'dog' || newData.val() === 'panda' || newData.val() === 'brown_bear' || newData.val() === 'capybara')"
         }
       }
@@ -109,7 +110,6 @@
         ".write": "auth != null && auth.uid === $uid",
         "totalVisits": { ".validate": "newData.isNumber() && newData.val() >= 0 && (!data.exists() || newData.val() >= data.val())" },
         "weeksAllMissions": { ".validate": "newData.isNumber() && newData.val() >= 0 && (!data.exists() || newData.val() >= data.val())" },
-        "vouchersUsed": { ".validate": "newData.isNumber() && newData.val() >= 0 && (!data.exists() || newData.val() >= data.val())" },
         "shopsVisited": {
           "$vendorID": { ".validate": "newData.val() === true && root.child('vendors/' + $vendorID + '/userID').exists()" }
         },

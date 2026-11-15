@@ -1,6 +1,9 @@
 package com.sapotlokal.data.model
 
 import com.sapotlokal.R
+import com.sapotlokal.util.MissionDateUtils
+import java.time.Instant
+import java.time.ZonedDateTime
 
 /**
  * The eight badges (REFRACTOR.md §3.5). Names are the same in both languages; [howToRes] is the
@@ -33,6 +36,51 @@ enum class BadgeDef(
 
         /** A visit at or after this hour (Malaysia time) earns [HANTU_MALAM]. */
         const val NIGHT_HOUR = 20
+    }
+}
+
+/** What a game play was, for the badges it can earn. [mark] is its key under userStats/{uid}/days/{day}. */
+enum class GameKind(val mark: String) { SPIN("spin"), MEMORY_WIN("memory") }
+
+/**
+ * Which badges a visit or a game play unlocks. Pure, so the rules are unit-tested; BadgeRepository
+ * reads the database into these arguments and turns the result into paths.
+ *
+ * [todayMarks] holds what the customer already did today ("visit", "spin", "memory"), [owned] the
+ * ids of badges already unlocked. Days and hours are Malaysia time.
+ */
+object BadgeRules {
+
+    private const val VISIT_MARK = "visit"
+
+    fun dayKey(now: Long): String =
+        ZonedDateTime.ofInstant(Instant.ofEpochMilli(now), MissionDateUtils.KL_ZONE).toLocalDate().toString()
+
+    fun hour(now: Long): Int =
+        ZonedDateTime.ofInstant(Instant.ofEpochMilli(now), MissionDateUtils.KL_ZONE).hour
+
+    /** [totalVisits] counts visits before this one; [shopDaysThisWeek] the days already visited at this shop this week. */
+    fun onVisit(
+        now: Long, totalVisits: Long, shopDaysThisWeek: Set<String>, todayMarks: Set<String>, owned: Set<String>
+    ): List<BadgeDef> {
+        val earned = mutableListOf<BadgeDef>()
+        if (totalVisits == 0L) earned += BadgeDef.LANGKAH_KANAN
+        if ((shopDaysThisWeek + dayKey(now)).size >= BadgeDef.REGULAR_DAYS) earned += BadgeDef.REGULAR
+        if (hour(now) >= BadgeDef.NIGHT_HOUR) earned += BadgeDef.HANTU_MALAM
+        if (GameKind.SPIN.mark in todayMarks && GameKind.MEMORY_WIN.mark in todayMarks) earned += BadgeDef.COMBO
+        return earned.filter { it.id !in owned }
+    }
+
+    /** [topSegment]: the wheel landed on its biggest prize. [perfect]: a Memory Match win without a wrong pair. */
+    fun onGame(
+        kind: GameKind, todayMarks: Set<String>, owned: Set<String>, topSegment: Boolean, perfect: Boolean
+    ): List<BadgeDef> {
+        val earned = mutableListOf<BadgeDef>()
+        if (kind == GameKind.SPIN && topSegment) earned += BadgeDef.NASIB_BAIK
+        if (kind == GameKind.MEMORY_WIN && perfect) earned += BadgeDef.OTAK_CERDAS
+        val other = if (kind == GameKind.SPIN) GameKind.MEMORY_WIN else GameKind.SPIN
+        if (VISIT_MARK in todayMarks && other.mark in todayMarks) earned += BadgeDef.COMBO
+        return earned.filter { it.id !in owned }
     }
 }
 

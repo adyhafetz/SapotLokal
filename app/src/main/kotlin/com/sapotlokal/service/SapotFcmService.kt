@@ -123,7 +123,7 @@ class SapotFcmService : FirebaseMessagingService() {
         }
 
         /**
-         * Phase 6: Posts a shop status notification informing customers that a shop is OPEN.
+         * Posts a shop status notification (open or closed).
          * Tapping launches ShopDetailActivity for the specified vendorId.
          */
         fun showShopStatusNotification(
@@ -146,8 +146,8 @@ class SapotFcmService : FirebaseMessagingService() {
 
             val title = if (isOpen) context.getString(com.sapotlokal.R.string.notif_shop_open_title, vendorName)
             else context.getString(com.sapotlokal.R.string.notif_shop_closed_title, vendorName)
-            val body = if (isOpen) context.getString(com.sapotlokal.R.string.notif_shop_open_body, vendorName)
-            else context.getString(com.sapotlokal.R.string.notif_shop_closed_body, vendorName)
+            val body = if (isOpen) context.getString(com.sapotlokal.R.string.notif_shop_open_body)
+            else context.getString(com.sapotlokal.R.string.notif_shop_closed_body)
 
             val intent = if (vendorId.isNotBlank()) {
                 android.content.Intent(context, com.sapotlokal.ui.customer.ShopDetailActivity::class.java).apply {
