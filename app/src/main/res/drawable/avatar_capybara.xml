@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Avatar: capybara -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="120dp"
+    android:height="120dp"
+    android:viewportWidth="120"
+    android:viewportHeight="120">
+    <path android:fillColor="#E1EEFF" android:pathData="M60,60m-60,0a60,60 0 1,1 120,0a60,60 0 1,1 -120,0" />
+    <!-- small ears -->
+    <path android:fillColor="#8E5F3B" android:pathData="M35,40m-7,0a7,6 0 1,1 14,0a7,6 0 1,1 -14,0" />
+    <path android:fillColor="#8E5F3B" android:pathData="M85,40m-7,0a7,6 0 1,1 14,0a7,6 0 1,1 -14,0" />
+    <!-- boxy head -->
+    <path android:fillColor="#B58353" android:pathData="M29,55Q29,35 60,35Q91,35 91,55L91,86Q91,100 76,100L44,100Q29,100 29,86Z" />
+    <!-- snout -->
+    <path android:fillColor="#C99B6B" android:pathData="M37,72Q37,64 60,64Q83,64 83,72L83,90Q83,97 72,97L48,97Q37,97 37,90Z" />
+    <!-- eyes -->
+    <path android:fillColor="#2B2323" android:pathData="M44,54m-3.8,0a3.8,3.8 0 1,1 7.6,0a3.8,3.8 0 1,1 -7.6,0" />
+    <path android:fillColor="#2B2323" android:pathData="M76,54m-3.8,0a3.8,3.8 0 1,1 7.6,0a3.8,3.8 0 1,1 -7.6,0" />
+    <path android:fillColor="#FFFFFF" android:pathData="M45.3,52.8m-1.2,0a1.2,1.2 0 1,1 2.4,0a1.2,1.2 0 1,1 -2.4,0" />
+    <path android:fillColor="#FFFFFF" android:pathData="M77.3,52.8m-1.2,0a1.2,1.2 0 1,1 2.4,0a1.2,1.2 0 1,1 -2.4,0" />
+    <!-- nostrils -->
+    <path android:fillColor="#3B2A2A" android:pathData="M51,74m-2.6,0a2.6,3.6 0 1,1 5.2,0a2.6,3.6 0 1,1 -5.2,0" />
+    <path android:fillColor="#3B2A2A" android:pathData="M69,74m-2.6,0a2.6,3.6 0 1,1 5.2,0a2.6,3.6 0 1,1 -5.2,0" />
+    <!-- mouth -->
+    <path android:strokeColor="#3B2A2A" android:strokeWidth="1.7" android:strokeLineCap="round" android:fillColor="#00000000" android:pathData="M50,88Q60,93 70,88" />
+</vector>

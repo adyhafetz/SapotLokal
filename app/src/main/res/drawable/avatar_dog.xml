@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Avatar: dog -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="120dp"
+    android:height="120dp"
+    android:viewportWidth="120"
+    android:viewportHeight="120">
+    <path android:fillColor="#E1EEFF" android:pathData="M60,60m-60,0a60,60 0 1,1 120,0a60,60 0 1,1 -120,0" />
+    <!-- floppy ears -->
+    <path android:fillColor="#8B5A3C" android:pathData="M31,36Q12,46 17,86Q31,94 40,70Z" />
+    <path android:fillColor="#8B5A3C" android:pathData="M89,36Q108,46 103,86Q89,94 80,70Z" />
+    <!-- head -->
+    <path android:fillColor="#D9A066" android:pathData="M60,64m-33,0a33,33 0 1,1 66,0a33,33 0 1,1 -66,0" />
+    <!-- eye patch -->
+    <path android:fillColor="#8B5A3C" android:pathData="M45,57m-9,0a9,9 0 1,1 18,0a9,9 0 1,1 -18,0" />
+    <!-- muzzle -->
+    <path android:fillColor="#F6E3CB" android:pathData="M60,80m-17,0a17,12 0 1,1 34,0a17,12 0 1,1 -34,0" />
+    <!-- eyes -->
+    <path android:fillColor="#2B2323" android:pathData="M47,59m-4.4,0a4.4,4.4 0 1,1 8.8,0a4.4,4.4 0 1,1 -8.8,0" />
+    <path android:fillColor="#2B2323" android:pathData="M73,59m-4.4,0a4.4,4.4 0 1,1 8.8,0a4.4,4.4 0 1,1 -8.8,0" />
+    <path android:fillColor="#FFFFFF" android:pathData="M48.6,57.6m-1.3,0a1.3,1.3 0 1,1 2.6,0a1.3,1.3 0 1,1 -2.6,0" />
+    <path android:fillColor="#FFFFFF" android:pathData="M74.6,57.6m-1.3,0a1.3,1.3 0 1,1 2.6,0a1.3,1.3 0 1,1 -2.6,0" />
+    <!-- tongue -->
+    <path android:fillColor="#E86F7B" android:pathData="M55,86Q60,99 65,86Z" />
+    <!-- nose + mouth -->
+    <path android:fillColor="#2B2323" android:pathData="M60,74m-7.5,0a7.5,5.2 0 1,1 15,0a7.5,5.2 0 1,1 -15,0" />
+    <path android:strokeColor="#2B2323" android:strokeWidth="1.7" android:strokeLineCap="round" android:fillColor="#00000000" android:pathData="M60,79L60,85M60,85Q54,91 49,86M60,85Q66,91 71,86" />
+</vector>

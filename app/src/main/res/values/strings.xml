@@ -94,16 +94,16 @@
     <string name="games_spin_button">Spin</string>
     <string name="games_spin_checking">Checking…</string>
     <string name="games_spin_come_back">Come back tomorrow</string>
-    <string name="games_spin_result">You won %1$d points!</string>
-    <string name="games_spin_available">Spin available today</string>
-    <string name="games_spin_used">Spun today</string>
-    <string name="games_memory_moves">Moves: %1$d</string>
-    <string name="games_memory_info">Memory points today: %1$d / %2$d</string>
+    <string name="games_spin_result">+%1$d level score</string>
+    <string name="games_spin_available">Spin ready</string>
+    <string name="games_spin_used">Come back tomorrow</string>
+    <string name="games_memory_moves">Moves %1$d</string>
+    <string name="games_memory_info">Today %1$d / %2$d level score</string>
     <string name="games_memory_saving">Saving your points…</string>
-    <string name="games_memory_win_full">You won in %1$d moves! +%2$d points!</string>
-    <string name="games_memory_win_partial">You won in %1$d moves! +%2$d points (daily limit reached)</string>
-    <string name="games_memory_win_none">You won in %1$d moves! (daily points limit reached)</string>
-    <string name="games_memory_save_failed">You won! We couldn\'t save your points. Tap here to try again.</string>
+    <string name="games_memory_win_full">Done in %1$d moves  +%2$d level score</string>
+    <string name="games_memory_win_partial">Done in %1$d moves  +%2$d level score (daily limit reached)</string>
+    <string name="games_memory_win_none">Done in %1$d moves  (daily limit reached)</string>
+    <string name="games_memory_save_failed">You won! We couldn\'t save your level score. Tap here to try again.</string>
     <string name="games_new_game">New Game</string>
     <string name="games_back">Back</string>
     <string name="games_error_load">Couldn\'t load your game status. Please try again.</string>
@@ -119,11 +119,13 @@
     <string name="notif_channel_shops_desc">Alerts when your favourite local shops open for business</string>
 
     <!-- Phase 6: Store Status & Vendor Controls -->
-    <string name="store_operating_status">Store Operating Status</string>
-    <string name="store_status_open_desc">Store is currently OPEN for customers</string>
-    <string name="store_status_closed_desc">Store is currently CLOSED</string>
-    <string name="store_status_open_badge">● OPEN</string>
-    <string name="store_status_closed_badge">● CLOSED</string>
+    <string name="store_operating_status">Shop status</string>
+    <string name="store_status_open_desc">Open for customers</string>
+    <string name="store_status_closed_desc">Closed to customers</string>
+    <string name="store_status_open_badge">Open</string>
+    <string name="status_open">Open</string>
+    <string name="status_closed">Closed</string>
+    <string name="store_status_closed_badge">Closed</string>
     <string name="store_status_hours_prefix">Hours: %s</string>
 
 </resources>

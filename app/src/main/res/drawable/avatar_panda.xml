@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Avatar: panda -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="120dp"
+    android:height="120dp"
+    android:viewportWidth="120"
+    android:viewportHeight="120">
+    <path android:fillColor="#E1EEFF" android:pathData="M60,60m-60,0a60,60 0 1,1 120,0a60,60 0 1,1 -120,0" />
+    <!-- ears -->
+    <path android:fillColor="#2B2B2B" android:pathData="M33,37m-13,0a13,13 0 1,1 26,0a13,13 0 1,1 -26,0" />
+    <path android:fillColor="#2B2B2B" android:pathData="M87,37m-13,0a13,13 0 1,1 26,0a13,13 0 1,1 -26,0" />
+    <!-- head -->
+    <path android:fillColor="#FFFFFF" android:strokeColor="#DADADA" android:strokeWidth="1.2" android:pathData="M60,67m-35,0a35,35 0 1,1 70,0a35,35 0 1,1 -70,0" />
+    <!-- eye patches -->
+    <path android:fillColor="#2B2B2B" android:pathData="M45,62m-10,0a10,12 0 1,1 20,0a10,12 0 1,1 -20,0" />
+    <path android:fillColor="#2B2B2B" android:pathData="M75,62m-10,0a10,12 0 1,1 20,0a10,12 0 1,1 -20,0" />
+    <!-- eyes -->
+    <path android:fillColor="#FFFFFF" android:pathData="M46,61m-4,0a4,4 0 1,1 8,0a4,4 0 1,1 -8,0" />
+    <path android:fillColor="#FFFFFF" android:pathData="M74,61m-4,0a4,4 0 1,1 8,0a4,4 0 1,1 -8,0" />
+    <path android:fillColor="#2B2B2B" android:pathData="M46.5,61.5m-2,0a2,2 0 1,1 4,0a2,2 0 1,1 -4,0" />
+    <path android:fillColor="#2B2B2B" android:pathData="M73.5,61.5m-2,0a2,2 0 1,1 4,0a2,2 0 1,1 -4,0" />
+    <!-- nose + mouth -->
+    <path android:fillColor="#2B2B2B" android:pathData="M54,76Q60,72 66,76Q60,83 54,76Z" />
+    <path android:strokeColor="#2B2B2B" android:strokeWidth="1.7" android:strokeLineCap="round" android:fillColor="#00000000" android:pathData="M60,80L60,84M60,84Q55,89 51,85M60,84Q65,89 69,85" />
+</vector>

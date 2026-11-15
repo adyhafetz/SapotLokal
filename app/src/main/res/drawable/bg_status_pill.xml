@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Light pill that sits on a shop photo: dot + Open/Closed (brand design "image-pill"). -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android" android:shape="rectangle">
+    <solid android:color="#F5FAFAFA" />
+    <corners android:radius="8dp" />
+</shape>

@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Avatar: cat -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="120dp"
+    android:height="120dp"
+    android:viewportWidth="120"
+    android:viewportHeight="120">
+    <path android:fillColor="#E1EEFF" android:pathData="M60,60m-60,0a60,60 0 1,1 120,0a60,60 0 1,1 -120,0" />
+    <!-- ears -->
+    <path android:fillColor="#F0A35E" android:pathData="M27,52L29,17L55,37Z" />
+    <path android:fillColor="#F0A35E" android:pathData="M93,52L91,17L65,37Z" />
+    <path android:fillColor="#F6C1B8" android:pathData="M34,43L35,26L48,36Z" />
+    <path android:fillColor="#F6C1B8" android:pathData="M86,43L85,26L72,36Z" />
+    <!-- head -->
+    <path android:fillColor="#F0A35E" android:pathData="M60,68m-35,0a35,35 0 1,1 70,0a35,35 0 1,1 -70,0" />
+    <!-- forehead stripes -->
+    <path android:strokeColor="#D98A43" android:strokeWidth="3" android:strokeLineCap="round" android:pathData="M60,36L60,46M49,38L51,46M71,38L69,46" />
+    <!-- muzzle -->
+    <path android:fillColor="#FBE3C8" android:pathData="M60,80m-13,0a13,9 0 1,1 26,0a13,9 0 1,1 -26,0" />
+    <!-- eyes -->
+    <path android:fillColor="#3B2A2A" android:pathData="M47,66m-4.5,0a4.5,4.5 0 1,1 9,0a4.5,4.5 0 1,1 -9,0" />
+    <path android:fillColor="#3B2A2A" android:pathData="M73,66m-4.5,0a4.5,4.5 0 1,1 9,0a4.5,4.5 0 1,1 -9,0" />
+    <path android:fillColor="#FFFFFF" android:pathData="M48.5,64.5m-1.4,0a1.4,1.4 0 1,1 2.8,0a1.4,1.4 0 1,1 -2.8,0" />
+    <path android:fillColor="#FFFFFF" android:pathData="M74.5,64.5m-1.4,0a1.4,1.4 0 1,1 2.8,0a1.4,1.4 0 1,1 -2.8,0" />
+    <!-- nose + mouth -->
+    <path android:fillColor="#E58A8A" android:pathData="M55.5,74L64.5,74L60,79Z" />
+    <path android:strokeColor="#3B2A2A" android:strokeWidth="1.6" android:strokeLineCap="round" android:fillColor="#00000000" android:pathData="M60,79L60,83M60,83Q56,87 52,84M60,83Q64,87 68,84" />
+    <!-- whiskers -->
+    <path android:strokeColor="#8A6A5A" android:strokeWidth="1.3" android:strokeLineCap="round" android:pathData="M37,78L22,75M37,82L22,85M83,78L98,75M83,82L98,85" />
+</vector>

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!--
-        Base SapotLokal theme.
+        Base SapotLokal theme (Figma Make App).
         Parent = Material Components Light NoActionBar.
     -->
     <style name="Theme.SapotLokal" parent="Theme.MaterialComponents.Light.NoActionBar">
@@ -12,14 +12,14 @@
         <item name="colorOnSurface">@color/sapot_text_primary</item>
         <item name="colorOnBackground">@color/sapot_text_primary</item>
 
-        <!-- Brand Primary (Sunny yellow & dark brown ink - NEVER white on yellow) -->
+        <!-- Brand Primary (Cocoa Brown & Soft White) -->
         <item name="colorPrimary">@color/sapot_primary</item>
-        <item name="colorPrimaryVariant">@color/sapot_primary</item>
+        <item name="colorPrimaryVariant">@color/colorPrimaryVariant</item>
         <item name="colorOnPrimary">@color/sapot_on_primary</item>
 
-        <!-- Secondary & Accents -->
-        <item name="colorSecondary">@color/sapot_accent_subtle</item>
-        <item name="colorSecondaryVariant">@color/sapot_accent_subtle</item>
+        <!-- Secondary & Accents (Soft Blue) -->
+        <item name="colorSecondary">@color/sapot_blue</item>
+        <item name="colorSecondaryVariant">@color/sapot_blue_dark</item>
         <item name="colorOnSecondary">@color/sapot_text_primary</item>
 
         <!-- Feedback & Outlines -->
@@ -34,19 +34,42 @@
         <item name="android:windowLightNavigationBar">true</item>
 
         <!-- Default App Typography -->
-        <item name="fontFamily">@font/inter</item>
-        <item name="android:fontFamily">@font/inter</item>
+        <item name="fontFamily">@font/dm_sans</item>
+        <item name="android:fontFamily">@font/dm_sans</item>
 
         <!-- Default Component Styles -->
         <item name="materialButtonStyle">@style/Widget.SapotLokal.Button.Primary</item>
         <item name="materialCardViewStyle">@style/Widget.SapotLokal.Card</item>
         <item name="textInputStyle">@style/Widget.SapotLokal.TextInputLayout</item>
     </style>
+    <!-- Customer app (Hadiah Utama): white ground, ink text, one orange for actions, Figtree. -->
+    <style name="Theme.SapotLokal.Customer" parent="Theme.SapotLokal">
+        <item name="android:windowBackground">@color/hu_bg</item>
+        <item name="android:colorBackground">@color/hu_bg</item>
+        <item name="colorSurface">@color/hu_bg</item>
+        <item name="colorOnSurface">@color/hu_ink</item>
+        <item name="colorOnBackground">@color/hu_ink</item>
+        <item name="colorPrimary">@color/hu_accent</item>
+        <item name="colorPrimaryVariant">@color/hu_accent_text</item>
+        <item name="colorOnPrimary">@color/hu_ink</item>
+        <item name="colorSecondary">@color/hu_accent</item>
+        <item name="colorOnSecondary">@color/hu_ink</item>
+        <item name="colorOutline">@color/hu_line</item>
+        <item name="colorControlActivated">@color/hu_accent</item>
+        <item name="android:statusBarColor">@color/hu_bg</item>
+        <item name="android:windowLightStatusBar">true</item>
+        <item name="android:navigationBarColor">@color/hu_bg</item>
+        <item name="fontFamily">@font/figtree_medium</item>
+        <item name="android:fontFamily">@font/figtree_medium</item>
+        <item name="materialButtonStyle">@style/Widget.HU.Button</item>
+        <item name="materialButtonOutlinedStyle">@style/Widget.HU.Button.Outlined</item>
+    </style>
 
-    <!-- Splash theme — full-screen background, no status bar chrome -->
+    <!-- Splash theme — clean canvas background -->
     <style name="Theme.SapotLokal.Splash" parent="Theme.SapotLokal">
         <item name="android:windowBackground">@color/splashBackground</item>
-        <item name="android:windowFullscreen">true</item>
+        <item name="android:windowFullscreen">false</item>
         <item name="android:statusBarColor">@color/splashBackground</item>
+        <item name="android:windowLightStatusBar">true</item>
     </style>
 </resources>

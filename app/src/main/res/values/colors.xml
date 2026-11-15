@@ -1,26 +1,33 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- ── SapotLokal Design System Tokens ──────────────────────────────── -->
+    <!-- ── SapotLokal Design System Tokens (Figma Make App) ────────────── -->
     <!-- Surfaces & Canvas -->
-    <color name="sapot_canvas">#F6F1E9</color>             <!-- Warm cream page background -->
-    <color name="sapot_surface">#FFFFFF</color>            <!-- Pure white for cards -->
+    <color name="sapot_canvas">#FAFAFA</color>             <!-- Crisp clean canvas background -->
+    <color name="sapot_surface">#FFFFFF</color>            <!-- White card surface -->
+    <color name="sapot_surface_soft">#F0F4F7</color>       <!-- Soft subtle container -->
+    <color name="sapot_surface_subtle">#F3F4F4</color>     <!-- Subtle neutral background -->
 
-    <!-- Primary Brand (Sunny yellow & dark brown ink — NEVER white on yellow) -->
-    <color name="sapot_primary">#FFD93D</color>            <!-- Sunny yellow -->
-    <color name="sapot_on_primary">#4F200D</color>         <!-- Dark brown ink -->
+    <!-- Brand Identity: Cocoa Ink & Soft Blue Accent -->
+    <color name="sapot_primary">#543A3A</color>            <!-- Cocoa Brown Primary Brand -->
+    <color name="sapot_on_primary">#FAFAFA</color>         <!-- Canvas text on Cocoa -->
 
-    <!-- Typography & Neutral Ink -->
-    <color name="sapot_text_primary">#4F200D</color>       <!-- Dark brown primary text -->
-    <color name="sapot_text_secondary">#78665A</color>     <!-- Muted warm gray secondary text -->
-    <color name="sapot_border">#E7DED3</color>             <!-- Subtle beige border/divider -->
+    <color name="sapot_blue">#E1EEFF</color>               <!-- Iconic Soft Blue container -->
+    <color name="sapot_blue_border">#DBE6F4</color>        <!-- Soft Blue card border -->
+    <color name="sapot_blue_dark">#C7DBF6</color>          <!-- Progress & border accent -->
+    <color name="sapot_neutral">#C2CFD8</color>            <!-- Neutral border & outline -->
+
+    <!-- Typography & Ink -->
+    <color name="sapot_text_primary">#543A3A</color>       <!-- Primary cocoa text -->
+    <color name="sapot_text_secondary">#91888A</color>     <!-- Muted secondary text -->
+    <color name="sapot_border">#E8E8E7</color>             <!-- Subtle line / divider -->
 
     <!-- Interactive / Disabled States -->
-    <color name="sapot_disabled_surface">#E9E2D8</color>
-    <color name="sapot_disabled_text">#8C7B6D</color>
+    <color name="sapot_disabled_surface">#ECEEEE</color>
+    <color name="sapot_disabled_text">#A6AAAA</color>
 
     <!-- Accent Highlights & Ripple -->
-    <color name="sapot_accent_subtle">#FFF0AB</color>      <!-- Soft yellow reward highlight -->
-    <color name="sapot_ripple">#204F200D</color>          <!-- Soft warm brown ripple -->
+    <color name="sapot_accent_subtle">#E1EEFF</color>      <!-- Soft blue reward highlight -->
+    <color name="sapot_ripple">#1A543A3A</color>           <!-- Soft cocoa ripple -->
 
     <!-- Semantic Feedback -->
     <color name="sapot_success_text">#256347</color>
@@ -29,16 +36,42 @@
     <color name="sapot_error_bg">#FCEBE7</color>
     <color name="sapot_info_text">#355B78</color>
     <color name="sapot_info_bg">#E8EFF4</color>
-    <color name="status_open">#10B981</color>
-    <color name="status_closed">#EF4444</color>
+    <color name="status_open">#543A3A</color>              <!-- Design uses brown active dot -->
+    <color name="status_open_dot">#543A3A</color>
+    <color name="status_closed">#A7ACAF</color>
+    <color name="status_closed_text">#7B7274</color>
+
+    <!-- ── Hadiah Utama (customer app world) ────────────────────────────── -->
+    <color name="hu_bg">#FFFFFF</color>               <!-- Page ground -->
+    <color name="hu_ink">#1A1C21</color>              <!-- All main text -->
+    <color name="hu_soft">#5A606B</color>             <!-- Secondary text (6.4:1 on white) -->
+    <color name="hu_mute">#9AA0AA</color>             <!-- Ticks, dividers, idle icons only — never text -->
+    <color name="hu_line">#ECEEF2</color>             <!-- Hairlines and borders -->
+    <color name="hu_fill">#F4F5F7</color>             <!-- Quiet fills: search, chips, tracks -->
+    <color name="hu_accent">#F5A524</color>           <!-- Actions only: Claim, active tab, progress -->
+    <color name="hu_accent_text">#8A5700</color>      <!-- Orange as text (6.0:1 on white) -->
+    <color name="hu_accent_tint">#FFF3DA</color>      <!-- Pale orange wash -->
+    <color name="hu_ok">#13734A</color>               <!-- Open now / success text -->
+    <color name="hu_ok_tint">#E3F6EC</color>
+    <color name="hu_danger">#B3261E</color>
+    <color name="hu_ripple">#1F1A1C21</color>
+    <!-- Shop colours: assigned per shop, fixed forever. Text colour chosen per hue for contrast. -->
+    <color name="hu_shop_pink">#E0436A</color>
+    <color name="hu_shop_indigo">#4B4FC4</color>
+    <color name="hu_shop_purple">#7B4FD6</color>
+    <color name="hu_shop_green">#1A9E63</color>
+    <color name="hu_shop_blue">#2F6FDE</color>
+    <color name="hu_shop_teal">#0F8C8C</color>
+    <color name="hu_shop_berry">#A9367F</color>
+    <color name="hu_shop_coral">#E86A4A</color>
 
     <!-- ── Compatibility / Legacy Color Aliases ─────────────────────────── -->
     <color name="colorPrimary">@color/sapot_primary</color>
-    <color name="colorPrimaryVariant">#E0A800</color>
+    <color name="colorPrimaryVariant">#3F2B2B</color>
     <color name="colorOnPrimary">@color/sapot_on_primary</color>
 
-    <color name="colorSecondary">@color/sapot_accent_subtle</color>
-    <color name="colorSecondaryVariant">#FFD93D</color>
+    <color name="colorSecondary">@color/sapot_blue</color>
+    <color name="colorSecondaryVariant">@color/sapot_blue_dark</color>
     <color name="colorOnSecondary">@color/sapot_text_primary</color>
 
     <color name="colorBackground">@color/sapot_canvas</color>
@@ -49,32 +82,34 @@
     <color name="colorOnError">#FFFFFF</color>
 
     <!-- Splash background -->
-    <color name="splashBackground">#FF6B2C</color>
+    <color name="splashBackground">@color/sapot_canvas</color>
 
-    <!-- Legacy Sapot Aliases -->
+    <!-- Legacy Sapot Aliases mapped to new design -->
     <color name="sapot_bg">@color/sapot_canvas</color>
-    <color name="sapot_primary_yellow">@color/sapot_primary</color>
-    <color name="sapot_primary_light">@color/sapot_accent_subtle</color>
-    <color name="sapot_badge_bg">#EEE6DA</color>
+    <color name="sapot_primary_yellow">@color/sapot_blue</color>
+    <color name="sapot_primary_light">@color/sapot_blue</color>
+    <color name="sapot_badge_bg">@color/sapot_blue</color>
     <color name="sapot_divider">@color/sapot_border</color>
     <color name="sapot_white">@color/sapot_surface</color>
 
     <!-- Shop Category Badges -->
-    <color name="sapot_cat_bakery">#F8E3B9</color>
-    <color name="sapot_cat_food">#DCE6CF</color>
-    <color name="sapot_cat_coffee">#E9D8C2</color>
+    <color name="sapot_cat_bakery">#F0F4F7</color>
+    <color name="sapot_cat_food">#F0F4F7</color>
+    <color name="sapot_cat_coffee">#E1EEFF</color>
 
     <!-- Mini-Games -->
-    <color name="game_wheel_segment_1">#FF8A65</color>
-    <color name="game_wheel_segment_2">#FFD54F</color>
-    <color name="game_wheel_segment_3">#81C784</color>
-    <color name="game_wheel_segment_4">#64B5F6</color>
-    <color name="game_wheel_hub">#FFFFFF</color>
-    <color name="game_wheel_label">#000000</color>
-    <color name="game_card_back">#64B5F6</color>
-    <color name="game_card_back_text">#FFFFFF</color>
+    <color name="game_wheel_segment_1">#E1EEFF</color>
+    <color name="game_wheel_segment_2">#F6F8FA</color>
+    <color name="game_wheel_segment_3">#E1EEFF</color>
+    <color name="game_wheel_segment_4">#F6F8FA</color>
+    <color name="game_wheel_hub">#FAFAFA</color>
+    <color name="game_wheel_label">#543A3A</color>
+    <color name="game_card_back">#543A3A</color>
+    <color name="game_card_back_text">#E1EEFF</color>
     <color name="game_card_front">#FFFFFF</color>
-    <color name="game_card_front_stroke">#64B5F6</color>
-    <color name="game_card_front_text">#000000</color>
-    <color name="game_card_matched">#C8E6C9</color>
+    <color name="game_card_front_stroke">#C2CFD8</color>
+    <color name="game_card_front_text">#543A3A</color>
+    <color name="game_card_matched">#E4F3E8</color>
+    <color name="game_card_matched_stroke">#7BB88F</color>
+    <color name="game_gold">#F2C14E</color>
 </resources>

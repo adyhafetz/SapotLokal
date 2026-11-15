@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Marks that SapotApp already attached its safe-area (insets) listener to a screen. -->
+    <item name="sapot_insets_applied" type="id" />
+</resources>
