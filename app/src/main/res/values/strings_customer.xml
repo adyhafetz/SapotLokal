@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="challenges_this_week">This week</string>
     <string name="customer_bottom_nav_home">Home</string>
     <string name="customer_bottom_nav_play">Play</string>
     <string name="customer_bottom_nav_profile">Profile</string>
@@ -8,7 +7,6 @@
     <string name="customer_bottom_nav_scan">Scan</string>
     <string name="customer_bottom_nav_shops">Shops</string>
     <string name="customer_home_games">Games</string>
-    <string name="customer_home_leaderboard_2">Leaderboard</string>
     <string name="customer_profile_badges">Badges</string>
     <string name="customer_profile_change_password">Change password</string>
     <string name="customer_profile_delete_account">Delete account</string>
@@ -132,7 +130,6 @@
     <string name="k_enough_to_claim">✓ You have enough points to claim this</string>
     <string name="k_enter_your_name">Enter your name</string>
     <string name="k_error_loading_shop">Could not load shop: %1$s</string>
-    <string name="k_error_rankings">Could not load rankings: %1$s</string>
     <string name="k_expired">Expired</string>
     <string name="k_expires_on">Expires %1$s</string>
     <string name="k_hours_not_specified">Hours not specified</string>
@@ -142,7 +139,6 @@
     <string name="k_member_since">Member since %1$s</string>
     <string name="k_n_more_to_unlock">%1$d more points to unlock</string>
     <string name="k_n_points">%1$d points</string>
-    <string name="k_n_pts_lb">%1$s XP</string>
     <string name="k_n_pts_required">%1$d points</string>
     <string name="k_name_empty">Name cannot be empty</string>
     <string name="k_need_more_pts">Need %1$d more points</string>
@@ -173,16 +169,9 @@
     <string name="k_sign_out_confirm">Are you sure you want to log out of SapotLokal?</string>
     <string name="k_spin_left_today">1 spin left today</string>
     <string name="k_terms_heading">Terms &amp; conditions</string>
-    <string name="k_top50_not_reached">%1$s · Top 50 not reached yet</string>
-    <string name="k_unclaimed">Unclaimed</string>
     <string name="k_valid_30_after_claim">Valid 30 days after you claim</string>
     <string name="k_valid_until">Valid until %1$s</string>
     <string name="k_view_shop">View shop</string>
-    <string name="k_you">You</string>
-    <string name="k_you_name">%1$s (You) %2$s</string>
-    <string name="k_you_tier_rank">%1$s · Ranked #%2$d</string>
-    <string name="leaderboard_all_time">All time</string>
-    <string name="leaderboard_no_points_yet_this">No points yet this week.</string>
     <string name="memory_match_new_game">New game</string>
     <string name="nav_tab_selected_cd">%1$s, selected</string>
     <string name="pts_label_long">points</string>
@@ -253,4 +242,14 @@
     <string name="badge_cd_earned">%1$s, earned</string>
     <string name="badge_cd_locked">%1$s, locked</string>
     <string name="games_memory_xp_wins">Played today: %1$d of %2$d XP wins</string>
+    <string name="lb_empty">No visits yet this week. Scan a shop to get on the board.</string>
+    <string name="lb_you">You</string>
+    <string name="lb_no_visits">No visits yet</string>
+    <string name="lb_row_cd">%1$s, place %2$d, %3$s</string>
+    <string name="lb_prize_last_week">You came #%1$d last week</string>
+    <string name="lb_prize_week">You came #%1$d in week %2$d</string>
+    <plurals name="lb_visits">
+        <item quantity="one">%1$d visit</item>
+        <item quantity="other">%1$d visits</item>
+    </plurals>
 </resources>

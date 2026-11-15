@@ -63,6 +63,7 @@ class ChallengesActivity : AppCompatActivity() {
     override fun onResume() {
         super.onResume()
         val uid = auth.currentUser?.uid ?: return
+        PrizeCard.bind(this, binding.prizeSlot, uid)
         GamesRepository.fetchStatus(uid) { status ->
             if (isFinishing || isDestroyed) return@fetchStatus
             if (status == null) {

@@ -37,10 +37,6 @@
           // Highest rank the customer has been shown a rank-up sheet for. Never goes down.
           ".validate": "newData.isNumber() && newData.val() >= 1 && newData.val() <= 5 && (!data.exists() || newData.val() >= data.val())"
         },
-        "lifetimePoints": {
-          // OLD — nothing writes it any more; removed in Phase 8 with the all-time leaderboard.
-          ".validate": "newData.isNumber() && newData.val() >= 0 && (!data.exists() || (newData.val() >= data.val() && newData.val() <= data.val() + 500))"
-        },
         "avatar": {
           ".validate": "newData.isString() && (newData.val() === '' || newData.val() === 'cat' || newData.val() === 'dog' || newData.val() === 'panda' || newData.val() === 'brown_bear' || newData.val() === 'capybara')"
         }
@@ -81,8 +77,8 @@
 
     "points": {
       // SHOP POINTS ledger. Append-only: rows are created, never edited or deleted.
-      // OLD — Phase 8 narrows .read once the leaderboard reads /weeklyVisits instead.
-      ".read": "auth != null",
+      // Your own rows; a shop owner reads their shop's rows, and a customer's rows to check a balance when redeeming.
+      ".read": "auth != null && ((query.orderByChild === 'userID' && query.equalTo === auth.uid) || (query.orderByChild === 'vendorID' && root.child('vendors/' + query.equalTo + '/userID').val() === auth.uid) || (query.orderByChild === 'userID' && root.child('users/' + auth.uid + '/role').val() === 'vendor'))",
       ".indexOn": ["userID", "vendorID"],
       "$pointID": {
         //  A) Customer, shop visit: a real shop, at most that shop's pointsPerVisit × 3 (the top rank bonus).

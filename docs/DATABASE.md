@@ -26,7 +26,6 @@ There are two currencies, and they never mix:
 | `games` | push id | one row per game played: `userID, gameType, gameAttempt, gameXpRewarded, gameDay, gamePlayedAt` | the customer |
 | `shopNotifications` | push id | "shop is open" announcements for the push Cloud Function | the owner |
 
-**Still present until their phase replaces them:** `users/*/lifetimePoints` and `currentTier` (Phase 8; nothing writes them, only the old all-time leaderboard reads them). The rules mark each of these as OLD.
 
 ## Keys and formats
 

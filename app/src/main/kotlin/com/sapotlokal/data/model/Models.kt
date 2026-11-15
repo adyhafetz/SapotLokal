@@ -2,7 +2,6 @@ package com.sapotlokal.data.model
 
 import com.google.firebase.database.PropertyName
 import com.sapotlokal.AppConfig
-import com.sapotlokal.AppConfig.CustomerTier
 
 /**
  * Data classes mirroring the SapotLokal ERD entities.
@@ -28,8 +27,6 @@ data class User(
     val userName: String = "",
     val userEmail: String = "",
     val role: String = "",           // "customer" or "vendor"
-    val lifetimePoints: Int = 0,
-    val currentTier: String = CustomerTier.FRESHIE.code,
     val avatar: String = "",         // optional profile avatar id (see AvatarDef); empty = none
     val xp: Int = 0,                 // customers only; never decreases (REFRACTOR.md §4)
     val rank: Int = 1                // 1–5, cached from xp for the leaderboard and display
@@ -100,18 +97,6 @@ data class Point(
     val timestamp: Long = 0L,
     val basePoints: Int = 0,            // shop_visit: the shop's points per visit at the time
     val rankBonus: Double = 1.0         // shop_visit: the customer's rank bonus at the time
-)
-
-/**
- * Represents a ranked user entry on the community leaderboard.
- */
-data class LeaderboardMember(
-    val userId: String = "",
-    val userName: String = "",
-    val points: Int = 0,
-    val currentTier: String = CustomerTier.FRESHIE.code,
-    val rank: Int = 0,
-    val avatar: String = ""
 )
 
 
@@ -220,7 +205,5 @@ fun User.toSignUpMap(): Map<String, Any> = mapOf(
     "userID" to userID,
     "userName" to userName,
     "userEmail" to userEmail,
-    "role" to role,
-    "lifetimePoints" to lifetimePoints,
-    "currentTier" to currentTier
+    "role" to role
 )

@@ -132,38 +132,6 @@ object AppConfig {
      */
     const val VOUCHER_EXPIRY_DAYS: Int = 30
 
-    // ── OLD tiers — removed in Phase 8 ───────────────────────────────────────
-    // Only the old all-time leaderboard still reads lifetimePoints with this; nothing writes it any
-    // more. Ranks for customers come from Rank (above), never from this.
-
-    /**
-     * Customer loyalty tiers based on Lifetime Accumulated Points.
-     * Separated from spendable points balance (which decreases upon voucher redemption).
-     */
-    enum class CustomerTier(
-        val code: String,
-        val title: String,
-        val emoji: String,
-        val minPoints: Int,
-        val maxPoints: Int,
-        val multiplier: Double
-    ) {
-        FRESHIE("freshie", "Freshie", "🔰", 0, 199, 1.0),
-        STEADY_BUYER("steady_buyer", "Steady Buyer", "🛒", 200, 599, 1.0),
-        TREND_SETTER("trend_setter", "Trend Setter", "🔥", 600, 1499, 1.2),
-        OTAI_LOKAL("otai_lokal", "Otai Lokal", "👑", 1500, 2499, 1.5),
-        SAPOT_GOAT("sapot_goat", "Sapot GOAT", "🐐", 2500, Int.MAX_VALUE, 2.0);
-
-        val nextTier: CustomerTier?
-            get() = entries.getOrNull(ordinal + 1)
-
-        companion object {
-            fun fromLifetimePoints(points: Int): CustomerTier {
-                return entries.lastOrNull { points >= it.minPoints } ?: FRESHIE
-            }
-        }
-    }
-
     // ── Spin the Wheel daily limit ─────────────────────────────────────────────
 
     /**

@@ -31,16 +31,6 @@ const RANKS = [
 const rankFor = (xp) => RANKS.filter((r) => xp >= r.minXp).pop();
 const shopPoints = (rate, rank) => Math.floor(rate * rank.bonus + 0.5); // AppConfig.shopPointsForVisit
 
-// OLD — remove in Phase 4 with users/*/lifetimePoints: the old tier ladder, so today's screens still read something sensible.
-const OLD_TIERS = [
-  { code: "freshie", min: 0 },
-  { code: "steady_buyer", min: 200 },
-  { code: "trend_setter", min: 600 },
-  { code: "otai_lokal", min: 1500 },
-  { code: "sapot_goat", min: 2500 },
-];
-const oldTierFor = (points) => OLD_TIERS.filter((t) => points >= t.min).pop().code;
-
 // ISO week key in Malaysia time, e.g. "2026-W46" (same as MissionDateUtils.getWeekYearKey).
 function weekKey(ms) {
   const d = new Date(ms + KL_OFFSET);
@@ -234,9 +224,6 @@ async function main() {
       role: "customer",
       xp: c.xp,
       rank: rank.level,
-      // OLD — remove in Phase 4 together with the screens that still read them.
-      lifetimePoints: c.xp,
-      currentTier: oldTierFor(c.xp),
       ...(c.avatar ? { avatar: c.avatar } : {}),
     };
     updates[`userStats/${uid}`] = { totalVisits, shopsVisited, weeksAllMissions: 0, vouchersUsed, lastVisitAt };

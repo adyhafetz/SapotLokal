@@ -56,6 +56,14 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dp" />
 
+            <!-- Unclaimed weekly top-3 prize (PrizeCard) -->
+            <FrameLayout
+                android:id="@+id/prizeSlot"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="14dp"
+                android:visibility="gone" />
+
             <!-- Missions (own screen) -->
             <LinearLayout
                 android:id="@+id/rowMissions"

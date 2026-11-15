@@ -96,6 +96,14 @@
                 android:gravity="center_vertical"
                 android:text="@string/hu_how_points_work" />
 
+            <!-- Unclaimed weekly top-3 prize (PrizeCard) -->
+            <FrameLayout
+                android:id="@+id/prizeSlot"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:visibility="gone" />
+
             <!-- The one big reward card (or first-scan card) -->
             <FrameLayout
                 android:id="@+id/readySlot"

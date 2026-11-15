@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="challenges_this_week">Minggu ini</string>
     <string name="customer_bottom_nav_home">Utama</string>
     <string name="customer_bottom_nav_play">Main</string>
     <string name="customer_bottom_nav_profile">Profil</string>
@@ -8,7 +7,6 @@
     <string name="customer_bottom_nav_scan">Imbas</string>
     <string name="customer_bottom_nav_shops">Kedai</string>
     <string name="customer_home_games">Permainan</string>
-    <string name="customer_home_leaderboard_2">Papan pendahulu</string>
     <string name="customer_profile_badges">Lencana</string>
     <string name="customer_profile_change_password">Tukar kata laluan</string>
     <string name="customer_profile_delete_account">Padam akaun</string>
@@ -132,7 +130,6 @@
     <string name="k_enough_to_claim">✓ Anda mempunyai mata yang cukup untuk menuntut ini</string>
     <string name="k_enter_your_name">Masukkan nama anda</string>
     <string name="k_error_loading_shop">Tidak dapat memuatkan kedai: %1$s</string>
-    <string name="k_error_rankings">Tidak dapat memuatkan kedudukan: %1$s</string>
     <string name="k_expired">Tamat tempoh</string>
     <string name="k_expires_on">Tamat %1$s</string>
     <string name="k_hours_not_specified">Waktu operasi tidak dinyatakan</string>
@@ -142,7 +139,6 @@
     <string name="k_member_since">Ahli sejak %1$s</string>
     <string name="k_n_more_to_unlock">%1$d mata lagi untuk dibuka</string>
     <string name="k_n_points">%1$d mata</string>
-    <string name="k_n_pts_lb">%1$s XP</string>
     <string name="k_n_pts_required">%1$d mata</string>
     <string name="k_name_empty">Nama tidak boleh kosong</string>
     <string name="k_need_more_pts">Perlu %1$d mata lagi</string>
@@ -173,16 +169,9 @@
     <string name="k_sign_out_confirm">Adakah anda pasti mahu log keluar daripada SapotLokal?</string>
     <string name="k_spin_left_today">1 putaran lagi hari ini</string>
     <string name="k_terms_heading">Terma &amp; syarat</string>
-    <string name="k_top50_not_reached">%1$s · Belum mencapai 50 teratas</string>
-    <string name="k_unclaimed">Belum dituntut</string>
     <string name="k_valid_30_after_claim">Sah 30 hari selepas anda menuntut</string>
     <string name="k_valid_until">Sah sehingga %1$s</string>
     <string name="k_view_shop">Lihat kedai</string>
-    <string name="k_you">Anda</string>
-    <string name="k_you_name">%1$s (Anda) %2$s</string>
-    <string name="k_you_tier_rank">%1$s · Kedudukan #%2$d</string>
-    <string name="leaderboard_all_time">Sepanjang masa</string>
-    <string name="leaderboard_no_points_yet_this">Belum ada mata minggu ini.</string>
     <string name="memory_match_new_game">Permainan baharu</string>
     <string name="nav_tab_selected_cd">%1$s, dipilih</string>
     <string name="pts_label_long">mata</string>
@@ -253,4 +242,13 @@
     <string name="badge_cd_earned">%1$s, diperoleh</string>
     <string name="badge_cd_locked">%1$s, terkunci</string>
     <string name="games_memory_xp_wins">Dimainkan hari ini: %1$d daripada %2$d kemenangan XP</string>
+    <string name="lb_empty">Belum ada lawatan minggu ini. Imbas kedai untuk masuk papan.</string>
+    <string name="lb_you">Anda</string>
+    <string name="lb_no_visits">Belum ada lawatan</string>
+    <string name="lb_row_cd">%1$s, tempat %2$d, %3$s</string>
+    <string name="lb_prize_last_week">Anda tempat #%1$d minggu lepas</string>
+    <string name="lb_prize_week">Anda tempat #%1$d pada minggu %2$d</string>
+    <plurals name="lb_visits">
+        <item quantity="other">%1$d lawatan</item>
+    </plurals>
 </resources>

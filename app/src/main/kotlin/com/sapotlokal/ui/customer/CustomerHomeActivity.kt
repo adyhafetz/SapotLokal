@@ -360,6 +360,7 @@ class CustomerHomeActivity : AppCompatActivity() {
         startListeningToVendors()
         val uid = auth.currentUser?.uid ?: return
         startMissionPreview(uid)
+        PrizeCard.bind(this, binding.prizeSlot, uid)
         startRewardListeners(uid)
         if (pointsListener == null) startListeningToPoints(uid)
         if (userListener == null) startListeningToUser(uid)
