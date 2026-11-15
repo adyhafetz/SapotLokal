@@ -12,8 +12,10 @@ captures/
 .cxx/
 
 # Secrets and signing (never commit these)
-google-services.json       # Real Firebase config — get from Firebase console
-app/google-services.json   # Belt-and-suspenders duplicate of the above
+# Real Firebase config — get it from the Firebase console.
+# (Git has no inline comments, so the patterns sit on their own lines.)
+google-services.json
+app/google-services.json
 *.jks
 *.keystore
 *.env
@@ -29,3 +31,9 @@ lint/
 # OS junk
 .DS_Store
 Thumbs.db
+# Local AI-agent tooling (installed skills, per-machine settings)
+.agent/
+.gemini/
+.claude/skills/
+.claude/settings.local.json
+.impeccable/config.local.json
