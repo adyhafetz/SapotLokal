@@ -27,8 +27,12 @@ object BadgeDialogHelper {
         dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
 
         binding.ivBadgeIcon.setImageResource(badge.iconRes)
+        // Glow in the badge's own colour.
+        binding.ivBadgeGlow.background = com.sapotlokal.ui.customer.BadgeStyle.halo(
+            activity, com.sapotlokal.ui.customer.BadgeStyle.accent(badge), 170
+        )
         binding.tvBadgeTitle.text = badge.title
-        binding.tvBadgeDescription.text = badge.description
+        binding.tvBadgeDescription.text = ContentText.badgeDescription(activity, badge)
 
         val bounceAnim = AnimationUtils.loadAnimation(activity, R.anim.badge_bounce)
         binding.ivBadgeIcon.startAnimation(bounceAnim)
@@ -43,6 +47,7 @@ object BadgeDialogHelper {
         }
 
         dialog.show()
+        binding.confetti.post { binding.confetti.burst(0.3f) }
         return dialog
     }
 }

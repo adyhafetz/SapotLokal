@@ -72,6 +72,24 @@ object MissionDateUtils {
     }
 
 
+    /** Same as [formatTimeRemaining] below, but worded in the language the customer chose. */
+    fun formatTimeRemaining(
+        context: android.content.Context,
+        expiresAt: Long,
+        nowMillis: Long = System.currentTimeMillis()
+    ): String {
+        val diff = expiresAt - nowMillis
+        return when {
+            diff <= 0L -> context.getString(com.sapotlokal.R.string.time_expired)
+            diff >= 2 * 86_400_000L -> context.getString(com.sapotlokal.R.string.time_days_left, (diff / 86_400_000L).toInt())
+            diff >= 86_400_000L -> context.getString(com.sapotlokal.R.string.time_one_day_left)
+            diff >= 2 * 3_600_000L -> context.getString(com.sapotlokal.R.string.time_hours_left, (diff / 3_600_000L).toInt())
+            diff >= 3_600_000L -> context.getString(com.sapotlokal.R.string.time_one_hour_left)
+            diff >= 2 * 60_000L -> context.getString(com.sapotlokal.R.string.time_mins_left, (diff / 60_000L).toInt())
+            else -> context.getString(com.sapotlokal.R.string.time_ending_soon)
+        }
+    }
+
     /**
      * Formats the remaining time until expiration into a human-readable string.
      * e.g. "3 days left", "1 day left", "5 hours left", "Ending soon".
