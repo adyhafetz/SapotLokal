@@ -64,11 +64,11 @@ class ShopVoucherAdapter(
             val context = binding.root.context
             if (customerPoints >= voucher.pointsRequired) {
                 binding.tvEligibility.text = "✓ " + binding.root.context.getString(com.sapotlokal.R.string.k_ready_to_claim)
-                binding.tvEligibility.setTextColor(ContextCompat.getColor(context, R.color.sapot_success_text))
+                binding.tvEligibility.setTextColor(ContextCompat.getColor(context, R.color.hu_ok))
             } else {
                 val needed = voucher.pointsRequired - customerPoints
                 binding.tvEligibility.text = binding.root.context.getString(com.sapotlokal.R.string.k_need_more_pts, needed)
-                binding.tvEligibility.setTextColor(ContextCompat.getColor(context, R.color.sapot_text_secondary))
+                binding.tvEligibility.setTextColor(ContextCompat.getColor(context, R.color.hu_soft))
             }
         }
     }

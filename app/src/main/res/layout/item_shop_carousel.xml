@@ -2,7 +2,7 @@
 <!-- One shop in the "Open now" carousel on the customer home screen. -->
 <com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    style="@style/Widget.SapotLokal.Card.Flat"
+    style="@style/Widget.HU.Card"
     app:cardBackgroundColor="@color/hu_bg"
     app:strokeColor="@color/hu_line"
     app:strokeWidth="1dp"

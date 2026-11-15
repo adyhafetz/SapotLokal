@@ -1,5 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string name="owner_nav_home">Home</string>
+    <string name="owner_nav_rewards">Rewards</string>
+    <string name="owner_nav_show_qr">Show QR</string>
+    <string name="owner_nav_redeem">Redeem</string>
+    <string name="owner_nav_shop">Shop</string>
     <string name="add_edit_rule_customers_earn_it_by">Customers earn it by collecting points at your shop.</string>
     <string name="add_edit_rule_description_terms">Description / Terms</string>
     <string name="add_edit_rule_points_required">Points required</string>
@@ -34,15 +39,15 @@
     <string name="kv_give">Give: %1$s</string>
     <string name="kv_guest">Guest</string>
     <string name="kv_hours_n">Hours: %1$s</string>
-    <string name="kv_minus_pts">-%1$d pts</string>
+    <string name="kv_minus_pts">-%1$d points</string>
     <string name="kv_network_error">network error</string>
     <string name="kv_no_internet">No internet connection. Please reconnect and try again.</string>
     <string name="kv_no_visits_today">No visits yet today</string>
     <string name="kv_not_set">Not set</string>
     <string name="kv_photo_failed">Could not save the photo. Check your connection.</string>
     <string name="kv_photo_saved">Photo saved</string>
-    <string name="kv_plus_pts">+%1$d pts</string>
-    <string name="kv_pts_required">%1$d pts required</string>
+    <string name="kv_plus_pts">+%1$d points</string>
+    <string name="kv_pts_required">%1$d points required</string>
     <string name="kv_redeem_failed">The redemption could not be saved. Please try again.</string>
     <string name="kv_refreshes_in">Refreshes in %1$ds</string>
     <string name="kv_reward_name_required">Reward name is required</string>
@@ -95,12 +100,9 @@
     <string name="show_qr_walk_in_check_in">Walk-in Check-in QR</string>
     <string name="store_status_closed_desc">Closed to customers</string>
     <string name="store_status_open_desc">Open for customers</string>
-    <string name="vendor_bottom_nav_shop_profile">Shop profile</string>
-    <string name="vendor_bottom_nav_vouchers">Vouchers</string>
     <string name="vendor_home_generating">Generating…</string>
     <string name="vendor_home_open">Open</string>
     <string name="vendor_home_open_for_customers">Open for customers</string>
-    <string name="vendor_home_overview">Overview</string>
     <string name="vendor_home_points_given">Points given</string>
     <string name="vendor_home_refresh">Refresh</string>
     <string name="vendor_home_shop_qr_code">Shop QR code</string>

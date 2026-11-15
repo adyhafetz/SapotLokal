@@ -2,7 +2,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/sapot_canvas"
+    android:background="@color/hu_bg"
     android:orientation="vertical">
 
     <androidx.coordinatorlayout.widget.CoordinatorLayout
@@ -12,13 +12,13 @@
     android:layout_width="match_parent"
     android:layout_height="0dp"
     android:layout_weight="1"
-    android:background="@color/sapot_canvas"
+    android:background="@color/hu_bg"
     tools:context=".ui.vendor.RewardRulesActivity">
 
     <com.google.android.material.appbar.AppBarLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/sapot_canvas"
+        android:background="@color/hu_bg"
         app:elevation="0dp">
 
         <com.google.android.material.appbar.MaterialToolbar
@@ -26,8 +26,8 @@
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
             app:title="@string/customer_bottom_nav_vouchers"
-            app:titleTextAppearance="@style/TextAppearance.SapotLokal.PageTitle"
-            app:titleTextColor="@color/sapot_text_primary" />
+            app:titleTextAppearance="@style/HU.Text.Screen"
+            app:titleTextColor="@color/hu_ink" />
 
     </com.google.android.material.appbar.AppBarLayout>
 
@@ -58,27 +58,26 @@
                     android:layout_height="32dp"
                     android:layout_gravity="center"
                     android:src="@drawable/ic_gift"
-                    app:tint="@color/sapot_text_primary" />
+                    app:tint="@color/hu_ink" />
             </FrameLayout>
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
-                android:fontFamily="@font/manrope"
+                android:fontFamily="@font/figtree_extrabold"
                 android:text="@string/reward_rules_no_vouchers_yet"
-                android:textColor="@color/sapot_text_primary"
-                android:textSize="18sp"
-                android:textStyle="bold" />
+                android:textColor="@color/hu_ink"
+                android:textSize="18sp" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="6dp"
-                android:fontFamily="@font/dm_sans"
+                android:fontFamily="@font/figtree_medium"
                 android:gravity="center"
                 android:text="@string/reward_rules_tap_to_add_your"
-                android:textColor="@color/sapot_text_secondary"
+                android:textColor="@color/hu_soft"
                 android:textSize="13sp" />
 
         </LinearLayout>
@@ -104,8 +103,8 @@
         android:layout_gravity="bottom|end"
         android:layout_margin="24dp"
         android:contentDescription="Create Voucher"
-        app:backgroundTint="@color/sapot_primary"
-        app:tint="@color/sapot_on_primary"
+        app:backgroundTint="@color/hu_accent"
+        app:tint="@color/hu_ink"
         app:elevation="4dp"
         app:srcCompat="@android:drawable/ic_input_add" />
 

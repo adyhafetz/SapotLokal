@@ -5,7 +5,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/sapot_canvas"
+    android:background="@color/hu_bg"
     android:orientation="vertical"
     tools:context=".ui.vendor.ShopProfileActivity">
 
@@ -25,15 +25,14 @@
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:fontFamily="@font/manrope"
-                android:text="@string/vendor_bottom_nav_shop_profile"
-                android:textColor="@color/sapot_text_primary"
-                android:textSize="26sp"
-                android:textStyle="bold" />
+                android:fontFamily="@font/figtree_extrabold"
+                android:text="@string/owner_nav_shop"
+                android:textColor="@color/hu_ink"
+                android:textSize="26sp" />
 
             <!-- Photo + name -->
             <com.google.android.material.card.MaterialCardView
-                style="@style/Widget.SapotLokal.Card.Flat"
+                style="@style/Widget.HU.Card"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp">
@@ -71,15 +70,15 @@
                                 android:layout_width="36dp"
                                 android:layout_height="36dp"
                                 android:src="@drawable/ic_store"
-                                app:tint="@color/sapot_text_secondary" />
+                                app:tint="@color/hu_soft" />
 
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_marginTop="6dp"
-                                android:fontFamily="@font/dm_sans"
+                                android:fontFamily="@font/figtree_medium"
                                 android:text="@string/shop_profile_add_a_shop_photo"
-                                android:textColor="@color/sapot_text_secondary"
+                                android:textColor="@color/hu_soft"
                                 android:textSize="13sp" />
                         </LinearLayout>
                     </FrameLayout>
@@ -92,35 +91,33 @@
                         android:background="?attr/selectableItemBackground"
                         android:clickable="true"
                         android:focusable="true"
-                        android:fontFamily="@font/dm_sans"
+                        android:fontFamily="@font/figtree_bold"
                         android:padding="8dp"
                         android:text="@string/shop_profile_change_photo"
-                        android:textColor="@color/sapot_primary"
-                        android:textSize="13sp"
-                        android:textStyle="bold" />
+                        android:textColor="@color/hu_accent_text"
+                        android:textSize="13sp" />
 
                     <TextView
                         android:id="@+id/tvProfileName"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="4dp"
-                        android:fontFamily="@font/manrope"
-                        android:textColor="@color/sapot_text_primary"
-                        android:textSize="22sp"
-                        android:textStyle="bold" />
+                        android:fontFamily="@font/figtree_extrabold"
+                        android:textColor="@color/hu_ink"
+                        android:textSize="22sp" />
 
                     <TextView
                         android:id="@+id/tvProfileCategory"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="2dp"
-                        android:fontFamily="@font/dm_sans"
-                        android:textColor="@color/sapot_text_secondary"
+                        android:fontFamily="@font/figtree_medium"
+                        android:textColor="@color/hu_soft"
                         android:textSize="14sp" />
 
                     <com.google.android.material.button.MaterialButton
                         android:id="@+id/btnUpdateProfile"
-                        style="@style/Widget.SapotLokal.Button.Primary"
+                        style="@style/Widget.HU.Button"
                         android:layout_width="match_parent"
                         android:layout_height="52dp"
                         android:layout_marginTop="16dp"
@@ -130,7 +127,7 @@
 
             <!-- Details -->
             <com.google.android.material.card.MaterialCardView
-                style="@style/Widget.SapotLokal.Card.Flat"
+                style="@style/Widget.HU.Card"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="12dp">
@@ -142,7 +139,7 @@
                     android:padding="20dp">
 
                     <TextView
-                        style="@style/TextAppearance.SapotLokal.Caption"
+                        style="@style/HU.Text.Small"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="@string/shop_profile_category" />
@@ -152,13 +149,12 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="2dp"
-                        android:fontFamily="@font/dm_sans"
-                        android:textColor="@color/sapot_text_primary"
-                        android:textSize="15sp"
-                        android:textStyle="bold" />
+                        android:fontFamily="@font/figtree_bold"
+                        android:textColor="@color/hu_ink"
+                        android:textSize="15sp" />
 
                     <TextView
-                        style="@style/TextAppearance.SapotLokal.Caption"
+                        style="@style/HU.Text.Small"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="16dp"
@@ -169,13 +165,12 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="2dp"
-                        android:fontFamily="@font/dm_sans"
-                        android:textColor="@color/sapot_text_primary"
-                        android:textSize="15sp"
-                        android:textStyle="bold" />
+                        android:fontFamily="@font/figtree_bold"
+                        android:textColor="@color/hu_ink"
+                        android:textSize="15sp" />
 
                     <TextView
-                        style="@style/TextAppearance.SapotLokal.Caption"
+                        style="@style/HU.Text.Small"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="16dp"
@@ -186,13 +181,12 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="2dp"
-                        android:fontFamily="@font/dm_sans"
-                        android:textColor="@color/sapot_text_primary"
-                        android:textSize="15sp"
-                        android:textStyle="bold" />
+                        android:fontFamily="@font/figtree_bold"
+                        android:textColor="@color/hu_ink"
+                        android:textSize="15sp" />
 
                     <TextView
-                        style="@style/TextAppearance.SapotLokal.Caption"
+                        style="@style/HU.Text.Small"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="16dp"
@@ -203,16 +197,15 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="2dp"
-                        android:fontFamily="@font/dm_sans"
-                        android:textColor="@color/sapot_text_primary"
-                        android:textSize="15sp"
-                        android:textStyle="bold" />
+                        android:fontFamily="@font/figtree_bold"
+                        android:textColor="@color/hu_ink"
+                        android:textSize="15sp" />
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
             <!-- Account -->
             <com.google.android.material.card.MaterialCardView
-                style="@style/Widget.SapotLokal.Card.Flat"
+                style="@style/Widget.HU.Card"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="12dp"
@@ -230,17 +223,17 @@
                         android:background="?attr/selectableItemBackground"
                         android:clickable="true"
                         android:focusable="true"
-                        android:fontFamily="@font/dm_sans"
+                        android:fontFamily="@font/figtree_medium"
                         android:gravity="center_vertical"
                         android:paddingHorizontal="20dp"
                         android:text="@string/shop_profile_change_password"
-                        android:textColor="@color/sapot_text_primary"
+                        android:textColor="@color/hu_ink"
                         android:textSize="15sp" />
 
                     <View
                         android:layout_width="match_parent"
                         android:layout_height="1dp"
-                        android:background="@color/sapot_border" />
+                        android:background="@color/hu_line" />
 
                     <TextView
                         android:id="@+id/rowLogout"
@@ -249,17 +242,17 @@
                         android:background="?attr/selectableItemBackground"
                         android:clickable="true"
                         android:focusable="true"
-                        android:fontFamily="@font/dm_sans"
+                        android:fontFamily="@font/figtree_medium"
                         android:gravity="center_vertical"
                         android:paddingHorizontal="20dp"
                         android:text="@string/shop_profile_log_out"
-                        android:textColor="@color/sapot_text_primary"
+                        android:textColor="@color/hu_ink"
                         android:textSize="15sp" />
 
                     <View
                         android:layout_width="match_parent"
                         android:layout_height="1dp"
-                        android:background="@color/sapot_border" />
+                        android:background="@color/hu_line" />
 
                     <TextView
                         android:id="@+id/rowDeleteAccount"
@@ -268,18 +261,18 @@
                         android:background="?attr/selectableItemBackground"
                         android:clickable="true"
                         android:focusable="true"
-                        android:fontFamily="@font/dm_sans"
+                        android:fontFamily="@font/figtree_medium"
                         android:gravity="center_vertical"
                         android:paddingHorizontal="20dp"
                         android:text="@string/shop_profile_delete_account"
-                        android:textColor="@color/sapot_error_text"
+                        android:textColor="@color/hu_danger"
                         android:textSize="15sp" />
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
             <!-- Language -->
             <com.google.android.material.card.MaterialCardView
-                style="@style/Widget.SapotLokal.Card.Flat"
+                style="@style/Widget.HU.Card"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="12dp">
@@ -295,11 +288,10 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:fontFamily="@font/manrope"
+                        android:fontFamily="@font/figtree_extrabold"
                         android:text="@string/customer_profile_language"
-                        android:textColor="@color/sapot_text_primary"
-                        android:textSize="15sp"
-                        android:textStyle="bold" />
+                        android:textColor="@color/hu_ink"
+                        android:textSize="15sp" />
 
                     <include
                         android:id="@+id/languageToggle"

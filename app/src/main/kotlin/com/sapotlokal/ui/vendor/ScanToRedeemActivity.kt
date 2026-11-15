@@ -93,7 +93,7 @@ class ScanToRedeemActivity : AppCompatActivity() {
 
         vendorID = intent.getStringExtra(VendorHomeActivity.EXTRA_VENDOR_ID) ?: ""
         if (vendorID.isEmpty()) { finish(); return }
-        VendorNav.bind(this, binding.vendorNav, VendorNav.Tab.SCANNER) { vendorID }
+        VendorNav.bind(this, binding.vendorNav, VendorNav.Tab.REDEEM) { vendorID }
 
         cameraExecutor = Executors.newSingleThreadExecutor()
 

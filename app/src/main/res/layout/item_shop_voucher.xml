@@ -5,10 +5,10 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_marginBottom="10dp"
-    app:cardBackgroundColor="@color/sapot_surface"
+    app:cardBackgroundColor="@color/hu_bg"
     app:cardCornerRadius="14dp"
     app:cardElevation="0dp"
-    app:strokeColor="@color/sapot_border"
+    app:strokeColor="@color/hu_line"
     app:strokeWidth="1dp">
 
     <LinearLayout
@@ -28,7 +28,7 @@
                 android:layout_height="22dp"
                 android:layout_gravity="center"
                 android:src="@drawable/ic_gift"
-                app:tint="@color/sapot_text_primary" />
+                app:tint="@color/hu_ink" />
         </FrameLayout>
 
         <LinearLayout
@@ -42,10 +42,9 @@
                 android:id="@+id/tvVoucherTitle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:fontFamily="@font/manrope"
-                android:textColor="@color/sapot_text_primary"
+                android:fontFamily="@font/figtree_extrabold"
+                android:textColor="@color/hu_ink"
                 android:textSize="15sp"
-                android:textStyle="bold"
                 tools:text="Free Kopi-O" />
 
             <TextView
@@ -53,8 +52,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="2dp"
-                android:fontFamily="@font/dm_sans"
-                android:textColor="@color/sapot_text_secondary"
+                android:fontFamily="@font/figtree_medium"
+                android:textColor="@color/hu_soft"
                 android:textSize="11sp"
                 android:maxLines="2"
                 android:ellipsize="end"
@@ -65,10 +64,9 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
-                android:fontFamily="@font/dm_sans"
-                android:textColor="@color/sapot_text_primary"
+                android:fontFamily="@font/figtree_bold"
+                android:textColor="@color/hu_ink"
                 android:textSize="11sp"
-                android:textStyle="bold"
                 tools:text="✓ You have enough points!" />
         </LinearLayout>
 
@@ -83,12 +81,11 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:background="@drawable/bg_nav_pill_active"
-                android:fontFamily="@font/dm_sans"
+                android:fontFamily="@font/figtree_bold"
                 android:paddingHorizontal="10dp"
                 android:paddingVertical="4dp"
-                android:textColor="@color/sapot_text_primary"
+                android:textColor="@color/hu_ink"
                 android:textSize="11sp"
-                android:textStyle="bold"
                 tools:text="50 pts" />
         </LinearLayout>
 

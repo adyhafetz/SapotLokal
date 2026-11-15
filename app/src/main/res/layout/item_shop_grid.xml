@@ -2,7 +2,7 @@
 <!-- One shop in the Explore grid: photo with the Open pill at top-left, then name and category. -->
 <com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    style="@style/Widget.SapotLokal.Card.Flat"
+    style="@style/Widget.HU.Card"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_margin="6dp"
@@ -17,7 +17,7 @@
         <FrameLayout
             android:layout_width="match_parent"
             android:layout_height="124dp"
-            android:background="@color/sapot_blue">
+            android:background="@color/hu_fill">
 
             <LinearLayout
                 android:id="@+id/placeholder"
@@ -29,7 +29,7 @@
                     android:layout_width="32dp"
                     android:layout_height="32dp"
                     android:src="@drawable/ic_store"
-                    app:tint="@color/sapot_text_secondary" />
+                    app:tint="@color/hu_soft" />
             </LinearLayout>
 
             <ImageView
@@ -45,12 +45,11 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="top|start"
                 android:layout_margin="10dp"
-                android:fontFamily="@font/dm_sans"
+                android:fontFamily="@font/figtree_bold"
                 android:paddingHorizontal="9dp"
                 android:paddingVertical="5dp"
-                android:textColor="@color/sapot_text_primary"
-                android:textSize="11sp"
-                android:textStyle="bold" />
+                android:textColor="@color/hu_ink"
+                android:textSize="11sp" />
         </FrameLayout>
 
         <LinearLayout
@@ -64,11 +63,10 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:ellipsize="end"
-                android:fontFamily="@font/manrope"
+                android:fontFamily="@font/figtree_extrabold"
                 android:maxLines="1"
-                android:textColor="@color/sapot_text_primary"
-                android:textSize="14sp"
-                android:textStyle="bold" />
+                android:textColor="@color/hu_ink"
+                android:textSize="14sp" />
 
             <TextView
                 android:id="@+id/tvCategory"
@@ -76,9 +74,9 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="2dp"
                 android:ellipsize="end"
-                android:fontFamily="@font/dm_sans"
+                android:fontFamily="@font/figtree_medium"
                 android:maxLines="1"
-                android:textColor="@color/sapot_text_secondary"
+                android:textColor="@color/hu_soft"
                 android:textSize="12sp" />
 
             <TextView
@@ -87,12 +85,11 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
                 android:background="@drawable/bg_nav_pill_active"
-                android:fontFamily="@font/dm_sans"
+                android:fontFamily="@font/figtree_bold"
                 android:paddingHorizontal="8dp"
                 android:paddingVertical="2dp"
-                android:textColor="@color/sapot_text_primary"
+                android:textColor="@color/hu_ink"
                 android:textSize="11sp"
-                android:textStyle="bold"
                 android:visibility="gone" />
         </LinearLayout>
     </LinearLayout>

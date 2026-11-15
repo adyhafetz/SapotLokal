@@ -23,7 +23,7 @@
     <string name="label_shop_address">Shop Address</string>
     <string name="label_shop_name">Shop Name</string>
     <string name="label_ssm_number">SSM Registration Number</string>
-    <string name="login_are_you_a_shop">Are you a shop owner? Login as a vendor</string>
+    <string name="login_are_you_a_shop">Own a shop? Log in here</string>
     <string name="login_log_in_as_customer">Log In as Customer</string>
     <string name="login_new_here_register_customer">New here? Register customer account</string>
     <string name="login_subtitle">Log in to continue</string>
@@ -44,7 +44,7 @@
     <string name="ssm_help">Your SSM Registration Number is stored securely. It is not verified automatically.</string>
     <string name="vendor_login_log_in">Log in</string>
     <string name="vendor_login_log_in_to_manage">Log in to manage your shop, QR code, and rewards</string>
-    <string name="vendor_login_new_here_register_vendor">New here? Register vendor account</string>
+    <string name="vendor_login_new_here_register_vendor">New here? Register your shop</string>
     <string name="vendor_login_not_a_shop_owner">Not a shop owner? Login as customer</string>
     <string name="vendor_login_registered_business_email">Registered Business Email</string>
     <string name="vendor_login_shop_owner_login">Shop owner login</string>

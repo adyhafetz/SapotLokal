@@ -12,20 +12,19 @@
         android:id="@+id/tvGroupHeader"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:fontFamily="@font/manrope"
+        android:fontFamily="@font/figtree_extrabold"
         android:paddingHorizontal="6dp"
         android:paddingTop="10dp"
         android:paddingBottom="4dp"
-        android:textColor="@color/sapot_text_primary"
+        android:textColor="@color/hu_ink"
         android:textSize="15sp"
-        android:textStyle="bold"
         android:visibility="gone"
         tools:text="Test Cafe · 30 points"
         tools:visibility="visible" />
 
 <com.google.android.material.card.MaterialCardView
     android:id="@+id/cardVoucher"
-    style="@style/Widget.SapotLokal.Card.Flat"
+    style="@style/Widget.HU.Card"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_margin="6dp">
@@ -57,7 +56,7 @@
                         android:layout_height="26dp"
                         android:layout_gravity="center"
                         android:src="@drawable/ic_gift"
-                        app:tint="@color/sapot_text_primary" />
+                        app:tint="@color/hu_ink" />
                 </FrameLayout>
 
                 <LinearLayout
@@ -73,13 +72,12 @@
                         android:layout_height="wrap_content"
                         android:layout_marginEnd="6dp"
                         android:background="@drawable/bg_nav_pill_active"
-                        android:fontFamily="@font/dm_sans"
+                        android:fontFamily="@font/figtree_bold"
                         android:paddingHorizontal="9dp"
                         android:paddingVertical="3dp"
                         android:text="@string/voucher_card_best_choice"
-                        android:textColor="@color/sapot_text_primary"
+                        android:textColor="@color/hu_ink"
                         android:textSize="10sp"
-                        android:textStyle="bold"
                         android:visibility="gone" />
 
                     <TextView
@@ -87,13 +85,12 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:background="@drawable/bg_nav_pill_active"
-                        android:fontFamily="@font/dm_sans"
+                        android:fontFamily="@font/figtree_bold"
                         android:paddingHorizontal="10dp"
                         android:paddingVertical="3dp"
                         android:text="@string/voucher_card_active"
-                        android:textColor="@color/sapot_text_primary"
+                        android:textColor="@color/hu_ink"
                         android:textSize="10sp"
-                        android:textStyle="bold"
                         tools:text="Active" />
                 </LinearLayout>
             </RelativeLayout>
@@ -103,12 +100,11 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
-                android:fontFamily="@font/dm_sans"
+                android:fontFamily="@font/figtree_bold"
                 android:letterSpacing="0.06"
                 android:textAllCaps="true"
-                android:textColor="@color/sapot_text_secondary"
+                android:textColor="@color/hu_soft"
                 android:textSize="11sp"
-                android:textStyle="bold"
                 tools:text="Kopi Kita" />
 
             <TextView
@@ -116,10 +112,9 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
-                android:fontFamily="@font/manrope"
-                android:textColor="@color/sapot_text_primary"
+                android:fontFamily="@font/figtree_extrabold"
+                android:textColor="@color/hu_ink"
                 android:textSize="19sp"
-                android:textStyle="bold"
                 tools:text="Free coffee" />
 
             <TextView
@@ -127,8 +122,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
-                android:fontFamily="@font/dm_sans"
-                android:textColor="@color/sapot_text_secondary"
+                android:fontFamily="@font/figtree_medium"
+                android:textColor="@color/hu_soft"
                 android:textSize="13sp"
                 tools:text="SAPOT-ABC123" />
 
@@ -138,11 +133,11 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="12dp"
                 android:drawablePadding="6dp"
-                android:fontFamily="@font/dm_sans"
-                android:textColor="@color/sapot_text_secondary"
+                android:fontFamily="@font/figtree_medium"
+                android:textColor="@color/hu_soft"
                 android:textSize="12sp"
                 app:drawableStartCompat="@drawable/ic_clock"
-                app:drawableTint="@color/sapot_text_secondary"
+                app:drawableTint="@color/hu_soft"
                 tools:text="Valid until 24 Nov 2026" />
         </LinearLayout>
 
@@ -165,14 +160,14 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:fontFamily="@font/dm_sans"
-                android:textColor="@color/sapot_text_secondary"
+                android:fontFamily="@font/figtree_medium"
+                android:textColor="@color/hu_soft"
                 android:textSize="12sp"
                 tools:text="200 points" />
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnViewQr"
-                style="@style/Widget.SapotLokal.Button.Primary"
+                style="@style/Widget.HU.Button"
                 android:layout_width="wrap_content"
                 android:layout_height="44dp"
                 android:text="@string/voucher_card_show_qr"
@@ -183,11 +178,11 @@
             android:id="@+id/tvLockedNotice"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@color/sapot_surface_soft"
-            android:fontFamily="@font/dm_sans"
+            android:background="@color/hu_fill"
+            android:fontFamily="@font/figtree_medium"
             android:paddingHorizontal="20dp"
             android:paddingVertical="11dp"
-            android:textColor="@color/sapot_text_primary"
+            android:textColor="@color/hu_ink"
             android:textSize="12sp"
             android:visibility="gone"
             tools:text="10 more points to unlock"

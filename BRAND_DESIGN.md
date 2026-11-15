@@ -115,6 +115,13 @@ All type is in sp and scales with the phone. Containers wrap, never clip.
 - **Depth:** flat. Only two things cast a shadow: shop cards (3dp) and the raised Scan / Show QR button (8dp).
 - **Icons:** line icons, 2-unit stroke on a 24 grid, round caps. The kopi cup is the brand mark: outline = visit to go, filled = visit made.
 
+### Logo and app icon
+- **The mark** is the filled kopi-cup stamp (the same drawing as a "visit made" cup on a shop card) with two short lines of steam, in ink.
+- **App icon:** the ink mark on a full Kopi Orange background (`ic_launcher_*`). The themed icon on Android 13+ uses the same cup in one colour.
+- **In-app logo** (`ic_brand_logo`): the app icon in miniature, an orange rounded tile (12dp corners at 40dp) with the ink cup. Shown alone at 64dp on sign-in screens and 96dp on the splash, never inside another box.
+- **Notification icon** (`ic_stat_notify`): the cup as a white silhouette; Android tints it orange.
+- The logo is the **one place orange stands for identity** rather than an action. Don't recolour it, put it on a shop colour, or add a wordmark beside it inside the tile.
+
 ---
 
 ## 6. Components

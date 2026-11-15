@@ -8,10 +8,10 @@
     android:clickable="true"
     android:focusable="true"
     android:foreground="?attr/selectableItemBackground"
-    app:cardBackgroundColor="@color/sapot_surface"
+    app:cardBackgroundColor="@color/hu_bg"
     app:cardCornerRadius="14dp"
     app:cardElevation="0dp"
-    app:strokeColor="@color/sapot_border"
+    app:strokeColor="@color/hu_line"
     app:strokeWidth="1dp">
 
     <LinearLayout
@@ -34,7 +34,7 @@
                 android:layout_height="22dp"
                 android:layout_gravity="center"
                 android:src="@drawable/ic_store"
-                app:tint="@color/sapot_text_primary" />
+                app:tint="@color/hu_ink" />
         </FrameLayout>
 
         <!-- Shop Name & Info -->
@@ -55,10 +55,9 @@
                     android:id="@+id/tvShopName"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:fontFamily="@font/manrope"
-                    android:textColor="@color/sapot_text_primary"
+                    android:fontFamily="@font/figtree_extrabold"
+                    android:textColor="@color/hu_ink"
                     android:textSize="14sp"
-                    android:textStyle="bold"
                     tools:text="Kopi Kita" />
 
                 <!-- Real-time Status Chip -->
@@ -68,13 +67,12 @@
                     android:layout_height="wrap_content"
                     android:layout_marginStart="6dp"
                     android:background="@drawable/bg_nav_pill_active"
-                    android:fontFamily="@font/dm_sans"
+                    android:fontFamily="@font/figtree_bold"
                     android:paddingHorizontal="6dp"
                     android:paddingVertical="2dp"
                     android:text="@string/shop_detail_open_now"
-                    android:textColor="@color/sapot_text_primary"
-                    android:textSize="9sp"
-                    android:textStyle="bold" />
+                    android:textColor="@color/hu_ink"
+                    android:textSize="9sp" />
             </LinearLayout>
 
             <TextView
@@ -82,8 +80,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="2dp"
-                android:fontFamily="@font/dm_sans"
-                android:textColor="@color/sapot_text_secondary"
+                android:fontFamily="@font/figtree_medium"
+                android:textColor="@color/hu_soft"
                 android:textSize="11sp"
                 tools:text="Café / F&amp;B · 350 m" />
         </LinearLayout>
@@ -93,10 +91,9 @@
             android:id="@+id/tvShopPoints"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:fontFamily="@font/dm_sans"
-            android:textColor="@color/sapot_text_primary"
+            android:fontFamily="@font/figtree_bold"
+            android:textColor="@color/hu_ink"
             android:textSize="12sp"
-            android:textStyle="bold"
             tools:text="85 pts" />
 
         <ImageView
@@ -104,6 +101,6 @@
             android:layout_height="16dp"
             android:layout_marginStart="6dp"
             android:src="@drawable/ic_arrow_right"
-            app:tint="@color/sapot_text_secondary" />
+            app:tint="@color/hu_soft" />
     </LinearLayout>
 </com.google.android.material.card.MaterialCardView>

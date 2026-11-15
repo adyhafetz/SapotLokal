@@ -1,5 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string name="owner_nav_home">Utama</string>
+    <string name="owner_nav_rewards">Ganjaran</string>
+    <string name="owner_nav_show_qr">Tunjuk QR</string>
+    <string name="owner_nav_redeem">Tebus</string>
+    <string name="owner_nav_shop">Kedai</string>
     <string name="add_edit_rule_customers_earn_it_by">Pelanggan memperolehnya dengan mengumpul mata di kedai anda.</string>
     <string name="add_edit_rule_description_terms">Penerangan / Syarat</string>
     <string name="add_edit_rule_points_required">Mata diperlukan</string>
@@ -95,12 +100,9 @@
     <string name="show_qr_walk_in_check_in">Kod QR Daftar Masuk</string>
     <string name="store_status_closed_desc">Ditutup kepada pelanggan</string>
     <string name="store_status_open_desc">Dibuka untuk pelanggan</string>
-    <string name="vendor_bottom_nav_shop_profile">Profil kedai</string>
-    <string name="vendor_bottom_nav_vouchers">Baucar</string>
     <string name="vendor_home_generating">Menjana…</string>
     <string name="vendor_home_open">Dibuka</string>
     <string name="vendor_home_open_for_customers">Dibuka untuk pelanggan</string>
-    <string name="vendor_home_overview">Gambaran</string>
     <string name="vendor_home_points_given">Mata diberikan</string>
     <string name="vendor_home_refresh">Muat semula</string>
     <string name="vendor_home_shop_qr_code">Kod QR kedai</string>

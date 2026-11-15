@@ -47,7 +47,7 @@ class VendorTransactionAdapter :
                     else -> binding.root.context.getString(com.sapotlokal.R.string.kv_tx_visit)
                 }
                 binding.tvTxPoints.text = binding.root.context.getString(com.sapotlokal.R.string.kv_plus_pts, point.pointEarnedAmount)
-                binding.tvTxPoints.setTextColor(ContextCompat.getColor(context, R.color.colorPrimary))
+                binding.tvTxPoints.setTextColor(ContextCompat.getColor(context, R.color.hu_ok))
             } else {
                 binding.ivTxIcon.setImageResource(R.drawable.ic_wallet)
                 binding.iconContainer.background = ContextCompat.getDrawable(
@@ -59,7 +59,7 @@ class VendorTransactionAdapter :
                     binding.root.context.getString(com.sapotlokal.R.string.kv_tx_spent)
                 }
                 binding.tvTxPoints.text = binding.root.context.getString(com.sapotlokal.R.string.kv_minus_pts, point.pointRedeemedAmount)
-                binding.tvTxPoints.setTextColor(ContextCompat.getColor(context, R.color.colorError))
+                binding.tvTxPoints.setTextColor(ContextCompat.getColor(context, R.color.hu_danger))
             }
 
             val shortUser = if (point.userID.length > 8) {

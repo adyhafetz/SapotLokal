@@ -168,9 +168,9 @@ class VoucherAdapter(
         /** Grey, faded look for rewards that can't be used yet. Everything else is reset (cards are reused). */
         private fun applyInactiveStyle(inactive: Boolean) {
             val ctx = binding.root.context
-            val primary = androidx.core.content.ContextCompat.getColor(ctx, R.color.sapot_text_primary)
-            val muted = androidx.core.content.ContextCompat.getColor(ctx, R.color.sapot_text_secondary)
-            val surface = androidx.core.content.ContextCompat.getColor(ctx, R.color.sapot_surface)
+            val primary = androidx.core.content.ContextCompat.getColor(ctx, R.color.hu_ink)
+            val muted = androidx.core.content.ContextCompat.getColor(ctx, R.color.hu_soft)
+            val surface = androidx.core.content.ContextCompat.getColor(ctx, R.color.hu_bg)
             binding.cardVoucher.setCardBackgroundColor(if (inactive) android.graphics.Color.parseColor("#F1F1F1") else surface)
             if (inactive) binding.cardVoucher.alpha = 0.8f
             binding.iconBox.setBackgroundResource(if (inactive) R.drawable.bg_pill_gray else R.drawable.bg_nav_pill_active)

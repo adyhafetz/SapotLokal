@@ -15,11 +15,11 @@ object StatusChip {
         if (isOpen) {
             view.text = ctx.getString(R.string.status_open)
             view.setBackgroundResource(R.drawable.bg_status_chip_open)
-            view.setTextColor(ContextCompat.getColor(ctx, R.color.sapot_on_primary))
+            view.setTextColor(ContextCompat.getColor(ctx, R.color.hu_ok))
         } else {
             view.text = ctx.getString(R.string.status_closed)
             view.setBackgroundResource(R.drawable.bg_status_chip_closed)
-            view.setTextColor(ContextCompat.getColor(ctx, R.color.status_closed_text))
+            view.setTextColor(ContextCompat.getColor(ctx, R.color.hu_soft))
         }
     }
 }

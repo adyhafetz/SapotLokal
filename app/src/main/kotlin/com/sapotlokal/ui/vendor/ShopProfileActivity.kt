@@ -63,7 +63,7 @@ class ShopProfileActivity : AppCompatActivity() {
             return
         }
 
-        VendorNav.bind(this, binding.vendorNav, VendorNav.Tab.PROFILE) { vendorID }
+        VendorNav.bind(this, binding.vendorNav, VendorNav.Tab.SHOP) { vendorID }
         binding.photoFrame.clipToOutline = true
         binding.ivShopPhoto.clipToOutline = true
 

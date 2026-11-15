@@ -23,7 +23,7 @@
     <string name="label_shop_address">Alamat Kedai</string>
     <string name="label_shop_name">Nama Kedai</string>
     <string name="label_ssm_number">Nombor Pendaftaran SSM</string>
-    <string name="login_are_you_a_shop">Pemilik kedai? Log masuk sebagai peniaga</string>
+    <string name="login_are_you_a_shop">Pemilik kedai? Log masuk di sini</string>
     <string name="login_log_in_as_customer">Log Masuk sebagai Pelanggan</string>
     <string name="login_new_here_register_customer">Baru di sini? Daftar akaun pelanggan</string>
     <string name="login_subtitle">Log masuk untuk teruskan</string>

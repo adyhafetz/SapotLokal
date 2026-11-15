@@ -4,24 +4,24 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/sapot_canvas">
+    android:background="@color/hu_bg">
 
     <com.google.android.material.appbar.AppBarLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/sapot_canvas"
+        android:background="@color/hu_bg"
         app:elevation="0dp">
 
         <com.google.android.material.appbar.MaterialToolbar
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
-            android:background="@color/sapot_canvas"
+            android:background="@color/hu_bg"
             app:navigationIcon="?attr/homeAsUpIndicator"
-            app:navigationIconTint="@color/sapot_text_primary"
+            app:navigationIconTint="@color/hu_ink"
             app:title="@string/vt_shop_settings"
-            app:titleTextAppearance="@style/TextAppearance.SapotLokal.PageTitle"
-            app:titleTextColor="@color/sapot_text_primary" />
+            app:titleTextAppearance="@style/HU.Text.Screen"
+            app:titleTextColor="@color/hu_ink" />
 
     </com.google.android.material.appbar.AppBarLayout>
 
@@ -43,16 +43,15 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
-                android:fontFamily="@font/manrope"
+                android:fontFamily="@font/figtree_extrabold"
                 android:text="@string/shop_profile_update_profile"
-                android:textColor="@color/sapot_text_primary"
-                android:textSize="22sp"
-                android:textStyle="bold" />
+                android:textColor="@color/hu_ink"
+                android:textSize="22sp" />
 
             <!-- Shop Name -->
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/tilShopName"
-                style="@style/Widget.SapotLokal.TextInputLayout"
+                style="@style/Widget.HU.TextInputLayout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="24dp"
@@ -66,16 +65,16 @@
                     android:id="@+id/etShopName"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:fontFamily="@font/dm_sans"
+                    android:fontFamily="@font/figtree_medium"
                     android:inputType="textCapWords"
                     android:maxLines="1"
-                    android:textColor="@color/sapot_text_primary" />
+                    android:textColor="@color/hu_ink" />
             </com.google.android.material.textfield.TextInputLayout>
 
             <!-- Shop Category -->
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/tilShopCategory"
-                style="@style/Widget.SapotLokal.TextInputLayout"
+                style="@style/Widget.HU.TextInputLayout"
 
                 app:endIconMode="dropdown_menu"
                 android:layout_width="match_parent"
@@ -91,16 +90,16 @@
                     android:id="@+id/etShopCategory"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:fontFamily="@font/dm_sans"
+                    android:fontFamily="@font/figtree_medium"
                     android:inputType="none"
                     android:paddingStart="16dp"
-                    android:textColor="@color/sapot_text_primary" />
+                    android:textColor="@color/hu_ink" />
             </com.google.android.material.textfield.TextInputLayout>
 
             <!-- Shop Address -->
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/tilShopAddress"
-                style="@style/Widget.SapotLokal.TextInputLayout"
+                style="@style/Widget.HU.TextInputLayout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="14dp"
@@ -114,17 +113,17 @@
                     android:id="@+id/etShopAddress"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:fontFamily="@font/dm_sans"
+                    android:fontFamily="@font/figtree_medium"
                     android:gravity="top|start"
                     android:inputType="textMultiLine"
                     android:lines="3"
-                    android:textColor="@color/sapot_text_primary" />
+                    android:textColor="@color/hu_ink" />
             </com.google.android.material.textfield.TextInputLayout>
 
             <!-- Shop Description -->
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/tilShopDesc"
-                style="@style/Widget.SapotLokal.TextInputLayout"
+                style="@style/Widget.HU.TextInputLayout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="14dp"
@@ -138,17 +137,17 @@
                     android:id="@+id/etShopDesc"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:fontFamily="@font/dm_sans"
+                    android:fontFamily="@font/figtree_medium"
                     android:gravity="top|start"
                     android:inputType="textMultiLine"
                     android:lines="2"
-                    android:textColor="@color/sapot_text_primary" />
+                    android:textColor="@color/hu_ink" />
             </com.google.android.material.textfield.TextInputLayout>
 
             <!-- Operating Hours -->
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/tilOperatingHours"
-                style="@style/Widget.SapotLokal.TextInputLayout"
+                style="@style/Widget.HU.TextInputLayout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="14dp"
@@ -157,7 +156,7 @@
                 app:boxCornerRadiusTopEnd="12dp"
                 app:boxCornerRadiusTopStart="12dp"
                 app:startIconDrawable="@drawable/ic_clock"
-                app:startIconTint="@color/sapot_text_secondary"
+                app:startIconTint="@color/hu_soft"
                 app:helperText="e.g. 8:00 AM - 10:00 PM (Daily)"
                 android:hint="@string/shop_settings_operating_hours">
 
@@ -165,16 +164,16 @@
                     android:id="@+id/etOperatingHours"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:fontFamily="@font/dm_sans"
+                    android:fontFamily="@font/figtree_medium"
                     android:inputType="textCapSentences"
                     android:maxLines="1"
-                    android:textColor="@color/sapot_text_primary" />
+                    android:textColor="@color/hu_ink" />
             </com.google.android.material.textfield.TextInputLayout>
 
             <!-- SSM Registration Number (Read-only) -->
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/tilSsmNumber"
-                style="@style/Widget.SapotLokal.TextInputLayout"
+                style="@style/Widget.HU.TextInputLayout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="14dp"
@@ -190,7 +189,7 @@
                     android:id="@+id/etSsmNumber"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:fontFamily="@font/dm_sans"
+                    android:fontFamily="@font/figtree_medium"
                     android:inputType="text" />
             </com.google.android.material.textfield.TextInputLayout>
 
@@ -202,20 +201,20 @@
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/btnSave"
-                    style="@style/Widget.SapotLokal.Button.Primary"
+                    style="@style/Widget.HU.Button"
                     android:layout_width="match_parent"
                     android:layout_height="52dp"
                     android:text="@string/shop_settings_save_changes"
                     android:textSize="15sp"
                     android:textStyle="bold"
-                    app:cornerRadius="@dimen/radius_control" />
+                    app:cornerRadius="@dimen/hu_radius_control" />
 
                 <ProgressBar
                     android:id="@+id/progressBar"
                     android:layout_width="28dp"
                     android:layout_height="28dp"
                     android:layout_gravity="center"
-                    android:indeterminateTint="@color/sapot_canvas"
+                    android:indeterminateTint="@color/hu_bg"
                     android:visibility="gone" />
             </FrameLayout>
 

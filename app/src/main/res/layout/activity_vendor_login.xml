@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fillViewport="true"
-    android:background="@color/sapot_canvas">
+    android:background="@color/hu_bg">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -15,22 +15,14 @@
         android:paddingTop="32dp"
         android:paddingBottom="36dp">
 
-        <!-- Logo -->
-        <FrameLayout
-            android:layout_width="72dp"
-            android:layout_height="72dp"
+        <ImageView
+            android:id="@+id/ivLogo"
+            android:layout_width="64dp"
+            android:layout_height="64dp"
             android:layout_gravity="center_horizontal"
             android:layout_marginTop="24dp"
-            android:background="@drawable/bg_nav_pill_active">
-
-            <ImageView
-                android:id="@+id/ivLogo"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                android:layout_gravity="center"
-                android:src="@drawable/ic_brand_logo"
-                android:contentDescription="SapotLokal logo" />
-        </FrameLayout>
+            android:contentDescription="@string/app_name"
+            android:src="@drawable/ic_brand_logo" />
 
         <TextView
             android:id="@+id/tvVendorTitle"
@@ -38,11 +30,10 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
             android:layout_marginTop="20dp"
-            android:fontFamily="@font/manrope"
+            android:fontFamily="@font/figtree_extrabold"
             android:text="@string/vendor_login_shop_owner_login"
-            android:textColor="@color/sapot_text_primary"
-            android:textSize="24sp"
-            android:textStyle="bold" />
+            android:textColor="@color/hu_ink"
+            android:textSize="24sp" />
 
         <TextView
             android:id="@+id/tvVendorSubtitle"
@@ -50,15 +41,15 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
             android:layout_marginTop="6dp"
-            android:fontFamily="@font/dm_sans"
+            android:fontFamily="@font/figtree_medium"
             android:text="@string/vendor_login_log_in_to_manage"
-            android:textColor="@color/sapot_text_secondary"
+            android:textColor="@color/hu_soft"
             android:textSize="14sp" />
 
         <!-- Business Email -->
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/tilVendorEmail"
-            style="@style/Widget.SapotLokal.TextInputLayout"
+            style="@style/Widget.HU.TextInputLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="32dp"
@@ -72,16 +63,16 @@
                 android:id="@+id/etVendorEmail"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:fontFamily="@font/dm_sans"
+                android:fontFamily="@font/figtree_medium"
                 android:inputType="textEmailAddress"
-                android:textColor="@color/sapot_text_primary"
+                android:textColor="@color/hu_ink"
                 android:imeOptions="actionNext" />
         </com.google.android.material.textfield.TextInputLayout>
 
         <!-- Password -->
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/tilVendorPassword"
-            style="@style/Widget.SapotLokal.TextInputLayout"
+            style="@style/Widget.HU.TextInputLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
@@ -91,15 +82,15 @@
             app:boxCornerRadiusTopStart="12dp"
             android:hint="@string/label_password"
             app:endIconMode="password_toggle"
-            app:endIconTint="@color/sapot_text_secondary">
+            app:endIconTint="@color/hu_soft">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/etVendorPassword"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:fontFamily="@font/dm_sans"
+                android:fontFamily="@font/figtree_medium"
                 android:inputType="textPassword"
-                android:textColor="@color/sapot_text_primary"
+                android:textColor="@color/hu_ink"
                 android:imeOptions="actionDone" />
         </com.google.android.material.textfield.TextInputLayout>
 
@@ -113,23 +104,23 @@
             android:background="?attr/selectableItemBackground"
             android:clickable="true"
             android:focusable="true"
-            android:fontFamily="@font/dm_sans"
+            android:fontFamily="@font/figtree_medium"
             android:padding="8dp"
             android:text="@string/forgot_password"
-            android:textColor="@color/sapot_primary"
+            android:textColor="@color/hu_accent_text"
             android:textSize="13sp" />
 
         <!-- Log In Button -->
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btnVendorLogin"
-            style="@style/Widget.SapotLokal.Button.Primary"
+            style="@style/Widget.HU.Button"
             android:layout_width="match_parent"
             android:layout_height="52dp"
             android:layout_marginTop="28dp"
             android:text="@string/vendor_login_log_in"
             android:textSize="15sp"
             android:textStyle="bold"
-            app:cornerRadius="@dimen/radius_control" />
+            app:cornerRadius="@dimen/hu_radius_control" />
 
         <!-- Loading indicator -->
         <ProgressBar
@@ -138,7 +129,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
             android:layout_marginTop="16dp"
-            android:indeterminateTint="@color/sapot_primary"
+            android:indeterminateTint="@color/hu_accent"
             android:visibility="gone" />
 
         <!-- 1. Link back to Customer Login -->
@@ -151,12 +142,11 @@
             android:background="?attr/selectableItemBackground"
             android:clickable="true"
             android:focusable="true"
-            android:fontFamily="@font/dm_sans"
+            android:fontFamily="@font/figtree_bold"
             android:padding="8dp"
             android:text="@string/vendor_login_not_a_shop_owner"
-            android:textColor="@color/sapot_text_primary"
-            android:textSize="13sp"
-            android:textStyle="bold" />
+            android:textColor="@color/hu_ink"
+            android:textSize="13sp" />
 
         <!-- 2. Vendor registration link ONLY appears here -->
         <TextView
@@ -168,10 +158,10 @@
             android:background="?attr/selectableItemBackground"
             android:clickable="true"
             android:focusable="true"
-            android:fontFamily="@font/dm_sans"
+            android:fontFamily="@font/figtree_medium"
             android:padding="8dp"
             android:text="@string/vendor_login_new_here_register_vendor"
-            android:textColor="@color/sapot_text_secondary"
+            android:textColor="@color/hu_soft"
             android:textSize="13sp" />
 
         <!-- Language: EN | BM -->

@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fillViewport="true"
-    android:background="@color/sapot_canvas">
+    android:background="@color/hu_bg">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -20,11 +20,10 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
-            android:fontFamily="@font/manrope"
+            android:fontFamily="@font/figtree_extrabold"
             android:text="@string/signup_vendor_title"
-            android:textColor="@color/sapot_text_primary"
-            android:textSize="24sp"
-            android:textStyle="bold" />
+            android:textColor="@color/hu_ink"
+            android:textSize="24sp" />
 
         <!-- ── Account Details ──────────────────────────────────── -->
 
@@ -32,17 +31,16 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="28dp"
-            android:fontFamily="@font/dm_sans"
+            android:fontFamily="@font/figtree_bold"
             android:letterSpacing="0.05"
             android:text="@string/signup_vendor_account"
-            android:textColor="@color/sapot_text_secondary"
-            android:textSize="11sp"
-            android:textStyle="bold" />
+            android:textColor="@color/hu_soft"
+            android:textSize="11sp" />
 
         <!-- Name -->
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/tilName"
-            style="@style/Widget.SapotLokal.TextInputLayout"
+            style="@style/Widget.HU.TextInputLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="12dp"
@@ -56,16 +54,16 @@
                 android:id="@+id/etName"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:fontFamily="@font/dm_sans"
+                android:fontFamily="@font/figtree_medium"
                 android:inputType="textPersonName|textCapWords"
-                android:textColor="@color/sapot_text_primary"
+                android:textColor="@color/hu_ink"
                 android:imeOptions="actionNext" />
         </com.google.android.material.textfield.TextInputLayout>
 
         <!-- Email -->
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/tilEmail"
-            style="@style/Widget.SapotLokal.TextInputLayout"
+            style="@style/Widget.HU.TextInputLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
@@ -79,16 +77,16 @@
                 android:id="@+id/etEmail"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:fontFamily="@font/dm_sans"
+                android:fontFamily="@font/figtree_medium"
                 android:inputType="textEmailAddress"
-                android:textColor="@color/sapot_text_primary"
+                android:textColor="@color/hu_ink"
                 android:imeOptions="actionNext" />
         </com.google.android.material.textfield.TextInputLayout>
 
         <!-- Password -->
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/tilPassword"
-            style="@style/Widget.SapotLokal.TextInputLayout"
+            style="@style/Widget.HU.TextInputLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
@@ -98,15 +96,15 @@
             app:boxCornerRadiusTopStart="12dp"
             android:hint="@string/label_password"
             app:endIconMode="password_toggle"
-            app:endIconTint="@color/sapot_text_secondary">
+            app:endIconTint="@color/hu_soft">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/etPassword"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:fontFamily="@font/dm_sans"
+                android:fontFamily="@font/figtree_medium"
                 android:inputType="textPassword"
-                android:textColor="@color/sapot_text_primary"
+                android:textColor="@color/hu_ink"
                 android:imeOptions="actionNext" />
         </com.google.android.material.textfield.TextInputLayout>
 
@@ -116,17 +114,16 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="28dp"
-            android:fontFamily="@font/dm_sans"
+            android:fontFamily="@font/figtree_bold"
             android:letterSpacing="0.05"
             android:text="@string/signup_vendor_shop"
-            android:textColor="@color/sapot_text_secondary"
-            android:textSize="11sp"
-            android:textStyle="bold" />
+            android:textColor="@color/hu_soft"
+            android:textSize="11sp" />
 
         <!-- Shop Name -->
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/tilShopName"
-            style="@style/Widget.SapotLokal.TextInputLayout"
+            style="@style/Widget.HU.TextInputLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="12dp"
@@ -140,16 +137,16 @@
                 android:id="@+id/etShopName"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:fontFamily="@font/dm_sans"
+                android:fontFamily="@font/figtree_medium"
                 android:inputType="textCapWords"
-                android:textColor="@color/sapot_text_primary"
+                android:textColor="@color/hu_ink"
                 android:imeOptions="actionNext" />
         </com.google.android.material.textfield.TextInputLayout>
 
         <!-- Shop Category -->
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/tilShopCategory"
-            style="@style/Widget.SapotLokal.TextInputLayout"
+            style="@style/Widget.HU.TextInputLayout"
 
             app:endIconMode="dropdown_menu"
             android:layout_width="match_parent"
@@ -165,16 +162,16 @@
                 android:id="@+id/etShopCategory"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:fontFamily="@font/dm_sans"
+                android:fontFamily="@font/figtree_medium"
                 android:inputType="none"
                 android:paddingStart="16dp"
-                android:textColor="@color/sapot_text_primary" />
+                android:textColor="@color/hu_ink" />
         </com.google.android.material.textfield.TextInputLayout>
 
         <!-- Shop Address -->
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/tilShopAddress"
-            style="@style/Widget.SapotLokal.TextInputLayout"
+            style="@style/Widget.HU.TextInputLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
@@ -188,9 +185,9 @@
                 android:id="@+id/etShopAddress"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:fontFamily="@font/dm_sans"
+                android:fontFamily="@font/figtree_medium"
                 android:inputType="textMultiLine|textCapSentences"
-                android:textColor="@color/sapot_text_primary"
+                android:textColor="@color/hu_ink"
                 android:minLines="2"
                 android:imeOptions="actionNext" />
         </com.google.android.material.textfield.TextInputLayout>
@@ -201,17 +198,16 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="28dp"
-            android:fontFamily="@font/dm_sans"
+            android:fontFamily="@font/figtree_bold"
             android:letterSpacing="0.05"
             android:text="@string/signup_vendor_business"
-            android:textColor="@color/sapot_text_secondary"
-            android:textSize="11sp"
-            android:textStyle="bold" />
+            android:textColor="@color/hu_soft"
+            android:textSize="11sp" />
 
         <!-- SSM Number — REQUIRED per build guide Rule 6 -->
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/tilSsmNumber"
-            style="@style/Widget.SapotLokal.TextInputLayout"
+            style="@style/Widget.HU.TextInputLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="12dp"
@@ -225,9 +221,9 @@
                 android:id="@+id/etSsmNumber"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:fontFamily="@font/dm_sans"
+                android:fontFamily="@font/figtree_medium"
                 android:inputType="textCapCharacters"
-                android:textColor="@color/sapot_text_primary"
+                android:textColor="@color/hu_ink"
                 android:imeOptions="actionDone" />
         </com.google.android.material.textfield.TextInputLayout>
 
@@ -236,22 +232,22 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="6dp"
-            android:fontFamily="@font/dm_sans"
+            android:fontFamily="@font/figtree_medium"
             android:text="@string/ssm_help"
-            android:textColor="@color/sapot_text_secondary"
+            android:textColor="@color/hu_soft"
             android:textSize="12sp" />
 
         <!-- Sign Up button -->
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btnSignUp"
-            style="@style/Widget.SapotLokal.Button.Primary"
+            style="@style/Widget.HU.Button"
             android:layout_width="match_parent"
             android:layout_height="52dp"
             android:layout_marginTop="28dp"
             android:text="@string/sign_up"
             android:textSize="15sp"
             android:textStyle="bold"
-            app:cornerRadius="@dimen/radius_control" />
+            app:cornerRadius="@dimen/hu_radius_control" />
 
         <!-- Loading indicator -->
         <ProgressBar
@@ -260,7 +256,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
             android:layout_marginTop="16dp"
-            android:indeterminateTint="@color/sapot_primary"
+            android:indeterminateTint="@color/hu_accent"
             android:visibility="gone" />
 
     </LinearLayout>

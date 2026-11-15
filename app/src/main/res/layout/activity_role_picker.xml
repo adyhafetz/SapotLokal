@@ -8,7 +8,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fillViewport="true"
-    android:background="@color/sapot_canvas">
+    android:background="@color/hu_bg">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -24,7 +24,7 @@
             android:layout_height="64dp"
             android:layout_marginTop="24dp"
             android:src="@drawable/ic_brand_logo"
-            android:contentDescription="SapotLokal logo" />
+            android:contentDescription="@string/app_name" />
 
         <TextView
             android:id="@+id/tvTitle"
@@ -32,10 +32,9 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
             android:text="@string/role_picker_title"
-            android:fontFamily="@font/manrope"
-            android:textColor="@color/sapot_text_primary"
+            android:fontFamily="@font/figtree_extrabold"
+            android:textColor="@color/hu_ink"
             android:textSize="24sp"
-            android:textStyle="bold"
             android:gravity="center" />
 
         <TextView
@@ -44,8 +43,8 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="6dp"
             android:text="@string/role_picker_subtitle"
-            android:fontFamily="@font/dm_sans"
-            android:textColor="@color/sapot_text_secondary"
+            android:fontFamily="@font/figtree_medium"
+            android:textColor="@color/hu_soft"
             android:textSize="13sp"
             android:gravity="center" />
 
@@ -60,9 +59,9 @@
             android:foreground="?attr/selectableItemBackground"
             app:cardCornerRadius="18dp"
             app:cardElevation="0dp"
-            app:strokeColor="@color/sapot_border"
+            app:strokeColor="@color/hu_line"
             app:strokeWidth="1dp"
-            app:cardBackgroundColor="@color/sapot_surface">
+            app:cardBackgroundColor="@color/hu_bg">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -88,19 +87,18 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="12dp"
-                    android:fontFamily="@font/manrope"
+                    android:fontFamily="@font/figtree_extrabold"
                     android:text="@string/role_customer"
-                    android:textColor="@color/sapot_text_primary"
-                    android:textSize="17sp"
-                    android:textStyle="bold" />
+                    android:textColor="@color/hu_ink"
+                    android:textSize="17sp" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="4dp"
-                    android:fontFamily="@font/dm_sans"
+                    android:fontFamily="@font/figtree_medium"
                     android:text="@string/role_customer_desc"
-                    android:textColor="@color/sapot_text_secondary"
+                    android:textColor="@color/hu_soft"
                     android:textSize="12sp"
                     android:gravity="center" />
 
@@ -118,9 +116,9 @@
             android:foreground="?attr/selectableItemBackground"
             app:cardCornerRadius="18dp"
             app:cardElevation="0dp"
-            app:strokeColor="@color/sapot_border"
+            app:strokeColor="@color/hu_line"
             app:strokeWidth="1dp"
-            app:cardBackgroundColor="@color/sapot_surface">
+            app:cardBackgroundColor="@color/hu_bg">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -146,19 +144,18 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="12dp"
-                    android:fontFamily="@font/manrope"
+                    android:fontFamily="@font/figtree_extrabold"
                     android:text="@string/role_vendor"
-                    android:textColor="@color/sapot_text_primary"
-                    android:textSize="17sp"
-                    android:textStyle="bold" />
+                    android:textColor="@color/hu_ink"
+                    android:textSize="17sp" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="4dp"
-                    android:fontFamily="@font/dm_sans"
+                    android:fontFamily="@font/figtree_medium"
                     android:text="@string/role_vendor_desc"
-                    android:textColor="@color/sapot_text_secondary"
+                    android:textColor="@color/hu_soft"
                     android:textSize="12sp"
                     android:gravity="center" />
 
@@ -171,11 +168,10 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="28dp"
-            android:fontFamily="@font/dm_sans"
+            android:fontFamily="@font/figtree_bold"
             android:text="@string/already_have_account"
-            android:textColor="@color/sapot_text_primary"
+            android:textColor="@color/hu_ink"
             android:textSize="13sp"
-            android:textStyle="bold"
             android:clickable="true"
             android:focusable="true" />
 

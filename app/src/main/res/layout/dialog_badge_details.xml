@@ -96,7 +96,7 @@
         android:textAllCaps="false"
         android:textSize="15sp"
         android:textStyle="bold"
-        app:cornerRadius="@dimen/radius_control" />
+        app:cornerRadius="@dimen/hu_radius_control" />
 
 </LinearLayout>
 

@@ -47,7 +47,7 @@ class VendorHomeActivity : AppCompatActivity() {
             return
         }
 
-        VendorNav.bind(this, binding.vendorNav, VendorNav.Tab.OVERVIEW) { vendorID }
+        VendorNav.bind(this, binding.vendorNav, VendorNav.Tab.HOME) { vendorID }
         setupStatusSwitch()
         binding.btnRefreshQr.setOnClickListener { qr?.refreshNow() }
         SapotFcmService.syncTokenForUser(user.uid)
@@ -154,12 +154,12 @@ class VendorHomeActivity : AppCompatActivity() {
         StatusChip.bind(binding.tvStatusBadge, isOpen)
 
         // Primary (cocoa) when open, disabled grey when closed.
-        val track = ContextCompat.getColor(this, if (isOpen) R.color.sapot_primary else R.color.sapot_neutral)
+        val track = ContextCompat.getColor(this, if (isOpen) R.color.hu_accent else R.color.hu_line)
         binding.switchStoreStatus.trackTintList = ColorStateList.valueOf(track)
         binding.switchStoreStatus.thumbTintList =
-            ColorStateList.valueOf(ContextCompat.getColor(this, R.color.sapot_surface))
+            ColorStateList.valueOf(ContextCompat.getColor(this, R.color.hu_bg))
         binding.cardStoreStatus.strokeColor =
-            ContextCompat.getColor(this, if (isOpen) R.color.sapot_primary else R.color.sapot_border)
+            ContextCompat.getColor(this, if (isOpen) R.color.hu_accent else R.color.hu_line)
 
         binding.tvStatusDescription.text =
             getString(if (isOpen) R.string.store_status_open_desc else R.string.store_status_closed_desc)

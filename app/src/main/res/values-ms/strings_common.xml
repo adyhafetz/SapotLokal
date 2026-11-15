@@ -53,7 +53,7 @@
     <string name="k_valid_email">Sila masukkan alamat e-mel yang sah.</string>
     <string name="k_your_password">Kata laluan anda</string>
     <string name="label_shop_category">Kategori Kedai</string>
-    <string name="m_arcade_champion_desc">Peroleh 200 skor tahap daripada permainan sebelum minggu berakhir</string>
+    <string name="m_arcade_champion_desc">Peroleh 200 XP daripada permainan sebelum minggu berakhir</string>
     <string name="m_arcade_champion_title">Juara Arked</string>
     <string name="m_daily_tri_play_desc">Imbas kedai, putar roda dan main padanan memori pada hari yang sama</string>
     <string name="m_daily_tri_play_title">Tiga Aktiviti Sehari</string>
@@ -65,8 +65,8 @@
     <string name="m_tapah_explorer_title">Peneroka Tapah</string>
     <string name="m_weekend_warrior_desc">Imbas kunjungan kedai pada hari Sabtu dan Ahad</string>
     <string name="m_weekend_warrior_title">Pahlawan Hujung Minggu</string>
-    <string name="notif_channel_levels_desc">Tahniah apabila anda mencapai tahap kesetiaan baharu</string>
-    <string name="notif_channel_levels_name">Naik Tahap!</string>
+    <string name="notif_channel_levels_desc">Apabila anda mencapai pangkat baharu</string>
+    <string name="notif_channel_levels_name">Naik pangkat!</string>
     <string name="notif_channel_rewards_desc">Makluman apabila anda memperoleh baucar baharu atau mencapai pencapaian ganjaran</string>
     <string name="notif_channel_rewards_name">Ganjaran &amp; Baucar</string>
     <string name="notif_channel_shops_desc">Makluman apabila kedai tempatan kegemaran anda dibuka</string>
@@ -84,5 +84,4 @@
     <string name="time_mins_left">%1$d min lagi</string>
     <string name="time_one_day_left">1 hari lagi</string>
     <string name="time_one_hour_left">1 jam lagi</string>
-    <string name="vendor_bottom_nav_scanner">Pengimbas</string>
 </resources>

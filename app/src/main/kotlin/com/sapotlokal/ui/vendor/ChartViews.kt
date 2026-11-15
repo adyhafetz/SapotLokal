@@ -21,10 +21,10 @@ class BarChartView @JvmOverloads constructor(
     private var values: List<Int> = emptyList()
     private var labels: List<String> = emptyList()
 
-    private val track = Paint(Paint.ANTI_ALIAS_FLAG).apply { color = ContextCompat.getColor(context, R.color.sapot_blue) }
-    private val bar = Paint(Paint.ANTI_ALIAS_FLAG).apply { color = ContextCompat.getColor(context, R.color.sapot_primary) }
+    private val track = Paint(Paint.ANTI_ALIAS_FLAG).apply { color = ContextCompat.getColor(context, R.color.hu_fill) }
+    private val bar = Paint(Paint.ANTI_ALIAS_FLAG).apply { color = ContextCompat.getColor(context, R.color.hu_accent) }
     private val text = Paint(Paint.ANTI_ALIAS_FLAG).apply {
-        color = ContextCompat.getColor(context, R.color.sapot_text_secondary)
+        color = ContextCompat.getColor(context, R.color.hu_soft)
         textSize = context.dp(11f)
         textAlign = Paint.Align.CENTER
     }
@@ -73,22 +73,22 @@ class LineChartView @JvmOverloads constructor(
     private var labels: List<String> = emptyList()
 
     private val line = Paint(Paint.ANTI_ALIAS_FLAG).apply {
-        color = ContextCompat.getColor(context, R.color.sapot_primary)
+        color = ContextCompat.getColor(context, R.color.hu_accent)
         style = Paint.Style.STROKE
         strokeWidth = context.dp(2.5f)
         strokeCap = Paint.Cap.ROUND
     }
     private val fill = Paint(Paint.ANTI_ALIAS_FLAG).apply {
-        color = ContextCompat.getColor(context, R.color.sapot_blue)
+        color = ContextCompat.getColor(context, R.color.hu_fill)
         alpha = 150
     }
-    private val dot = Paint(Paint.ANTI_ALIAS_FLAG).apply { color = ContextCompat.getColor(context, R.color.sapot_primary) }
+    private val dot = Paint(Paint.ANTI_ALIAS_FLAG).apply { color = ContextCompat.getColor(context, R.color.hu_accent) }
     private val grid = Paint(Paint.ANTI_ALIAS_FLAG).apply {
-        color = ContextCompat.getColor(context, R.color.sapot_border)
+        color = ContextCompat.getColor(context, R.color.hu_line)
         strokeWidth = context.dp(1f)
     }
     private val text = Paint(Paint.ANTI_ALIAS_FLAG).apply {
-        color = ContextCompat.getColor(context, R.color.sapot_text_secondary)
+        color = ContextCompat.getColor(context, R.color.hu_soft)
         textSize = context.dp(11f)
     }
 

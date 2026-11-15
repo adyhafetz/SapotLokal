@@ -5,7 +5,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/sapot_canvas"
+    android:background="@color/hu_bg"
     android:orientation="vertical"
     tools:context=".ui.vendor.VendorHomeActivity">
 
@@ -39,19 +39,18 @@
                         android:id="@+id/tvShopName"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:fontFamily="@font/manrope"
-                        android:text="@string/vendor_home_overview"
-                        android:textColor="@color/sapot_text_primary"
-                        android:textSize="26sp"
-                        android:textStyle="bold" />
+                        android:fontFamily="@font/figtree_extrabold"
+                        android:text="@string/owner_nav_home"
+                        android:textColor="@color/hu_ink"
+                        android:textSize="26sp" />
 
                     <TextView
                         android:id="@+id/tvShopMeta"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="2dp"
-                        android:fontFamily="@font/dm_sans"
-                        android:textColor="@color/sapot_text_secondary"
+                        android:fontFamily="@font/figtree_medium"
+                        android:textColor="@color/hu_soft"
                         android:textSize="13sp" />
                 </LinearLayout>
 
@@ -59,18 +58,17 @@
                     android:id="@+id/tvStatusBadge"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:fontFamily="@font/dm_sans"
+                    android:fontFamily="@font/figtree_bold"
                     android:paddingHorizontal="12dp"
                     android:paddingVertical="5dp"
                     android:text="@string/vendor_home_open"
-                    android:textSize="12sp"
-                    android:textStyle="bold" />
+                    android:textSize="12sp" />
             </LinearLayout>
 
             <!-- Open / closed switch -->
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/cardStoreStatus"
-                style="@style/Widget.SapotLokal.Card.Flat"
+                style="@style/Widget.HU.Card"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="18dp">
@@ -92,19 +90,18 @@
                             android:id="@+id/tvStatusDescription"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:fontFamily="@font/manrope"
+                            android:fontFamily="@font/figtree_extrabold"
                             android:text="@string/vendor_home_open_for_customers"
-                            android:textColor="@color/sapot_text_primary"
-                            android:textSize="16sp"
-                            android:textStyle="bold" />
+                            android:textColor="@color/hu_ink"
+                            android:textSize="16sp" />
 
                         <TextView
                             android:id="@+id/tvOperatingHoursHint"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="2dp"
-                            android:fontFamily="@font/dm_sans"
-                            android:textColor="@color/sapot_text_secondary"
+                            android:fontFamily="@font/figtree_medium"
+                            android:textColor="@color/hu_soft"
                             android:textSize="12sp"
                             android:visibility="gone" />
                     </LinearLayout>
@@ -126,7 +123,7 @@
                 android:orientation="horizontal">
 
                 <com.google.android.material.card.MaterialCardView
-                    style="@style/Widget.SapotLokal.Card.Flat"
+                    style="@style/Widget.HU.Card"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_marginEnd="6dp"
@@ -139,7 +136,7 @@
                         android:padding="16dp">
 
                         <TextView
-                            style="@style/TextAppearance.SapotLokal.Caption"
+                            style="@style/HU.Text.Small"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="@string/vendor_home_visits_today" />
@@ -149,25 +146,24 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="6dp"
-                            android:fontFamily="@font/manrope"
+                            android:fontFamily="@font/figtree_extrabold"
                             android:text="0"
-                            android:textColor="@color/sapot_text_primary"
-                            android:textSize="30sp"
-                            android:textStyle="bold" />
+                            android:textColor="@color/hu_ink"
+                            android:textSize="30sp" />
 
                         <TextView
                             android:id="@+id/tvStatTodayDelta"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="2dp"
-                            android:fontFamily="@font/dm_sans"
-                            android:textColor="@color/sapot_text_secondary"
+                            android:fontFamily="@font/figtree_medium"
+                            android:textColor="@color/hu_soft"
                             android:textSize="12sp" />
                     </LinearLayout>
                 </com.google.android.material.card.MaterialCardView>
 
                 <com.google.android.material.card.MaterialCardView
-                    style="@style/Widget.SapotLokal.Card.Flat"
+                    style="@style/Widget.HU.Card"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="6dp"
@@ -180,7 +176,7 @@
                         android:padding="16dp">
 
                         <TextView
-                            style="@style/TextAppearance.SapotLokal.Caption"
+                            style="@style/HU.Text.Small"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="@string/vendor_home_visits_this_month" />
@@ -190,19 +186,18 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="6dp"
-                            android:fontFamily="@font/manrope"
+                            android:fontFamily="@font/figtree_extrabold"
                             android:text="0"
-                            android:textColor="@color/sapot_text_primary"
-                            android:textSize="30sp"
-                            android:textStyle="bold" />
+                            android:textColor="@color/hu_ink"
+                            android:textSize="30sp" />
 
                         <TextView
                             android:id="@+id/tvStatMonthDelta"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="2dp"
-                            android:fontFamily="@font/dm_sans"
-                            android:textColor="@color/sapot_text_secondary"
+                            android:fontFamily="@font/figtree_medium"
+                            android:textColor="@color/hu_soft"
                             android:textSize="12sp" />
                     </LinearLayout>
                 </com.google.android.material.card.MaterialCardView>
@@ -216,7 +211,7 @@
                 android:orientation="horizontal">
 
                 <com.google.android.material.card.MaterialCardView
-                    style="@style/Widget.SapotLokal.Card.Flat"
+                    style="@style/Widget.HU.Card"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_marginEnd="6dp"
@@ -229,7 +224,7 @@
                         android:padding="16dp">
 
                         <TextView
-                            style="@style/TextAppearance.SapotLokal.Caption"
+                            style="@style/HU.Text.Small"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="@string/vendor_home_points_given" />
@@ -239,16 +234,15 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="6dp"
-                            android:fontFamily="@font/manrope"
+                            android:fontFamily="@font/figtree_extrabold"
                             android:text="0"
-                            android:textColor="@color/sapot_text_primary"
-                            android:textSize="30sp"
-                            android:textStyle="bold" />
+                            android:textColor="@color/hu_ink"
+                            android:textSize="30sp" />
                     </LinearLayout>
                 </com.google.android.material.card.MaterialCardView>
 
                 <com.google.android.material.card.MaterialCardView
-                    style="@style/Widget.SapotLokal.Card.Flat"
+                    style="@style/Widget.HU.Card"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="6dp"
@@ -261,7 +255,7 @@
                         android:padding="16dp">
 
                         <TextView
-                            style="@style/TextAppearance.SapotLokal.Caption"
+                            style="@style/HU.Text.Small"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="@string/vendor_home_vouchers_redeemed" />
@@ -271,18 +265,17 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="6dp"
-                            android:fontFamily="@font/manrope"
+                            android:fontFamily="@font/figtree_extrabold"
                             android:text="0"
-                            android:textColor="@color/sapot_text_primary"
-                            android:textSize="30sp"
-                            android:textStyle="bold" />
+                            android:textColor="@color/hu_ink"
+                            android:textSize="30sp" />
                     </LinearLayout>
                 </com.google.android.material.card.MaterialCardView>
             </LinearLayout>
 
             <!-- Shop QR code -->
             <com.google.android.material.card.MaterialCardView
-                style="@style/Widget.SapotLokal.Card.Flat"
+                style="@style/Widget.HU.Card"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="12dp">
@@ -297,11 +290,10 @@
                     <TextView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:fontFamily="@font/manrope"
+                        android:fontFamily="@font/figtree_extrabold"
                         android:text="@string/vendor_home_shop_qr_code"
-                        android:textColor="@color/sapot_text_primary"
-                        android:textSize="17sp"
-                        android:textStyle="bold" />
+                        android:textColor="@color/hu_ink"
+                        android:textSize="17sp" />
 
                     <FrameLayout
                         android:layout_width="224dp"
@@ -314,7 +306,7 @@
                             android:id="@+id/ivQrCode"
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
-                            android:background="@color/sapot_surface"
+                            android:background="@color/hu_bg"
                             android:contentDescription="Shop QR code"
                             android:padding="6dp" />
                     </FrameLayout>
@@ -324,9 +316,9 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="12dp"
-                        android:fontFamily="@font/dm_sans"
+                        android:fontFamily="@font/figtree_medium"
                         android:text="@string/vendor_home_generating"
-                        android:textColor="@color/sapot_text_secondary"
+                        android:textColor="@color/hu_soft"
                         android:textSize="13sp" />
 
                     <TextView
@@ -334,16 +326,16 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="4dp"
-                        android:fontFamily="@font/dm_sans"
+                        android:fontFamily="@font/figtree_medium"
                         android:gravity="center"
-                        android:textColor="@color/sapot_text_secondary"
+                        android:textColor="@color/hu_soft"
                         android:textIsSelectable="true"
                         android:textSize="11sp"
                         android:visibility="gone" />
 
                     <com.google.android.material.button.MaterialButton
                         android:id="@+id/btnRefreshQr"
-                        style="@style/Widget.SapotLokal.Button.Outlined"
+                        style="@style/Widget.HU.Button.Outlined"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="10dp"
@@ -353,7 +345,7 @@
 
             <!-- Visits today (by time of day) -->
             <com.google.android.material.card.MaterialCardView
-                style="@style/Widget.SapotLokal.Card.Flat"
+                style="@style/Widget.HU.Card"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="12dp">
@@ -367,19 +359,18 @@
                     <TextView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:fontFamily="@font/manrope"
+                        android:fontFamily="@font/figtree_extrabold"
                         android:text="@string/vendor_home_visits_today"
-                        android:textColor="@color/sapot_text_primary"
-                        android:textSize="17sp"
-                        android:textStyle="bold" />
+                        android:textColor="@color/hu_ink"
+                        android:textSize="17sp" />
 
                     <TextView
                         android:id="@+id/tvBusiest"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="2dp"
-                        android:fontFamily="@font/dm_sans"
-                        android:textColor="@color/sapot_text_secondary"
+                        android:fontFamily="@font/figtree_medium"
+                        android:textColor="@color/hu_soft"
                         android:textSize="13sp" />
 
                     <com.sapotlokal.ui.vendor.BarChartView
@@ -392,7 +383,7 @@
 
             <!-- Visits this month (by week) -->
             <com.google.android.material.card.MaterialCardView
-                style="@style/Widget.SapotLokal.Card.Flat"
+                style="@style/Widget.HU.Card"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="12dp"
@@ -407,11 +398,10 @@
                     <TextView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:fontFamily="@font/manrope"
+                        android:fontFamily="@font/figtree_extrabold"
                         android:text="@string/vendor_home_visits_this_month"
-                        android:textColor="@color/sapot_text_primary"
-                        android:textSize="17sp"
-                        android:textStyle="bold" />
+                        android:textColor="@color/hu_ink"
+                        android:textSize="17sp" />
 
                     <com.sapotlokal.ui.vendor.LineChartView
                         android:id="@+id/chartMonth"
