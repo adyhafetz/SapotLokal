@@ -118,7 +118,16 @@
         "shopsVisited": {
           "$vendorID": { ".validate": "newData.val() === true && root.child('vendors/' + $vendorID + '/userID').exists()" }
         },
-        "lastVisitAt": { ".validate": "newData.isNumber()" }
+        "lastVisitAt": { ".validate": "newData.isNumber()" },
+        // Badge tracking: which of visit / spin / memory happened each day (Combo) …
+        "days": { "$day": {
+          ".validate": "$day.matches(/^[0-9]{4}-[0-9]{2}-[0-9]{2}$/)",
+          "$what": { ".validate": "newData.val() === true && ($what === 'visit' || $what === 'spin' || $what === 'memory')" }
+        } },
+        // … and the days each shop was visited this week (Regular).
+        "shopDays": { "$weekKey": { "$vendorID": { "$day": {
+          ".validate": "newData.val() === true && $day.matches(/^[0-9]{4}-[0-9]{2}-[0-9]{2}$/)"
+        } } } }
       }
     },
 

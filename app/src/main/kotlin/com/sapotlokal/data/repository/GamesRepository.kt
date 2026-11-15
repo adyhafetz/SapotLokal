@@ -58,8 +58,11 @@ object GamesRepository {
     }
 
     /** onResult(success, pointsActuallyEarned) — earned already includes the tier multiplier. */
-    fun recordSpin(userID: String, pointsWon: Int, attemptNumber: Int, onResult: (Boolean, Int) -> Unit) {
-        PointRepository.awardMiniGamePoints(userID, pointsWon, GameType.SPIN_WHEEL, attemptNumber, onResult = onResult)
+    fun recordSpin(userID: String, pointsWon: Int, attemptNumber: Int, topSegment: Boolean, onResult: (Boolean, Int) -> Unit) {
+        PointRepository.awardMiniGamePoints(
+            userID, pointsWon, GameType.SPIN_WHEEL, attemptNumber,
+            badgeKind = BadgeRepository.GameKind.SPIN, topSegment = topSegment, onResult = onResult
+        )
     }
 
     /**
@@ -71,16 +74,20 @@ object GamesRepository {
         basePoints: Int,
         roomToday: Int,
         attemptNumber: Int,
+        perfect: Boolean,
         onResult: (Boolean, Int) -> Unit
     ) {
         if (roomToday <= 0) {
             // Cap reached: still log the play (0 points) but award nothing.
-            PointRepository.awardMiniGamePoints(userID, 0, GameType.MEMORY_MATCH, attemptNumber, onResult = onResult)
+            PointRepository.awardMiniGamePoints(
+                userID, 0, GameType.MEMORY_MATCH, attemptNumber,
+                badgeKind = BadgeRepository.GameKind.MEMORY_WIN, perfect = perfect, onResult = onResult
+            )
             return
         }
         PointRepository.awardMiniGamePoints(
             userID, basePoints, GameType.MEMORY_MATCH, attemptNumber,
-            maxEarnedPoints = roomToday, onResult = onResult
+            maxEarnedPoints = roomToday, badgeKind = BadgeRepository.GameKind.MEMORY_WIN, perfect = perfect, onResult = onResult
         )
     }
 }

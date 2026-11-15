@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
     Play tab (Hadiah Utama) — one job: "something fun to do".
-    Rank card → missions → games → badges → leaderboard → Me.
+    Rank card → missions → games → leaderboard → Me. Badges live on Me.
 -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -106,22 +106,6 @@
                 </LinearLayout>
             </LinearLayout>
 
-            <!-- Badges live here, in Play (the brief). Tap a badge for what it takes. -->
-            <TextView
-                android:id="@+id/tvBadges"
-                style="@style/HU.Text.Title"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="26dp"
-                android:accessibilityHeading="true"
-                tools:text="Badges · 2 of 8" />
-
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/rvBadges"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="6dp"
-                android:nestedScrollingEnabled="false" />
 
             <!-- Leaderboard, me -->
 

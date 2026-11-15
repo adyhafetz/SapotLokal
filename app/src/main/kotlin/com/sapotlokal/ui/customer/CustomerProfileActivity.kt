@@ -1,6 +1,5 @@
 package com.sapotlokal.ui.customer
 
-import android.app.Dialog
 import android.content.Intent
 import android.graphics.Color
 import android.graphics.ColorMatrix
@@ -9,7 +8,6 @@ import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
-import android.view.Window
 import android.widget.EditText
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
@@ -24,9 +22,7 @@ import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
 import com.sapotlokal.AppConfig
 import com.sapotlokal.R
-import com.sapotlokal.data.model.BadgeDef
 import com.sapotlokal.databinding.ActivityCustomerProfileBinding
-import com.sapotlokal.databinding.DialogBadgeDetailsBinding
 import com.sapotlokal.ui.auth.LoginActivity
 import java.util.Locale
 
@@ -48,9 +44,9 @@ class CustomerProfileActivity : AppCompatActivity() {
 
     private var currentUserId: String = ""
     private var currentUserName: String = ""
-    private var unlockedBadgesMap: Map<String, Boolean> = emptyMap()
+    private var badgeListener: com.google.firebase.database.ValueEventListener? = null
 
-    private lateinit var badgeAdapter: BadgeAdapter
+    private lateinit var badgeAdapter: BadgeGridAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -70,9 +66,6 @@ class CustomerProfileActivity : AppCompatActivity() {
         binding.tvUserEmail.text = currentUser.email ?: ""
 
         setupBadgesGrid()
-        // Badges live in Play (one place for them); Me keeps the account only.
-        binding.rvBadges.visibility = View.GONE
-        (binding.tvBadgesUnlockedCount.parent as View).visibility = View.GONE
         setupListeners(currentUserId)
         bindMemberSince()
         // The rank card sits inside the profile card here, so it is drawn flat (no box in a box).
@@ -80,25 +73,19 @@ class CustomerProfileActivity : AppCompatActivity() {
         setupActions()
     }
 
+    /** Badges live on Me (REFRACTOR.md M2): 4 per row, 3 on narrow phones. Tap one for its sheet. */
     private fun setupBadgesGrid() {
-        badgeAdapter = BadgeAdapter { badge, isUnlocked ->
-            showBadgeDetailsDialog(badge, isUnlocked)
-        }
-        binding.rvBadges.layoutManager = GridLayoutManager(this, 2)
+        badgeAdapter = BadgeGridAdapter { badge -> Badges.showSheet(this, currentUserId, badge) }
+        val columns = if (resources.configuration.screenWidthDp < 360) 3 else 4
+        binding.rvBadges.layoutManager = GridLayoutManager(this, columns)
         binding.rvBadges.adapter = badgeAdapter
-        refreshBadgesGrid()
     }
 
-    private fun refreshBadgesGrid() {
-        val items = BadgeDef.entries.map { badge ->
-            BadgeShowcaseItem(
-                badge = badge,
-                isUnlocked = unlockedBadgesMap[badge.id] == true
-            )
+    private fun listenToBadges(userId: String) {
+        badgeListener = com.sapotlokal.data.repository.BadgeRepository.listen(userId) { states ->
+            badgeAdapter.submitList(states)
+            binding.tvBadgesUnlockedCount.text = getString(com.sapotlokal.R.string.badge_count, states.count { it.unlocked }, states.size)
         }
-        badgeAdapter.submitList(items)
-        val unlockedCount = items.count { it.isUnlocked }
-        binding.tvBadgesUnlockedCount.text = getString(com.sapotlokal.R.string.k_n_unlocked, unlockedCount, items.size)
     }
 
     private fun setupListeners(userId: String) {
@@ -139,19 +126,6 @@ class CustomerProfileActivity : AppCompatActivity() {
 
                 currentAvatarId = snapshot.child("avatar").getValue(String::class.java).orEmpty()
                 com.sapotlokal.util.AvatarUi.bind(binding.ivAvatar, binding.tvAvatarInitials, currentAvatarId)
-
-                // Read unlocked badges
-                val badgesSnapshot = snapshot.child("unlockedBadges")
-                val updatedBadges = mutableMapOf<String, Boolean>()
-                for (child in badgesSnapshot.children) {
-                    val key = child.key
-                    val isUnlocked = child.getValue(Boolean::class.java) ?: false
-                    if (key != null) {
-                        updatedBadges[key] = isUnlocked
-                    }
-                }
-                unlockedBadgesMap = updatedBadges
-                refreshBadgesGrid()
 
                 val standing = com.sapotlokal.data.repository.XpRepository.standingOf(snapshot)
                 RankCard.bind(binding.rankCard, standing)
@@ -242,38 +216,6 @@ class CustomerProfileActivity : AppCompatActivity() {
             .show()
     }
 
-    private fun showBadgeDetailsDialog(badge: BadgeDef, isUnlocked: Boolean) {
-        val dialog = Dialog(this)
-        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
-        val dialogBinding = DialogBadgeDetailsBinding.inflate(LayoutInflater.from(this))
-        dialog.setContentView(dialogBinding.root)
-        dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
-
-        dialogBinding.tvBadgeTitle.text = com.sapotlokal.util.ContentText.badgeTitle(this, badge)
-        dialogBinding.tvBadgeDescription.text = com.sapotlokal.util.ContentText.badgeDescription(this, badge)
-        dialogBinding.ivBadgeIcon.setImageResource(badge.iconRes)
-
-        if (isUnlocked) {
-            dialogBinding.ivBadgeIcon.colorFilter = null
-            dialogBinding.ivBadgeLockOverlay.visibility = View.GONE
-            dialogBinding.tvBadgeStatusPill.text = getString(com.sapotlokal.R.string.k_status_unlocked_pill)
-            dialogBinding.tvBadgeStatusPill.setBackgroundResource(R.drawable.bg_badge_success)
-            dialogBinding.tvBadgeStatusPill.setTextColor(ContextCompat.getColor(this, R.color.hu_ok))
-        } else {
-            val matrix = ColorMatrix().apply { setSaturation(0f) }
-            dialogBinding.ivBadgeIcon.colorFilter = ColorMatrixColorFilter(matrix)
-            dialogBinding.ivBadgeLockOverlay.visibility = View.VISIBLE
-            dialogBinding.tvBadgeStatusPill.text = getString(com.sapotlokal.R.string.k_status_locked_pill)
-            dialogBinding.tvBadgeStatusPill.setBackgroundResource(R.drawable.bg_pill_gray)
-            dialogBinding.tvBadgeStatusPill.setTextColor(ContextCompat.getColor(this, R.color.hu_soft))
-        }
-
-        dialogBinding.btnDismissBadgeDialog.setOnClickListener {
-            dialog.dismiss()
-        }
-
-        dialog.show()
-    }
 
     private fun showSignOutConfirmation() {
         MaterialAlertDialogBuilder(this)
@@ -304,6 +246,8 @@ class CustomerProfileActivity : AppCompatActivity() {
                     .removeEventListener(it)
             }
             userListener = null
+            com.sapotlokal.data.repository.BadgeRepository.stopListening(currentUserId, badgeListener)
+            badgeListener = null
         }
     }
 
@@ -313,6 +257,7 @@ class CustomerProfileActivity : AppCompatActivity() {
             if (userListener == null) {
                 setupListeners(currentUserId)
             }
+            if (badgeListener == null) listenToBadges(currentUserId)
         }
     }
 }

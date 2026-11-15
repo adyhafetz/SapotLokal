@@ -130,7 +130,8 @@ object PointRepository {
         val rankBonus: Double,
         val xp: Int,
         val rankBefore: AppConfig.Rank,
-        val rankAfter: AppConfig.Rank
+        val rankAfter: AppConfig.Rank,
+        val badgesUnlocked: List<com.sapotlokal.data.model.BadgeDef> = emptyList()
     )
 
     /**
@@ -155,7 +156,9 @@ object PointRepository {
                             val perVisit = rate.getValue(Long::class.java)?.toInt()
                                 ?.takeIf { it in AppConfig.ALLOWED_POINTS_PER_VISIT }
                                 ?: AppConfig.DEFAULT_POINTS_PER_VISIT
-                            writeVisit(userID, vendorID, perVisit, user, onResult)
+                            BadgeRepository.readContext(userID) { stats, badges ->
+                                writeVisit(userID, vendorID, perVisit, user, stats, badges, onResult)
+                            }
                         }
                         override fun onCancelled(error: DatabaseError) = onResult(null)
                     })
@@ -169,6 +172,8 @@ object PointRepository {
         vendorID: String,
         perVisit: Int,
         user: DataSnapshot,
+        stats: DataSnapshot?,
+        badges: DataSnapshot?,
         onResult: (VisitResult?) -> Unit
     ) {
         val pointID = db.child("points").push().key ?: return onResult(null)
@@ -208,10 +213,12 @@ object PointRepository {
         )
         updates.putAll(xpPaths)
         updates.putAll(MissionRepository.visitPaths(userID, vendorID, week))
+        val (badgePaths, unlocked) = BadgeRepository.visitPaths(userID, vendorID, now, stats, badges)
+        updates.putAll(badgePaths)
 
         db.updateChildren(updates)
             .addOnSuccessListener {
-                onResult(VisitResult(points, perVisit, rank.pointsBonus, AppConfig.VISIT_XP, rank, rankAfter))
+                onResult(VisitResult(points, perVisit, rank.pointsBonus, AppConfig.VISIT_XP, rank, rankAfter, unlocked))
             }
             .addOnFailureListener { onResult(null) }
     }
@@ -260,12 +267,35 @@ object PointRepository {
         gameType: String,
         attemptNumber: Int,
         maxEarnedPoints: Int = Int.MAX_VALUE,
+        badgeKind: BadgeRepository.GameKind? = null,
+        topSegment: Boolean = false,
+        perfect: Boolean = false,
         onResult: (success: Boolean, earnedPoints: Int) -> Unit
     ) {
         if (userID.isBlank()) {
             onResult(false, 0)
             return
         }
+        if (badgeKind == null) {
+            writeGame(userID, basePoints, gameType, attemptNumber, maxEarnedPoints, emptyMap(), onResult)
+            return
+        }
+        // Badges a play can earn (Nasib Baik, Otak Cerdas, Combo) ride in the same write.
+        BadgeRepository.readContext(userID) { stats, badges ->
+            val (paths, _) = BadgeRepository.gamePaths(userID, badgeKind, System.currentTimeMillis(), stats, badges, topSegment, perfect)
+            writeGame(userID, basePoints, gameType, attemptNumber, maxEarnedPoints, paths, onResult)
+        }
+    }
+
+    private fun writeGame(
+        userID: String,
+        basePoints: Int,
+        gameType: String,
+        attemptNumber: Int,
+        maxEarnedPoints: Int,
+        badgePaths: Map<String, Any>,
+        onResult: (success: Boolean, earnedPoints: Int) -> Unit
+    ) {
 
         val todayKey = LocalDate.now(ZoneId.of(AppConfig.GAMES_RESET_TIME_ZONE)).toString()
         val gameID = db.child("games").push().key ?: run {
@@ -286,6 +316,7 @@ object PointRepository {
             val week = com.sapotlokal.util.MissionDateUtils.getWeekYearKey()
             val updates = hashMapOf<String, Any>("games/$gameID" to game)
             updates.putAll(MissionRepository.gamePaths(userID, todayKey, week))
+            updates.putAll(badgePaths)
             db.updateChildren(updates)
                 .addOnSuccessListener { onResult(true, 0) }
                 .addOnFailureListener { onResult(false, 0) }
@@ -337,6 +368,7 @@ object PointRepository {
                     "users/$userID/currentTier" to newTier.code
                 )
                 updates.putAll(MissionRepository.gamePaths(userID, todayKey, com.sapotlokal.util.MissionDateUtils.getWeekYearKey()))
+                updates.putAll(badgePaths)
 
                 db.updateChildren(updates)
                     .addOnSuccessListener { onResult(true, earnedPoints) }

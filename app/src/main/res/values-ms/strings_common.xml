@@ -1,13 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="b_combo_master_desc">Kunjungi kedai, putar roda dan main Padanan Memori dalam satu hari.</string>
-    <string name="b_hantu_malam_desc">Mengimbas kunjungan kedai selepas 8:00 malam.</string>
-    <string name="b_langkah_kanan_desc">Mengimbas kunjungan kedai pertama anda.</string>
-    <string name="b_nasib_baik_desc">Mendapat mata tertinggi pada Roda Putar.</string>
-    <string name="b_raja_sapot_desc">Menyelesaikan semua misi mingguan dalam seminggu.</string>
-    <string name="b_regular_desc">Mengunjungi kedai yang sama dua kali dalam seminggu.</string>
-    <string name="b_sharp_brain_desc">Mendapat markah penuh dalam Padanan Memori sebanyak 10 kali.</string>
-    <string name="b_tapah_ranger_desc">Mengunjungi 10 kedai tempatan.</string>
     <string name="cat_bakery">Bakeri</string>
     <string name="cat_bookstore">Kedai buku</string>
     <string name="cat_cafe">Kafe</string>

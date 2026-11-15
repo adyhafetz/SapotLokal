@@ -144,7 +144,7 @@ On top of that, one-off XP is available: badges (425 total) and lifetime mission
 | `regular` | Regular | Visit the same shop on 3 days in one week | 50 |
 | `hantu_malam` | Hantu Malam | Visit a shop after 8 PM | 50 |
 | `combo` | Combo | Visit a shop, spin the wheel and win Memory Match on the same day | 50 |
-| `nasib_baik` | Nasib Baik | Land on 15 XP on the wheel | 50 |
+| `nasib_baik` | Nasib Baik | Land on the top prize on the wheel (15 XP after Phase 7) | 50 |
 | `otak_cerdas` | Otak Cerdas | Win Memory Match without a wrong pair | 50 |
 | `belanja_diri` | Belanja Diri | Use your first voucher | 50 |
 | `juara_minggu` | Juara Minggu | Finish in the weekly top 3 | 100 |
@@ -333,7 +333,7 @@ Start fresh. Delete first, then make sure it still builds.
 ### Phase 6: Badges
 
 - `BadgeDef` gets the 8 badges in §3.5 (id, names in EN/MS, how-to line in EN/MS, xp, icon, optional target for a progress count).
-- Unlock checks run inside the writes that can trigger them: scan (`langkah_kanan`, `regular`, `hantu_malam`, `combo`), games (`nasib_baik`, `otak_cerdas`, `combo`), voucher use (`belanja_diri`, written by the redeem flow for the customer), leaderboard claim (`juara_minggu`).
+- Unlock checks run inside the writes that can trigger them: scan (`langkah_kanan`, `regular`, `hantu_malam`, `combo`), games (`nasib_baik`, `otak_cerdas`, `combo`), voucher use (`belanja_diri`, unlocked by the customer's own app when it sees a used voucher, since the shop owner can't write a customer's badges), leaderboard claim (`juara_minggu`).
 - **Me screen:** a "Badges" section with a 4-column grid (3 columns under 360dp), styled per BRAND_DESIGN §6. Tap → badge sheet. "Claim 50 XP" → `XpRepository.award` and sets `claimedAt`.
 - **Unlocked toast:** "Badge unlocked: Hantu Malam" with a "See" action that opens the sheet.
 - New badge art for the renamed or new badges (`otak_cerdas`, `belanja_diri`, `juara_minggu`) in the line-icon style.

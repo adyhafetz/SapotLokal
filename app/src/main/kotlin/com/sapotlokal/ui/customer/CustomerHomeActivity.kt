@@ -308,13 +308,20 @@ class CustomerHomeActivity : AppCompatActivity() {
     private fun startRewardListeners(uid: String) {
         if (vouchersListener == null) {
             vouchersListener = com.sapotlokal.data.repository.VoucherRepository.listenToVouchersForUser(
-                userID = uid, onUpdate = { myVouchers = it; refreshAll() }, onError = { }
+                userID = uid, onUpdate = { myVouchers = it; unlockTreatBadge(uid); refreshAll() }, onError = { }
             )
         }
         if (rulesListener == null) {
             rulesListener = com.sapotlokal.data.repository.VoucherRepository.listenToAllActiveRules(
                 onUpdate = { allRules = it; refreshAll() }, onError = { }
             )
+        }
+    }
+
+    /** Belanja Diri: the shop marks the voucher used, so the customer's own app unlocks the badge when it sees one. */
+    private fun unlockTreatBadge(uid: String) {
+        if (myVouchers.any { it.voucherStatus == VoucherStatus.USED }) {
+            com.sapotlokal.data.repository.BadgeRepository.unlockNow(uid, com.sapotlokal.data.model.BadgeDef.BELANJA_DIRI)
         }
     }
 

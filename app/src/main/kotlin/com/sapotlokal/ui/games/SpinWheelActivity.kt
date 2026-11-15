@@ -13,6 +13,7 @@ import com.sapotlokal.util.isNetworkAvailable
 import kotlin.random.Random
 
 class SpinWheelActivity : AppCompatActivity() {
+    private var badgeWatch: com.google.firebase.database.ValueEventListener? = null
 
     private lateinit var binding: ActivitySpinWheelBinding
     private var isSpinning = false
@@ -30,6 +31,7 @@ class SpinWheelActivity : AppCompatActivity() {
             return
         }
         userID = currentUID
+        badgeWatch = com.sapotlokal.ui.customer.Badges.watchUnlocks(this, userID, binding.root)
 
         binding.toolbar.setNavigationOnClickListener { finish() }
         binding.backButton.setOnClickListener { finish() }
@@ -48,6 +50,7 @@ class SpinWheelActivity : AppCompatActivity() {
     }
 
     override fun onDestroy() {
+        if (::userID.isInitialized) com.sapotlokal.ui.customer.Badges.stopWatching(userID, badgeWatch)
         binding.wheel.animate().cancel()
         super.onDestroy()
     }
@@ -110,7 +113,7 @@ class SpinWheelActivity : AppCompatActivity() {
             val pointsWon = segments[winnerIndex]
 
             // COMMIT FIRST. Animate only if the write succeeded (prevents free re-spins, C8).
-            GamesRepository.recordSpin(userID, pointsWon, status.spinAttemptsTotal + 1) { ok, earned ->
+            GamesRepository.recordSpin(userID, pointsWon, status.spinAttemptsTotal + 1, pointsWon == segments.max()) { ok, earned ->
                 if (!ok) {
                     if (isFinishing || isDestroyed) return@recordSpin
                     setBusy(false)

@@ -1,8 +1,6 @@
 package com.sapotlokal
 
 import com.sapotlokal.AppConfig.CustomerTier
-import com.sapotlokal.data.model.BadgeDef
-import com.sapotlokal.ui.customer.BadgeShowcaseItem
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
@@ -10,34 +8,6 @@ import org.junit.Assert.assertTrue
 import org.junit.Test
 
 class CustomerProfileTest {
-
-    @Test
-    fun testBadgeShowcaseItemsMapping() {
-        val unlockedMap = mapOf(
-            "langkah_kanan" to true,
-            "nasib_baik" to true
-        )
-
-        val showcaseItems = BadgeDef.entries.map { badge ->
-            BadgeShowcaseItem(
-                badge = badge,
-                isUnlocked = unlockedMap[badge.id] == true
-            )
-        }
-
-        assertEquals(8, showcaseItems.size)
-        val unlockedCount = showcaseItems.count { it.isUnlocked }
-        val lockedCount = showcaseItems.count { !it.isUnlocked }
-
-        assertEquals(2, unlockedCount)
-        assertEquals(6, lockedCount)
-
-        val langkahKanan = showcaseItems.find { it.badge == BadgeDef.LANGKAH_KANAN }
-        assertTrue(langkahKanan?.isUnlocked == true)
-
-        val tapahRanger = showcaseItems.find { it.badge == BadgeDef.TAPAH_RANGER }
-        assertFalse(tapahRanger?.isUnlocked == true)
-    }
 
     @Test
     fun testDualLedgerSeparationLogic() {

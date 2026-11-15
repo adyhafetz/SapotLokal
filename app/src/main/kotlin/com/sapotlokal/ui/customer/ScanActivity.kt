@@ -55,6 +55,7 @@ import java.util.concurrent.Executors
  *   manually. This is for testing without two devices. REMOVE BEFORE PHASE 7.
  */
 class ScanActivity : AppCompatActivity() {
+    private var badgeWatch: com.google.firebase.database.ValueEventListener? = null
 
     private lateinit var binding: ActivityScanBinding
     private lateinit var cameraExecutor: ExecutorService
@@ -82,6 +83,7 @@ class ScanActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityScanBinding.inflate(layoutInflater)
         setContentView(binding.root)
+        auth.currentUser?.uid?.let { badgeWatch = Badges.watchUnlocks(this, it, binding.root) }
         CustomerNav.bind(this, binding.customerNav, CustomerNav.Tab.SCAN)
 
         cameraExecutor = Executors.newSingleThreadExecutor()
@@ -102,6 +104,7 @@ class ScanActivity : AppCompatActivity() {
 
     override fun onDestroy() {
         super.onDestroy()
+        auth.currentUser?.uid?.let { Badges.stopWatching(it, badgeWatch) }
         cameraExecutor.shutdown()
     }
 
@@ -299,7 +302,8 @@ class ScanActivity : AppCompatActivity() {
         binding.successOverlay.startAnimation(AnimationUtils.loadAnimation(this, android.R.anim.fade_in))
 
         // Back to where the customer came from once they have read it.
-        mainHandler.postDelayed({ finish() }, 2500L)
+        // Stay a little longer when a badge unlocked, so its snackbar can be read.
+        mainHandler.postDelayed({ finish() }, if (result.badgesUnlocked.isEmpty()) 2500L else 4000L)
     }
 
     private fun showError(message: String) {

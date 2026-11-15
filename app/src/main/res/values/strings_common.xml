@@ -1,14 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name" translatable="false">SapotLokal</string>
-    <string name="b_combo_master_desc">Visit a shop, spin the wheel and play Memory Match in one day.</string>
-    <string name="b_hantu_malam_desc">Scanned a shop visit after 8:00 PM.</string>
-    <string name="b_langkah_kanan_desc">Scanned your first shop visit.</string>
-    <string name="b_nasib_baik_desc">Hit the highest points on the Spin Wheel.</string>
-    <string name="b_raja_sapot_desc">Completed all weekly missions in a week.</string>
-    <string name="b_regular_desc">Visited the same shop twice in one week.</string>
-    <string name="b_sharp_brain_desc">Got a perfect score in Memory Match 10 times.</string>
-    <string name="b_tapah_ranger_desc">Visited 10 local shops.</string>
     <string name="cat_bakery">Bakery</string>
     <string name="cat_bookstore">Bookstore</string>
     <string name="cat_cafe">Cafe</string>

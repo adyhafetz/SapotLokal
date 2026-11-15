@@ -201,33 +201,29 @@
             </com.google.android.material.card.MaterialCardView>
 
             <!-- Badges -->
-            <RelativeLayout
+            <!-- Badges: grey until earned; tap one to see how to earn or claim it -->
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="26dp">
+                android:layout_marginTop="26dp"
+                android:baselineAligned="true"
+                android:orientation="horizontal">
 
                 <TextView
-                    android:layout_width="wrap_content"
+                    style="@style/HU.Text.Title"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:fontFamily="@font/figtree_bold"
-                    android:text="@string/customer_profile_badges"
-                    android:textColor="@color/hu_ink"
-                    android:textSize="17sp"
-                    android:textStyle="bold" />
+                    android:layout_weight="1"
+                    android:accessibilityHeading="true"
+                    android:text="@string/customer_profile_badges" />
 
                 <TextView
                     android:id="@+id/tvBadgesUnlockedCount"
+                    style="@style/HU.Text.Small"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_alignParentEnd="true"
-                    android:background="@drawable/bg_hu_icon_tile"
-                    android:fontFamily="@font/figtree_medium"
-                    android:paddingHorizontal="10dp"
-                    android:paddingVertical="4dp"
-                    android:textColor="@color/hu_ink"
-                    android:textSize="11sp"
-                    android:textStyle="bold" />
-            </RelativeLayout>
+                    tools:text="3 of 8" />
+            </LinearLayout>
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/rvBadges"
@@ -235,7 +231,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dp"
                 android:nestedScrollingEnabled="false"
-                tools:listitem="@layout/item_badge_showcase" />
+                tools:listitem="@layout/item_badge_tile" />
 
             <!-- Member since -->
             <com.google.android.material.card.MaterialCardView

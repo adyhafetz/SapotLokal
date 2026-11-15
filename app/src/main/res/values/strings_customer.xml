@@ -1,13 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="badge_details_got_it">Got it</string>
-    <string name="badge_details_langkah_kanan">Langkah Kanan</string>
-    <string name="badge_details_scanned_your_first_shop">Scanned your first shop visit.</string>
-    <string name="badge_details_unlocked">UNLOCKED</string>
-    <string name="badge_showcase_first_steps">First steps</string>
-    <string name="badge_showcase_unlocked">Unlocked</string>
-    <string name="badge_unlocked_great">Great</string>
-    <string name="badge_unlocked_new_badge">New badge</string>
     <string name="challenges_this_week">This week</string>
     <string name="customer_bottom_nav_home">Home</string>
     <string name="customer_bottom_nav_play">Play</string>
@@ -87,7 +79,6 @@
     <string name="hu_open">Open</string>
     <string name="hu_open_maps">Open in Maps</string>
     <string name="hu_open_me_cd">%1$s. Open your profile</string>
-    <string name="hu_play_badges">Badges · %1$d of %2$d</string>
     <string name="hu_play_games">Games</string>
     <string name="hu_play_leaderboard">Leaderboard</string>
     <string name="hu_play_leaderboard_sub">See how you rank in your taman</string>
@@ -155,7 +146,6 @@
     <string name="k_n_points">%1$d points</string>
     <string name="k_n_pts_lb">%1$s XP</string>
     <string name="k_n_pts_required">%1$d points</string>
-    <string name="k_n_unlocked">%1$d / %2$d unlocked</string>
     <string name="k_name_empty">Name cannot be empty</string>
     <string name="k_need_more_pts">Need %1$d more points</string>
     <string name="k_no_expiry">No expiry date</string>
@@ -184,12 +174,9 @@
     <string name="k_sign_out">Log out</string>
     <string name="k_sign_out_confirm">Are you sure you want to log out of SapotLokal?</string>
     <string name="k_spin_left_today">1 spin left today</string>
-    <string name="k_status_locked_pill">🔒 LOCKED</string>
-    <string name="k_status_unlocked_pill">✓ UNLOCKED</string>
     <string name="k_terms_heading">Terms &amp; conditions</string>
     <string name="k_top50_not_reached">%1$s · Top 50 not reached yet</string>
     <string name="k_unclaimed">Unclaimed</string>
-    <string name="k_unlocked">Unlocked</string>
     <string name="k_valid_30_after_claim">Valid 30 days after you claim</string>
     <string name="k_valid_until">Valid until %1$s</string>
     <string name="k_view_shop">View shop</string>
@@ -252,4 +239,19 @@
     <string name="mission_row_cd">%1$s, %2$d of %3$d, %4$d XP</string>
     <string name="mission_row_done_cd">%1$s, done</string>
     <string name="play_missions_ready">%1$d ready to claim</string>
+    <string name="badge_how_langkah_kanan">Make your first visit</string>
+    <string name="badge_how_regular">Visit the same shop on 3 days in one week</string>
+    <string name="badge_how_hantu_malam">Visit a shop after 8 PM</string>
+    <string name="badge_how_combo">Visit a shop, spin the wheel and win Memory Match on the same day</string>
+    <string name="badge_how_nasib_baik">Land on the top prize on the wheel</string>
+    <string name="badge_how_otak_cerdas">Win Memory Match without a wrong pair</string>
+    <string name="badge_how_belanja_diri">Use your first voucher</string>
+    <string name="badge_how_juara_minggu">Finish in the weekly top 3</string>
+    <string name="badge_count">%1$d of %2$d</string>
+    <string name="badge_earned_on">Earned on %1$s</string>
+    <string name="badge_unlocked_toast">Badge unlocked: %1$s</string>
+    <string name="badge_see">See</string>
+    <string name="badge_cd_ready">%1$s, ready to claim</string>
+    <string name="badge_cd_earned">%1$s, earned</string>
+    <string name="badge_cd_locked">%1$s, locked</string>
 </resources>

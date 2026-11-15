@@ -17,6 +17,7 @@ import com.sapotlokal.data.repository.GamesRepository
 import com.sapotlokal.databinding.ActivityMemoryMatchBinding
 
 class MemoryMatchActivity : AppCompatActivity() {
+    private var badgeWatch: com.google.firebase.database.ValueEventListener? = null
 
     private lateinit var binding: ActivityMemoryMatchBinding
     private lateinit var userID: String
@@ -50,6 +51,7 @@ class MemoryMatchActivity : AppCompatActivity() {
             return
         }
         userID = currentUID
+        badgeWatch = com.sapotlokal.ui.customer.Badges.watchUnlocks(this, userID, binding.root)
 
         binding.toolbar.setNavigationOnClickListener { finish() }
         binding.backButton.setOnClickListener { finish() }
@@ -59,6 +61,7 @@ class MemoryMatchActivity : AppCompatActivity() {
     }
 
     override fun onDestroy() {
+        if (::userID.isInitialized) com.sapotlokal.ui.customer.Badges.stopWatching(userID, badgeWatch)
         handler.removeCallbacksAndMessages(null)
         super.onDestroy()
     }
@@ -192,7 +195,8 @@ class MemoryMatchActivity : AppCompatActivity() {
             // PointRepository, so a 2x tier can no longer overshoot it.
             val room = status.memoryRoomToday
             GamesRepository.recordMemoryWin(
-                userID, AppConfig.MEMORY_MATCH_REWARD_POINTS, room, status.memoryAttemptsTotal + 1
+                userID, AppConfig.MEMORY_MATCH_REWARD_POINTS, room, status.memoryAttemptsTotal + 1,
+                perfect = pendingSaveMoves == GameConfig.MEMORY_EMOJIS.size
             ) { ok, earned ->
                 if (isFinishing || isDestroyed) return@recordMemoryWin
                 if (!ok) return@recordMemoryWin showSaveFailed()

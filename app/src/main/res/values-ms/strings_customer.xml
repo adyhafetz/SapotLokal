@@ -1,13 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="badge_details_got_it">Faham</string>
-    <string name="badge_details_langkah_kanan">Langkah Kanan</string>
-    <string name="badge_details_scanned_your_first_shop">Mengimbas kunjungan kedai pertama anda.</string>
-    <string name="badge_details_unlocked">DIBUKA</string>
-    <string name="badge_showcase_first_steps">Langkah pertama</string>
-    <string name="badge_showcase_unlocked">Dibuka</string>
-    <string name="badge_unlocked_great">Bagus</string>
-    <string name="badge_unlocked_new_badge">Lencana baharu</string>
     <string name="challenges_this_week">Minggu ini</string>
     <string name="customer_bottom_nav_home">Utama</string>
     <string name="customer_bottom_nav_play">Main</string>
@@ -87,7 +79,6 @@
     <string name="hu_open">Buka</string>
     <string name="hu_open_maps">Buka dalam Peta</string>
     <string name="hu_open_me_cd">%1$s. Buka profil anda</string>
-    <string name="hu_play_badges">Lencana · %1$d daripada %2$d</string>
     <string name="hu_play_games">Permainan</string>
     <string name="hu_play_leaderboard">Papan pendahulu</string>
     <string name="hu_play_leaderboard_sub">Lihat kedudukan anda di taman</string>
@@ -155,7 +146,6 @@
     <string name="k_n_points">%1$d mata</string>
     <string name="k_n_pts_lb">%1$s XP</string>
     <string name="k_n_pts_required">%1$d mata</string>
-    <string name="k_n_unlocked">%1$d / %2$d dibuka</string>
     <string name="k_name_empty">Nama tidak boleh kosong</string>
     <string name="k_need_more_pts">Perlu %1$d mata lagi</string>
     <string name="k_no_expiry">Tiada tarikh tamat</string>
@@ -184,12 +174,9 @@
     <string name="k_sign_out">Log keluar</string>
     <string name="k_sign_out_confirm">Adakah anda pasti mahu log keluar daripada SapotLokal?</string>
     <string name="k_spin_left_today">1 putaran lagi hari ini</string>
-    <string name="k_status_locked_pill">🔒 DIKUNCI</string>
-    <string name="k_status_unlocked_pill">✓ DIBUKA</string>
     <string name="k_terms_heading">Terma &amp; syarat</string>
     <string name="k_top50_not_reached">%1$s · Belum mencapai 50 teratas</string>
     <string name="k_unclaimed">Belum dituntut</string>
-    <string name="k_unlocked">Dibuka</string>
     <string name="k_valid_30_after_claim">Sah 30 hari selepas anda menuntut</string>
     <string name="k_valid_until">Sah sehingga %1$s</string>
     <string name="k_view_shop">Lihat kedai</string>
@@ -252,4 +239,19 @@
     <string name="mission_row_cd">%1$s, %2$d daripada %3$d, %4$d XP</string>
     <string name="mission_row_done_cd">%1$s, selesai</string>
     <string name="play_missions_ready">%1$d sedia dituntut</string>
+    <string name="badge_how_langkah_kanan">Buat lawatan pertama anda</string>
+    <string name="badge_how_regular">Lawat kedai yang sama pada 3 hari dalam seminggu</string>
+    <string name="badge_how_hantu_malam">Lawat kedai selepas 8 malam</string>
+    <string name="badge_how_combo">Lawat kedai, putar roda dan menang Padanan Memori pada hari yang sama</string>
+    <string name="badge_how_nasib_baik">Dapat hadiah tertinggi pada roda</string>
+    <string name="badge_how_otak_cerdas">Menang Padanan Memori tanpa pasangan salah</string>
+    <string name="badge_how_belanja_diri">Guna baucar pertama anda</string>
+    <string name="badge_how_juara_minggu">Tamat dalam 3 teratas mingguan</string>
+    <string name="badge_count">%1$d daripada %2$d</string>
+    <string name="badge_earned_on">Diperoleh pada %1$s</string>
+    <string name="badge_unlocked_toast">Lencana dibuka: %1$s</string>
+    <string name="badge_see">Lihat</string>
+    <string name="badge_cd_ready">%1$s, sedia dituntut</string>
+    <string name="badge_cd_earned">%1$s, diperoleh</string>
+    <string name="badge_cd_locked">%1$s, terkunci</string>
 </resources>

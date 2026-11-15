@@ -30,7 +30,6 @@ data class User(
     val role: String = "",           // "customer" or "vendor"
     val lifetimePoints: Int = 0,
     val currentTier: String = CustomerTier.FRESHIE.code,
-    val unlockedBadges: Map<String, Boolean> = emptyMap(),
     val avatar: String = "",         // optional profile avatar id (see AvatarDef); empty = none
     val xp: Int = 0,                 // customers only; never decreases (REFRACTOR.md §4)
     val rank: Int = 1                // 1–5, cached from xp for the leaderboard and display
