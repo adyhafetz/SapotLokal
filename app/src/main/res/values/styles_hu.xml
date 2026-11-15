@@ -323,4 +323,25 @@
         <item name="android:textSize">20sp</item>
         <item name="android:textColor">@color/hu_ink</item>
     </style>
+
+    <!-- How it works sheet rows -->
+    <style name="HU.HowRow" parent="">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_marginTop">18dp</item>
+        <item name="android:orientation">horizontal</item>
+        <item name="android:gravity">center_vertical</item>
+    </style>
+    <style name="HU.HowIconTile" parent="">
+        <item name="android:layout_width">44dp</item>
+        <item name="android:layout_height">44dp</item>
+        <item name="android:background">@drawable/bg_hu_icon_tile</item>
+        <item name="android:importantForAccessibility">no</item>
+    </style>
+    <style name="HU.HowIcon" parent="">
+        <item name="android:layout_width">24dp</item>
+        <item name="android:layout_height">24dp</item>
+        <item name="android:layout_gravity">center</item>
+        <item name="android:contentDescription">@null</item>
+    </style>
 </resources>

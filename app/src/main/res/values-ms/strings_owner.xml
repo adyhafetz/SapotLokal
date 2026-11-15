@@ -28,7 +28,6 @@
     <string name="kv_could_not_update_n">Tidak dapat mengemas kini: %1$s</string>
     <string name="kv_could_not_update_rule">Tidak dapat mengemas kini ganjaran. Sila cuba lagi.</string>
     <string name="kv_could_not_verify">Tidak dapat mengesahkan baucar: %1$s</string>
-    <string name="kv_customer_id">ID pelanggan: %1$s</string>
     <string name="kv_delete_shop_msg">Ini akan memadam kedai, ganjaran dan gambar anda secara kekal. Pelanggan kekal mempunyai sejarah mata mereka. Tindakan ini tidak boleh dibatalkan.\n\nMasukkan kata laluan anda untuk mengesahkan.</string>
     <string name="kv_edit_reward_rule">Sunting ganjaran</string>
     <string name="kv_enter_valid_points">Masukkan jumlah mata yang sah (cth. 100)</string>
@@ -37,16 +36,13 @@
     <string name="kv_error_reason">Ralat: %1$s</string>
     <string name="kv_generating">Menjana…</string>
     <string name="kv_give">Beri: %1$s</string>
-    <string name="kv_guest">Tetamu</string>
     <string name="kv_hours_n">Waktu: %1$s</string>
-    <string name="kv_minus_pts">-%1$d mata</string>
     <string name="kv_network_error">ralat rangkaian</string>
     <string name="kv_no_internet">Tiada sambungan internet. Sila sambung semula dan cuba lagi.</string>
     <string name="kv_no_visits_today">Belum ada kunjungan hari ini</string>
     <string name="kv_not_set">Belum ditetapkan</string>
     <string name="kv_photo_failed">Tidak dapat menyimpan gambar. Semak sambungan anda.</string>
     <string name="kv_photo_saved">Gambar disimpan</string>
-    <string name="kv_plus_pts">+%1$d mata</string>
     <string name="kv_pts_required">%1$d mata diperlukan</string>
     <string name="kv_redeem_failed">Penebusan tidak dapat disimpan. Sila cuba lagi.</string>
     <string name="kv_refreshes_in">Dimuat semula dalam %1$ds</string>
@@ -64,9 +60,6 @@
     <string name="kv_shop_not_found">Kedai tidak ditemui</string>
     <string name="kv_shop_not_found_user">Tidak menjumpai kedai untuk akaun ini</string>
     <string name="kv_shop_updated">Profil kedai dikemas kini ✓</string>
-    <string name="kv_tx_redeemed">Baucar ditebus</string>
-    <string name="kv_tx_spent">Mata digunakan</string>
-    <string name="kv_tx_visit">Imbasan kunjungan pelanggan</string>
     <string name="kv_update_failed">Tidak dapat mengemas kini profil</string>
     <string name="kv_vs_last_month">%1$s berbanding bulan lalu</string>
     <string name="kv_vs_yesterday_less">%1$d lebih sedikit daripada semalam</string>

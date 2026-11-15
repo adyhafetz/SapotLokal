@@ -17,7 +17,7 @@ import com.sapotlokal.ui.games.SpinWheelActivity
 
 /**
  * Play tab (Hadiah Utama). Everything fun in one place: level score with a ticked bar, this
- * missions, the two games, the leaderboard, and a way to Me.
+ * missions, the two games and the leaderboard.
  * Level score never buys rewards; that rule is explained by "How points work".
  */
 class ChallengesActivity : AppCompatActivity() {
@@ -42,7 +42,6 @@ class ChallengesActivity : AppCompatActivity() {
         binding.cardSpin.setOnClickListener { startActivity(Intent(this, SpinWheelActivity::class.java)) }
         binding.cardMemory.setOnClickListener { startActivity(Intent(this, MemoryMatchActivity::class.java)) }
         binding.rowLeaderboard.setOnClickListener { startActivity(Intent(this, LeaderboardActivity::class.java)) }
-        binding.rowMe.setOnClickListener { openMe() }
 
         binding.rowMissions.setOnClickListener { startActivity(Intent(this, MissionsActivity::class.java)) }
         missions = MissionRepository.listen(user.uid) { list ->
@@ -75,7 +74,6 @@ class ChallengesActivity : AppCompatActivity() {
     }
 
 
-    private fun openMe() = startActivity(Intent(this, CustomerProfileActivity::class.java))
 
     override fun onDestroy() {
         super.onDestroy()

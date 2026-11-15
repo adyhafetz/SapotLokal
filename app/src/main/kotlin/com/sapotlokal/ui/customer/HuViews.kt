@@ -200,14 +200,26 @@ object RewardCard {
     }
 }
 
-/** The one "How points work" explanation, linked from Home, Shops, the Shop page, Rewards and Play. */
+/**
+ * "How it works" (REFRACTOR.md Phase 9): points, XP and the rank bonus in three short rows, linked
+ * from Home, Shops, the Shop page, Rewards, Play and Me. Home also shows it once to a new customer.
+ */
 object HowPoints {
     fun show(context: Context) {
-        com.google.android.material.dialog.MaterialAlertDialogBuilder(context)
-            .setTitle(R.string.hu_how_points_title)
-            .setMessage(R.string.hu_how_points_body)
-            .setPositiveButton(R.string.hu_got_it, null)
-            .show()
+        val sheet = com.google.android.material.bottomsheet.BottomSheetDialog(context)
+        val b = com.sapotlokal.databinding.SheetHowItWorksBinding.inflate(LayoutInflater.from(context))
+        b.btnGotIt.setOnClickListener { sheet.dismiss() }
+        sheet.setContentView(b.root)
+        sheet.show()
+    }
+
+    /** First run: shows the sheet once per account on this phone (a convenience flag, not game state). */
+    fun showOnce(context: Context, uid: String) {
+        val prefs = context.getSharedPreferences("sapot_user_prefs", Context.MODE_PRIVATE)
+        val key = "seen_how_it_works_$uid"
+        if (uid.isBlank() || prefs.getBoolean(key, false)) return
+        prefs.edit().putBoolean(key, true).apply()
+        show(context)
     }
 }
 

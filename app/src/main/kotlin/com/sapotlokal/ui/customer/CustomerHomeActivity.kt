@@ -109,6 +109,7 @@ class CustomerHomeActivity : AppCompatActivity() {
         startListeningToShopNotifications()
 
         CustomerNav.bind(this, binding.customerNav, CustomerNav.Tab.HOME)
+        HowPoints.showOnce(this, user.uid)
     }
 
     // ── Header & level ────────────────────────────────────────────────────────
