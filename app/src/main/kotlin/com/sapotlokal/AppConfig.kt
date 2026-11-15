@@ -31,7 +31,7 @@ object AppConfig {
      * Never call FirebaseDatabase.getInstance() with no argument.
      */
     const val DATABASE_URL =
-        "https://sapotlokal-cd37b-default-rtdb.asia-southeast1.firebasedatabase.app"
+        "https://sapotlokal-app-default-rtdb.asia-southeast1.firebasedatabase.app"
 
     // ── Points ────────────────────────────────────────────────────────────────
 

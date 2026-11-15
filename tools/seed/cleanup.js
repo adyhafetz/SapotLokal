@@ -9,7 +9,7 @@
 const fs = require("fs");
 const admin = require("firebase-admin");
 
-const DATABASE_URL = "https://sapotlokal-cd37b-default-rtdb.asia-southeast1.firebasedatabase.app";
+const DATABASE_URL = "https://sapotlokal-app-default-rtdb.asia-southeast1.firebasedatabase.app";
 const PREFIX = "seed_";
 
 function fail(message) {

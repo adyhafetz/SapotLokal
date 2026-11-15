@@ -18,7 +18,7 @@ admin.initializeApp();
 exports.notifyShopOpened = onValueCreated(
   {
     ref: "/shopNotifications/{notificationId}",
-    instance: "sapotlokal-cd37b-default-rtdb",
+    instance: "sapotlokal-app-default-rtdb",
     region: "asia-southeast1",
   },
   async (event) => {

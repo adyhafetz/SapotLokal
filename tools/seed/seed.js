@@ -13,7 +13,7 @@ const fs = require("fs");
 const path = require("path");
 const admin = require("firebase-admin");
 
-const DATABASE_URL = "https://sapotlokal-cd37b-default-rtdb.asia-southeast1.firebasedatabase.app";
+const DATABASE_URL = "https://sapotlokal-app-default-rtdb.asia-southeast1.firebasedatabase.app";
 const DAY = 24 * 60 * 60 * 1000;
 const VOUCHER_EXPIRY_DAYS = 30; // same as AppConfig.VOUCHER_EXPIRY_DAYS in the app
 
