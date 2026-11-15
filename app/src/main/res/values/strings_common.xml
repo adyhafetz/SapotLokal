@@ -45,7 +45,7 @@
     <string name="k_valid_days_after_claim">Valid for %1$d days after you claim</string>
     <string name="k_valid_email">Please enter a valid email address.</string>
     <string name="k_your_password">Your password</string>
-    <string name="label_shop_category">Shop Category</string>
+    <string name="label_shop_category">Category</string>
     <string name="notif_channel_levels_desc">When you reach a new rank</string>
     <string name="notif_channel_levels_name">Rank up!</string>
     <string name="notif_channel_rewards_desc">Alerts when you earn a new voucher or reach a reward milestone</string>

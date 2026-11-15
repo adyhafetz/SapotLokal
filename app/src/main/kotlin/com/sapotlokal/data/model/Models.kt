@@ -189,16 +189,6 @@ object GameType {
     const val MEMORY_MATCH = "memory_match"
 }
 
-// ── VENDOR STATS (Phase 6) ───────────────────────────────────────────────────
-data class VendorStats(
-    val vendorID: String = "",
-    val totalCustomers: Int = 0,
-    val totalPointsDistributed: Int = 0,
-    val totalPointsRedeemed: Int = 0,
-    val totalVouchersRedeemed: Int = 0,
-    val recentPoints: List<Point> = emptyList()
-)
-
 
 /** Fields written when an account is created; leaves out the optional avatar so it can be validated later. */
 fun User.toSignUpMap(): Map<String, Any> = mapOf(

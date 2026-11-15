@@ -1,146 +1,95 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.coordinatorlayout.widget.CoordinatorLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+<!-- Show QR: the shop's rotating QR, full screen, in the shop's colour. Opened from the owner's bar. -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/hu_bg"
-    tools:context=".ui.vendor.ShowQrActivity">
+    android:keepScreenOn="true"
+    android:orientation="vertical"
+    android:paddingHorizontal="20dp"
+    android:paddingTop="12dp"
+    android:paddingBottom="28dp">
 
-    <com.google.android.material.appbar.AppBarLayout
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/hu_bg"
-        app:elevation="0dp">
+        android:layout_marginStart="-12dp"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
 
-        <com.google.android.material.appbar.MaterialToolbar
-            android:id="@+id/toolbar"
-            android:layout_width="match_parent"
-            android:layout_height="?attr/actionBarSize"
-            app:navigationIcon="@drawable/ic_back"
-            app:navigationIconTint="@color/hu_ink"
-            app:title="@string/vt_walk_in_qr"
-            app:titleTextAppearance="@style/HU.Text.Screen"
-            app:titleTextColor="@color/hu_ink" />
+        <ImageButton
+            android:id="@+id/btnBack"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="@string/hu_back"
+            android:src="@drawable/ic_arrow_back_hu" />
 
-    </com.google.android.material.appbar.AppBarLayout>
+        <TextView
+            android:id="@+id/tvShopName"
+            style="@style/HU.Text.Screen"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="4dp"
+            android:layout_weight="1"
+            android:ellipsize="end"
+            android:maxLines="1"
+            tools:text="Kopi Kita Cafe" />
+    </LinearLayout>
 
-    <ScrollView
+    <Space
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior"
-        android:fillViewport="true">
+        android:layout_height="0dp"
+        android:layout_weight="1" />
 
-        <LinearLayout
+    <FrameLayout
+        android:id="@+id/qrFrame"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/bg_qr_frame"
+        android:padding="18dp">
+
+        <ImageView
+            android:id="@+id/ivQrCode"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:gravity="center_horizontal"
-            android:padding="24dp">
+            android:adjustViewBounds="true"
+            android:background="@drawable/bg_hu_card"
+            android:contentDescription="@string/owner_qr_cd"
+            android:padding="16dp" />
+    </FrameLayout>
 
-            <com.google.android.material.card.MaterialCardView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:cardElevation="0dp"
-                app:cardCornerRadius="18dp"
-                app:strokeColor="@color/hu_line"
-                app:strokeWidth="1dp"
-                app:cardBackgroundColor="@color/hu_bg">
+    <TextView
+        style="@style/HU.Text.Title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:gravity="center"
+        android:text="@string/owner_ask_to_scan" />
 
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:gravity="center_horizontal"
-                    android:orientation="vertical"
-                    android:padding="24dp">
+    <TextView
+        android:id="@+id/tvCountdown"
+        style="@style/HU.Text.Small"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:gravity="center"
+        tools:text="New code in 45s" />
 
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:fontFamily="@font/figtree_extrabold"
-                        android:text="@string/show_qr_walk_in_check_in"
-                        android:textColor="@color/hu_ink"
-                        android:textSize="20sp" />
+    <TextView
+        android:id="@+id/tvDebugValue"
+        style="@style/HU.Text.Small"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:gravity="center"
+        android:textIsSelectable="true"
+        android:visibility="gone"
+        tools:text="Code: 22e5ca8b-45af" />
 
-                    <TextView
-                        android:id="@+id/tvQrHint"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="4dp"
-                        android:gravity="center"
-                        android:fontFamily="@font/figtree_medium"
-                        android:text="@string/show_qr_display_this_qr_code"
-                        android:textColor="@color/hu_soft"
-                        android:textSize="12sp" />
-
-                    <!-- QR frame -->
-                    <FrameLayout
-                        android:layout_width="220dp"
-                        android:layout_height="220dp"
-                        android:layout_marginTop="20dp"
-                        android:background="@drawable/bg_nav_pill_active"
-                        android:padding="14dp">
-
-                        <ImageView
-                            android:id="@+id/ivQrCode"
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:scaleType="fitCenter"
-                            android:contentDescription="QR Code"
-                            tools:src="@android:drawable/ic_menu_gallery" />
-                    </FrameLayout>
-
-                    <!-- Refresh countdown -->
-                    <TextView
-                        android:id="@+id/tvCountdown"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="16dp"
-                        android:fontFamily="@font/figtree_extrabold"
-                        android:textColor="@color/hu_ink"
-                        android:textSize="18sp"
-                        tools:text="Refreshes in 45s" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="2dp"
-                        android:fontFamily="@font/figtree_medium"
-                        android:text="@string/show_qr_rotating_dynamic_security_code"
-                        android:textColor="@color/hu_soft"
-                        android:textSize="11sp" />
-
-                    <com.google.android.material.button.MaterialButton
-                        android:id="@+id/btnRefreshNow"
-                        style="@style/Widget.HU.Button.Outlined"
-                        android:layout_width="wrap_content"
-                        android:layout_height="40dp"
-                        android:layout_marginTop="18dp"
-                        android:text="@string/show_qr_refresh_now"
-                        android:textAllCaps="false"
-                        android:textSize="12sp"
-                        app:cornerRadius="10dp" />
-
-                    <TextView
-                        android:id="@+id/tvDebugValue"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="8dp"
-                        android:gravity="center"
-                        android:fontFamily="monospace"
-                        android:textColor="@color/hu_soft"
-                        android:textSize="10sp"
-                        android:visibility="gone"
-                        tools:text="⚠️ DEBUG: qr_value_here"
-                        tools:visibility="visible" />
-
-                </LinearLayout>
-
-            </com.google.android.material.card.MaterialCardView>
-
-        </LinearLayout>
-
-    </ScrollView>
-
-</androidx.coordinatorlayout.widget.CoordinatorLayout>
+    <Space
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1" />
+</LinearLayout>

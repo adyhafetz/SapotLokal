@@ -32,6 +32,9 @@ class ShopProfileActivity : AppCompatActivity() {
     private lateinit var binding: ActivityShopProfileBinding
     private val auth = FirebaseAuth.getInstance()
     private var vendorID = ""
+    private var currentVendor: Vendor? = null
+    private var selectedCategory = ""
+    private var formFilled = false
     private var vendorListener: ValueEventListener? = null
 
     private val pickPhoto = registerForActivityResult(ActivityResultContracts.GetContent()) { uri ->
@@ -69,12 +72,7 @@ class ShopProfileActivity : AppCompatActivity() {
 
         binding.photoFrame.setOnClickListener { pickPhoto.launch("image/*") }
         binding.btnChangePhoto.setOnClickListener { pickPhoto.launch("image/*") }
-        binding.btnUpdateProfile.setOnClickListener {
-            startActivity(
-                Intent(this, ShopSettingsActivity::class.java)
-                    .putExtra(VendorHomeActivity.EXTRA_VENDOR_ID, vendorID)
-            )
-        }
+        binding.btnSave.setOnClickListener { saveChanges() }
         binding.rowChangePassword.setOnClickListener { showChangePassword() }
         binding.rowLogout.setOnClickListener { confirmLogout() }
         binding.rowDeleteAccount.setOnClickListener { showDeleteAccount() }
@@ -94,12 +92,88 @@ class ShopProfileActivity : AppCompatActivity() {
     }
 
     private fun bind(v: Vendor) {
+        currentVendor = v
         binding.tvProfileName.text = v.vendorName
         binding.tvProfileCategory.text = com.sapotlokal.data.model.ShopCategory.label(this, v.vendorCategory)
-        binding.tvDetailCategory.text = com.sapotlokal.data.model.ShopCategory.label(this, v.vendorCategory).ifBlank { getString(com.sapotlokal.R.string.kv_not_set) }
-        binding.tvDetailAddress.text = v.vendorAddress.ifBlank { getString(com.sapotlokal.R.string.kv_not_set) }
-        binding.tvDetailHours.text = v.operatingHours.ifBlank { getString(com.sapotlokal.R.string.kv_not_set) }
-        binding.tvDetailSsm.text = v.ssmNumber.ifBlank { getString(com.sapotlokal.R.string.kv_not_set) }
+        // Fill the form once; later live updates (e.g. the open switch on Home) must not wipe an edit in progress.
+        if (!formFilled) {
+            populateFields(v)
+            formFilled = true
+        }
+    }
+
+    // ── Shop details form ─────────────────────────────────────────────────────
+
+    private fun populateFields(vendor: Vendor) {
+        binding.etShopName.setText(vendor.vendorName)
+        selectedCategory = vendor.vendorCategory
+        com.sapotlokal.util.CategoryPicker.bind(this, binding.etShopCategory, vendor.vendorCategory) {
+            selectedCategory = it
+            binding.tilShopCategory.error = null
+        }
+        binding.etShopAddress.setText(vendor.vendorAddress)
+        binding.etShopDesc.setText(vendor.vendorDescription)
+        binding.etOperatingHours.setText(vendor.operatingHours)
+        binding.etSsmNumber.setText(vendor.ssmNumber)
+        bindPointsPerVisit(vendor.pointsPerVisit)
+    }
+
+    /** One chip per allowed value; the shop's current value starts selected. */
+    private fun bindPointsPerVisit(current: Int) {
+        val group = binding.chipsPointsPerVisit
+        group.removeAllViews()
+        val selected = current.takeIf { it in AppConfig.ALLOWED_POINTS_PER_VISIT } ?: AppConfig.DEFAULT_POINTS_PER_VISIT
+        AppConfig.ALLOWED_POINTS_PER_VISIT.forEach { value ->
+            val chip = com.google.android.material.chip.Chip(this).apply {
+                id = View.generateViewId()
+                text = value.toString()
+                tag = value
+                isCheckable = true
+                isChecked = value == selected
+            }
+            group.addView(chip)
+        }
+    }
+
+    private fun selectedPointsPerVisit(): Int =
+        (binding.chipsPointsPerVisit.findViewById<com.google.android.material.chip.Chip>(binding.chipsPointsPerVisit.checkedChipId)?.tag as? Int)
+            ?: AppConfig.DEFAULT_POINTS_PER_VISIT
+
+    private fun saveChanges() {
+        val vendor = currentVendor ?: return
+        val name = binding.etShopName.text.toString().trim()
+        val category = selectedCategory.trim()
+        val address = binding.etShopAddress.text.toString().trim()
+
+        binding.tilShopName.error = if (name.isEmpty()) getString(com.sapotlokal.R.string.kv_shop_name_empty) else null
+        binding.tilShopCategory.error = if (category.isEmpty()) getString(com.sapotlokal.R.string.kv_shop_category_empty) else null
+        binding.tilShopAddress.error = if (address.isEmpty()) getString(com.sapotlokal.R.string.kv_shop_address_empty) else null
+        if (name.isEmpty() || category.isEmpty() || address.isEmpty()) return
+
+        val updated = vendor.copy(
+            vendorName = name,
+            vendorCategory = category,
+            vendorAddress = address,
+            vendorDescription = binding.etShopDesc.text.toString().trim(),
+            operatingHours = binding.etOperatingHours.text.toString().trim(),
+            pointsPerVisit = selectedPointsPerVisit()
+        )
+        setLoading(true)
+        VendorRepository.updateVendor(updated) { success, errorMsg ->
+            setLoading(false)
+            if (success) {
+                currentVendor = updated
+                toast(getString(com.sapotlokal.R.string.kv_shop_updated))
+            } else {
+                toast(errorMsg ?: getString(com.sapotlokal.R.string.kv_update_failed))
+            }
+        }
+    }
+
+    private fun setLoading(loading: Boolean) {
+        binding.progressBar.visibility = if (loading) View.VISIBLE else View.GONE
+        binding.btnSave.isEnabled = !loading
+        binding.btnSave.text = if (loading) "" else getString(com.sapotlokal.R.string.kv_save_changes)
     }
 
     private fun loadPhoto() {

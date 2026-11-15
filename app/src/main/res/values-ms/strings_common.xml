@@ -44,7 +44,7 @@
     <string name="k_valid_days_after_claim">Sah selama %1$d hari selepas anda menuntut</string>
     <string name="k_valid_email">Sila masukkan alamat e-mel yang sah.</string>
     <string name="k_your_password">Kata laluan anda</string>
-    <string name="label_shop_category">Kategori Kedai</string>
+    <string name="label_shop_category">Kategori</string>
     <string name="notif_channel_levels_desc">Apabila anda mencapai pangkat baharu</string>
     <string name="notif_channel_levels_name">Naik pangkat!</string>
     <string name="notif_channel_rewards_desc">Makluman apabila anda memperoleh baucar baharu atau mencapai pencapaian ganjaran</string>

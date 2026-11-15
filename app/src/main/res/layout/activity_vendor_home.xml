@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Vendor Overview: shop status, today's numbers, QR code and charts. -->
+<!-- Shop owner Home: shop status, this week in three numbers, recent visits. The QR lives on Show QR. -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
@@ -114,302 +114,117 @@
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
-            <!-- Four numbers -->
+            <!-- This week, in three numbers -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="12dp"
+                android:layout_marginHorizontal="-4dp"
+                android:layout_marginTop="16dp"
                 android:baselineAligned="false"
                 android:orientation="horizontal">
 
-                <com.google.android.material.card.MaterialCardView
-                    style="@style/Widget.HU.Card"
+                <LinearLayout
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginEnd="6dp"
-                    android:layout_weight="1">
+                    android:layout_marginHorizontal="4dp"
+                    android:layout_weight="1"
+                    android:background="@drawable/bg_hu_card"
+                    android:minHeight="104dp"
+                    android:orientation="vertical"
+                    android:padding="14dp">
 
-                    <LinearLayout
+                    <TextView
+                        android:id="@+id/tvStatVisits"
+                        style="@style/HU.Text.Big"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textSize="30sp"
+                        tools:text="12" />
+
+                    <TextView
+                        style="@style/HU.Text.Small"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:orientation="vertical"
-                        android:padding="16dp">
+                        android:layout_marginTop="6dp"
+                        android:text="@string/owner_week_visits" />
+                </LinearLayout>
 
-                        <TextView
-                            style="@style/HU.Text.Small"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="@string/vendor_home_visits_today" />
-
-                        <TextView
-                            android:id="@+id/tvStatToday"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="6dp"
-                            android:fontFamily="@font/figtree_extrabold"
-                            android:text="0"
-                            android:textColor="@color/hu_ink"
-                            android:textSize="30sp" />
-
-                        <TextView
-                            android:id="@+id/tvStatTodayDelta"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="2dp"
-                            android:fontFamily="@font/figtree_medium"
-                            android:textColor="@color/hu_soft"
-                            android:textSize="12sp" />
-                    </LinearLayout>
-                </com.google.android.material.card.MaterialCardView>
-
-                <com.google.android.material.card.MaterialCardView
-                    style="@style/Widget.HU.Card"
+                <LinearLayout
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="6dp"
-                    android:layout_weight="1">
+                    android:layout_marginHorizontal="4dp"
+                    android:layout_weight="1"
+                    android:background="@drawable/bg_hu_card"
+                    android:minHeight="104dp"
+                    android:orientation="vertical"
+                    android:padding="14dp">
 
-                    <LinearLayout
+                    <TextView
+                        android:id="@+id/tvStatPoints"
+                        style="@style/HU.Text.Big"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textSize="30sp"
+                        tools:text="12" />
+
+                    <TextView
+                        style="@style/HU.Text.Small"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:orientation="vertical"
-                        android:padding="16dp">
+                        android:layout_marginTop="6dp"
+                        android:text="@string/owner_week_points" />
+                </LinearLayout>
 
-                        <TextView
-                            style="@style/HU.Text.Small"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="@string/vendor_home_visits_this_month" />
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="4dp"
+                    android:layout_weight="1"
+                    android:background="@drawable/bg_hu_card"
+                    android:minHeight="104dp"
+                    android:orientation="vertical"
+                    android:padding="14dp">
 
-                        <TextView
-                            android:id="@+id/tvStatMonth"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="6dp"
-                            android:fontFamily="@font/figtree_extrabold"
-                            android:text="0"
-                            android:textColor="@color/hu_ink"
-                            android:textSize="30sp" />
+                    <TextView
+                        android:id="@+id/tvStatVouchers"
+                        style="@style/HU.Text.Big"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textSize="30sp"
+                        tools:text="12" />
 
-                        <TextView
-                            android:id="@+id/tvStatMonthDelta"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="2dp"
-                            android:fontFamily="@font/figtree_medium"
-                            android:textColor="@color/hu_soft"
-                            android:textSize="12sp" />
-                    </LinearLayout>
-                </com.google.android.material.card.MaterialCardView>
+                    <TextView
+                        style="@style/HU.Text.Small"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="6dp"
+                        android:text="@string/owner_vouchers_used" />
+                </LinearLayout>
             </LinearLayout>
+
+            <!-- Recent visits -->
+            <TextView
+                style="@style/HU.Text.Title"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="26dp"
+                android:accessibilityHeading="true"
+                android:text="@string/owner_recent_visits" />
 
             <LinearLayout
+                android:id="@+id/recentRows"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="12dp"
-                android:baselineAligned="false"
-                android:orientation="horizontal">
+                android:orientation="vertical" />
 
-                <com.google.android.material.card.MaterialCardView
-                    style="@style/Widget.HU.Card"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginEnd="6dp"
-                    android:layout_weight="1">
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="vertical"
-                        android:padding="16dp">
-
-                        <TextView
-                            style="@style/HU.Text.Small"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="@string/vendor_home_points_given" />
-
-                        <TextView
-                            android:id="@+id/tvStatPoints"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="6dp"
-                            android:fontFamily="@font/figtree_extrabold"
-                            android:text="0"
-                            android:textColor="@color/hu_ink"
-                            android:textSize="30sp" />
-                    </LinearLayout>
-                </com.google.android.material.card.MaterialCardView>
-
-                <com.google.android.material.card.MaterialCardView
-                    style="@style/Widget.HU.Card"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="6dp"
-                    android:layout_weight="1">
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="vertical"
-                        android:padding="16dp">
-
-                        <TextView
-                            style="@style/HU.Text.Small"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="@string/vendor_home_vouchers_redeemed" />
-
-                        <TextView
-                            android:id="@+id/tvStatVouchers"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="6dp"
-                            android:fontFamily="@font/figtree_extrabold"
-                            android:text="0"
-                            android:textColor="@color/hu_ink"
-                            android:textSize="30sp" />
-                    </LinearLayout>
-                </com.google.android.material.card.MaterialCardView>
-            </LinearLayout>
-
-            <!-- Shop QR code -->
-            <com.google.android.material.card.MaterialCardView
-                style="@style/Widget.HU.Card"
+            <TextView
+                android:id="@+id/tvNoVisits"
+                style="@style/HU.Text.Body"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="12dp">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:gravity="center_horizontal"
-                    android:orientation="vertical"
-                    android:padding="20dp">
-
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:fontFamily="@font/figtree_extrabold"
-                        android:text="@string/vendor_home_shop_qr_code"
-                        android:textColor="@color/hu_ink"
-                        android:textSize="17sp" />
-
-                    <FrameLayout
-                        android:layout_width="224dp"
-                        android:layout_height="224dp"
-                        android:layout_marginTop="14dp"
-                        android:background="@drawable/bg_nav_pill_active"
-                        android:padding="10dp">
-
-                        <ImageView
-                            android:id="@+id/ivQrCode"
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:background="@color/hu_bg"
-                            android:contentDescription="Shop QR code"
-                            android:padding="6dp" />
-                    </FrameLayout>
-
-                    <TextView
-                        android:id="@+id/tvCountdown"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="12dp"
-                        android:fontFamily="@font/figtree_medium"
-                        android:text="@string/vendor_home_generating"
-                        android:textColor="@color/hu_soft"
-                        android:textSize="13sp" />
-
-                    <TextView
-                        android:id="@+id/tvQrValue"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="4dp"
-                        android:fontFamily="@font/figtree_medium"
-                        android:gravity="center"
-                        android:textColor="@color/hu_soft"
-                        android:textIsSelectable="true"
-                        android:textSize="11sp"
-                        android:visibility="gone" />
-
-                    <com.google.android.material.button.MaterialButton
-                        android:id="@+id/btnRefreshQr"
-                        style="@style/Widget.HU.Button.Outlined"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="10dp"
-                        android:text="@string/vendor_home_refresh" />
-                </LinearLayout>
-            </com.google.android.material.card.MaterialCardView>
-
-            <!-- Visits today (by time of day) -->
-            <com.google.android.material.card.MaterialCardView
-                style="@style/Widget.HU.Card"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="12dp">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:padding="20dp">
-
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:fontFamily="@font/figtree_extrabold"
-                        android:text="@string/vendor_home_visits_today"
-                        android:textColor="@color/hu_ink"
-                        android:textSize="17sp" />
-
-                    <TextView
-                        android:id="@+id/tvBusiest"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="2dp"
-                        android:fontFamily="@font/figtree_medium"
-                        android:textColor="@color/hu_soft"
-                        android:textSize="13sp" />
-
-                    <com.sapotlokal.ui.vendor.BarChartView
-                        android:id="@+id/chartToday"
-                        android:layout_width="match_parent"
-                        android:layout_height="190dp"
-                        android:layout_marginTop="14dp" />
-                </LinearLayout>
-            </com.google.android.material.card.MaterialCardView>
-
-            <!-- Visits this month (by week) -->
-            <com.google.android.material.card.MaterialCardView
-                style="@style/Widget.HU.Card"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="12dp"
-                android:layout_marginBottom="8dp">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:padding="20dp">
-
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:fontFamily="@font/figtree_extrabold"
-                        android:text="@string/vendor_home_visits_this_month"
-                        android:textColor="@color/hu_ink"
-                        android:textSize="17sp" />
-
-                    <com.sapotlokal.ui.vendor.LineChartView
-                        android:id="@+id/chartMonth"
-                        android:layout_width="match_parent"
-                        android:layout_height="190dp"
-                        android:layout_marginTop="14dp" />
-                </LinearLayout>
-            </com.google.android.material.card.MaterialCardView>
+                android:layout_marginTop="10dp"
+                android:text="@string/owner_no_visits"
+                android:visibility="gone" />
         </LinearLayout>
     </ScrollView>
 

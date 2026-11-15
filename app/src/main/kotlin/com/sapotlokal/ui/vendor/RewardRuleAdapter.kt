@@ -36,7 +36,7 @@ class RewardRuleAdapter(
         fun bind(rule: Voucher) {
             binding.tvRuleName.text        = rule.voucherName
             binding.tvRuleDescription.text = rule.voucherDescription
-            binding.tvPointsRequired.text  = binding.root.context.getString(com.sapotlokal.R.string.kv_pts_required, rule.pointsRequired)
+            binding.tvPointsRequired.text  = binding.root.context.getString(com.sapotlokal.R.string.owner_n_points, rule.pointsRequired)
 
             // Remove listener before setting state to avoid phantom callbacks on recycle
             binding.switchActive.setOnCheckedChangeListener(null)
@@ -45,7 +45,11 @@ class RewardRuleAdapter(
                 onToggleActive(rule, isChecked)
             }
 
-            binding.btnEdit.setOnClickListener { onEditClick(rule) }
+            binding.tvRuleDescription.visibility =
+                if (rule.voucherDescription.isBlank()) android.view.View.GONE else android.view.View.VISIBLE
+            // A switched-off reward reads quieter, so the owner sees at a glance what customers can claim.
+            binding.tvRuleName.alpha = if (rule.isActive) 1f else 0.55f
+            binding.root.setOnClickListener { onEditClick(rule) }
         }
     }
 

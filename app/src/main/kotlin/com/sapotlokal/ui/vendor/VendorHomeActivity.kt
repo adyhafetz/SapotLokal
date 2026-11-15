@@ -7,7 +7,6 @@ import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
-import androidx.lifecycle.Lifecycle
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.ValueEventListener
 import com.sapotlokal.R
@@ -33,7 +32,7 @@ class VendorHomeActivity : AppCompatActivity() {
     private var currentVendor: Vendor? = null
     private var vendorListener: ValueEventListener? = null
     private var analyticsListener: ValueEventListener? = null
-    private var qr: VendorQrController? = null
+    private val customerNames = mutableMapOf<String, String>()
     private var isProgrammaticUpdate = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -49,21 +48,9 @@ class VendorHomeActivity : AppCompatActivity() {
 
         VendorNav.bind(this, binding.vendorNav, VendorNav.Tab.HOME) { vendorID }
         setupStatusSwitch()
-        binding.btnRefreshQr.setOnClickListener { qr?.refreshNow() }
         SapotFcmService.syncTokenForUser(user.uid)
 
         loadVendor(user.uid)
-    }
-
-    override fun onStart() {
-        super.onStart()
-        qr?.start()
-    }
-
-    override fun onStop() {
-        super.onStop()
-        // Nothing is scannable while the owner is not looking at the QR.
-        qr?.stop()
     }
 
     override fun onDestroy() {
@@ -89,9 +76,6 @@ class VendorHomeActivity : AppCompatActivity() {
                 vendorID = vendor.vendorID
                 bindVendor(vendor)
                 attachListeners(vendor.vendorID)
-
-                qr = VendorQrController(vendorID, binding.ivQrCode, binding.tvCountdown, binding.tvQrValue)
-                if (lifecycle.currentState.isAtLeast(Lifecycle.State.STARTED)) qr?.start()
             },
             onError = { err -> binding.tvShopName.text = getString(com.sapotlokal.R.string.kv_could_not_load_shop_n, err) }
         )
@@ -172,30 +156,42 @@ class VendorHomeActivity : AppCompatActivity() {
         }
     }
 
-    // ── Numbers and charts ────────────────────────────────────────────────────
+    // ── This week and recent visits ───────────────────────────────────────────
 
     private fun bindAnalytics(a: VendorAnalytics) {
-        binding.tvStatToday.text = a.todayVisits.toString()
-        binding.tvStatTodayDelta.text = when {
-            a.todayVisits > a.yesterdayVisits -> getString(com.sapotlokal.R.string.kv_vs_yesterday_more, a.todayVisits - a.yesterdayVisits)
-            a.todayVisits < a.yesterdayVisits -> getString(com.sapotlokal.R.string.kv_vs_yesterday_less, a.yesterdayVisits - a.todayVisits)
-            else -> getString(com.sapotlokal.R.string.kv_same_yesterday)
+        val fmt = java.text.NumberFormat.getIntegerInstance()
+        binding.tvStatVisits.text = fmt.format(a.weekVisits)
+        binding.tvStatPoints.text = fmt.format(a.weekPointsGiven)
+        binding.tvStatVouchers.text = fmt.format(a.vouchersUsed)
+
+        binding.tvNoVisits.visibility = if (a.recentVisits.isEmpty()) View.VISIBLE else View.GONE
+        binding.recentRows.removeAllViews()
+        a.recentVisits.forEach { p ->
+            val row = com.sapotlokal.databinding.ItemOwnerVisitBinding.inflate(layoutInflater, binding.recentRows, false)
+            row.tvWhen.text = android.text.format.DateUtils.getRelativeTimeSpanString(
+                p.timestamp, System.currentTimeMillis(), android.text.format.DateUtils.MINUTE_IN_MILLIS
+            )
+            row.tvPoints.text = getString(R.string.owner_plus_points, p.pointEarnedAmount)
+            bindCustomer(row, p.userID)
+            binding.recentRows.addView(row.root)
         }
+    }
 
-        binding.tvStatMonth.text = a.monthVisits.toString()
-        binding.tvStatMonthDelta.text = if (a.lastMonthVisits > 0) {
-            val pct = (a.monthVisits - a.lastMonthVisits) * 100 / a.lastMonthVisits
-            getString(com.sapotlokal.R.string.kv_vs_last_month, if (pct >= 0) "+$pct%" else "$pct%")
-        } else {
-            ""
+    /** Shows the customer's name (read once from their public profile) and initials. */
+    private fun bindCustomer(row: com.sapotlokal.databinding.ItemOwnerVisitBinding, uid: String) {
+        fun show(name: String) {
+            row.tvName.text = name
+            row.tvInitials.text = com.sapotlokal.ui.customer.ShopStyle.initials(name)
         }
-
-        binding.tvStatPoints.text = java.text.NumberFormat.getInstance().format(a.totalPointsIssued)
-        binding.tvStatVouchers.text = a.vouchersRedeemed.toString()
-
-        binding.tvBusiest.text = a.busiestHourLabel?.let { getString(com.sapotlokal.R.string.kv_busiest_around, it) } ?: getString(com.sapotlokal.R.string.kv_no_visits_today)
-        binding.chartToday.setData(a.hourly, VendorAnalytics.HOUR_LABELS)
-        binding.chartMonth.setData(a.weekly, (1..4).map { getString(com.sapotlokal.R.string.kv_week_n, it) })
+        customerNames[uid]?.let { return show(it) }
+        show(getString(R.string.owner_a_customer))
+        com.google.firebase.database.FirebaseDatabase.getInstance(com.sapotlokal.AppConfig.DATABASE_URL).reference
+            .child("users").child(uid).child("userName").get()
+            .addOnSuccessListener { snap ->
+                val name = snap.getValue(String::class.java)?.ifBlank { null } ?: return@addOnSuccessListener
+                customerNames[uid] = name
+                if (!isFinishing && !isDestroyed) show(name)
+            }
     }
 
     private fun goToLogin() {

@@ -154,12 +154,9 @@
     <string name="scan_enter_a_code">Masukkan kod</string>
     <string name="scan_look_for_the_sapotlokal">Cari QR SapotLokal di kedai tempatan. Setiap kunjungan memberi mata.</string>
     <string name="scan_position_the_qr_code">Letakkan kod QR di dalam bingkai</string>
-    <string name="scan_redeem_done">Selesai</string>
     <string name="scan_redeem_enter_voucher_code">Masukkan kod baucar</string>
-    <string name="scan_redeem_point_the_camera_at">Halakan kamera ke kod QR baucar pelanggan</string>
     <string name="scan_redeem_verify">Sahkan</string>
     <string name="scan_redeem_voucher_code_e_g">Kod baucar (cth. KOPIKITA200)</string>
-    <string name="scan_redeem_voucher_redeemed">Baucar ditebus</string>
     <string name="scan_shop_code">Kod kedai</string>
     <string name="scan_starting_camera">Memulakan kamera…</string>
     <string name="scan_your_camera_is_only">Kamera anda hanya digunakan untuk mengimbas</string>

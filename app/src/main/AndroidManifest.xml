@@ -84,7 +84,6 @@
         <activity android:name=".ui.customer.ChallengesActivity"   android:exported="false" />
         <activity android:name=".ui.customer.MissionsActivity"     android:exported="false" />
         <activity android:name=".ui.customer.LeaderboardActivity"  android:exported="false" />
-        <activity android:name=".ui.vendor.ShopSettingsActivity"   android:exported="false" />
         <activity android:name=".ui.vendor.ShopProfileActivity"    android:exported="false" />
 
         <!-- Games (merged from SapotLokalGames) -->

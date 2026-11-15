@@ -42,8 +42,6 @@ class RewardRulesActivity : AppCompatActivity() {
         binding = ActivityRewardRulesBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        setSupportActionBar(binding.toolbar)
-        supportActionBar?.setDisplayHomeAsUpEnabled(false)
 
         vendorID = intent.getStringExtra(VendorHomeActivity.EXTRA_VENDOR_ID) ?: ""
         if (vendorID.isEmpty()) { finish(); return }
@@ -51,7 +49,7 @@ class RewardRulesActivity : AppCompatActivity() {
 
         setupRecyclerView()
 
-        binding.fabAddRule.setOnClickListener {
+        binding.btnAddRule.setOnClickListener {
             startActivity(
                 Intent(this, AddEditRuleActivity::class.java)
                     .putExtra(VendorHomeActivity.EXTRA_VENDOR_ID, vendorID)
@@ -119,5 +117,4 @@ class RewardRulesActivity : AppCompatActivity() {
         if (rulesListener == null) startListening()
     }
 
-    override fun onSupportNavigateUp(): Boolean { finish(); return true }
 }

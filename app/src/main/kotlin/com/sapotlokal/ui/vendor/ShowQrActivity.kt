@@ -32,9 +32,7 @@ import com.sapotlokal.databinding.ActivityShowQrBinding
  *   the customer-side validation (QrCodeRepository.validateScannedCode) query by
  *   qrcodeValue without needing to know the record's key in advance.
  *
- * ⚠️ DEBUG: tvDebugValue shows the raw QR string for manual paste into ScanActivity's
- *   debug panel. REMOVE BEFORE PHASE 7 (just set visibility=gone is not enough —
- *   delete the whole debug block).
+ * Debug builds only: tvDebugValue shows the code as text, for typing into Scan's "Enter a code".
  */
 class ShowQrActivity : AppCompatActivity() {
 
@@ -50,16 +48,19 @@ class ShowQrActivity : AppCompatActivity() {
         binding = ActivityShowQrBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        setSupportActionBar(binding.toolbar)
-        supportActionBar?.setDisplayHomeAsUpEnabled(true)
+        binding.btnBack.setOnClickListener { finish() }
 
         vendorID = intent.getStringExtra(VendorHomeActivity.EXTRA_VENDOR_ID) ?: ""
         if (vendorID.isEmpty()) { finish(); return }
 
-        binding.btnRefreshNow.setOnClickListener {
-            countDownTimer?.cancel()
-            publishAndStartCountdown()
-        }
+        // The frame wears the shop's own colour, the same one customers see on its card.
+        binding.qrFrame.backgroundTintList =
+            android.content.res.ColorStateList.valueOf(com.sapotlokal.ui.customer.ShopStyle.colors(this, vendorID).bg)
+        com.sapotlokal.data.repository.VendorRepository.fetchVendorById(
+            vendorID,
+            onResult = { v -> if (!isFinishing) binding.tvShopName.text = v?.vendorName.orEmpty() },
+            onError = { }
+        )
 
         publishAndStartCountdown()
     }
@@ -77,9 +78,10 @@ class ShowQrActivity : AppCompatActivity() {
                 currentQrId = newCode.qrcodeID
                 runOnUiThread {
                     renderQrBitmap(newCode.qrcodeValue)
-                    // ⚠️ DEBUG — shows raw value so testers can paste it in ScanActivity
-                    binding.tvDebugValue.text = "⚠️ DEBUG value: ${newCode.qrcodeValue}"
-                    binding.tvDebugValue.visibility = View.VISIBLE
+                    // Debug builds only: the code as text, for testing with "Enter a code" on Scan.
+                    val debuggable = (applicationInfo.flags and android.content.pm.ApplicationInfo.FLAG_DEBUGGABLE) != 0
+                    binding.tvDebugValue.text = getString(com.sapotlokal.R.string.owner_code_n, newCode.qrcodeValue)
+                    binding.tvDebugValue.visibility = if (debuggable) View.VISIBLE else View.GONE
                     startCountdown()
                 }
             },
@@ -150,5 +152,4 @@ class ShowQrActivity : AppCompatActivity() {
         }
     }
 
-    override fun onSupportNavigateUp(): Boolean { finish(); return true }
 }
