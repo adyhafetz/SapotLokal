@@ -18,16 +18,14 @@
     <string name="games_error_load">Couldn\'t load your game status. Please try again.</string>
     <string name="games_error_not_logged_in">Not logged in. Please restart the app.</string>
     <string name="games_error_save">Couldn\'t save your result. Please try again.</string>
-    <string name="games_memory_info">Today %1$d / %2$d XP</string>
     <string name="games_memory_moves">Moves %1$d</string>
-    <string name="games_memory_save_failed">You won! We couldn\'t save your XP. Tap here to try again.</string>
-    <string name="games_memory_saving">Saving your points…</string>
+    <string name="games_memory_save_failed">You won! We couldn\'t save it. Tap here to try again.</string>
+    <string name="games_memory_saving">Saving…</string>
     <string name="games_memory_win_full">Done in %1$d moves  +%2$d XP</string>
-    <string name="games_memory_win_none">Done in %1$d moves  (daily limit reached)</string>
-    <string name="games_memory_win_partial">Done in %1$d moves  +%2$d XP (daily limit reached)</string>
-    <string name="games_menu_match_the_pairs_20">Match the pairs. 20 XP a match, up to 60 a day.</string>
+    <string name="games_memory_win_none">Done in %1$d moves. No more XP today, come back tomorrow</string>
+    <string name="games_menu_match_the_pairs_20">Match the pairs. 5 XP a win, 2 wins a day.</string>
     <string name="games_menu_memory_match">Memory match</string>
-    <string name="games_menu_one_free_spin_a">One free spin a day. Win 10 to 100 XP.</string>
+    <string name="games_menu_one_free_spin_a">One free spin a day. Win 2 to 15 XP.</string>
     <string name="games_menu_spin_the_wheel">Spin the wheel</string>
     <string name="games_spin_available">Spin ready</string>
     <string name="games_spin_button">Spin</string>
@@ -65,7 +63,7 @@
     <string name="hu_load_error">Couldn\'t load your points. Check your connection.</string>
     <string name="hu_location">Location</string>
     <string name="hu_memory">Memory match</string>
-    <string name="hu_memory_today">%1$d of %2$d XP today</string>
+    <string name="hu_memory_today">%1$d of %2$d XP wins today</string>
     <string name="hu_mission_progress">%1$s · %2$d of %3$d</string>
     <string name="hu_more_ready">%1$d more ready · See Rewards</string>
     <string name="hu_n_points_at">%1$d points at %2$s</string>
@@ -254,4 +252,5 @@
     <string name="badge_cd_ready">%1$s, ready to claim</string>
     <string name="badge_cd_earned">%1$s, earned</string>
     <string name="badge_cd_locked">%1$s, locked</string>
+    <string name="games_memory_xp_wins">Played today: %1$d of %2$d XP wins</string>
 </resources>

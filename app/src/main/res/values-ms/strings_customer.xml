@@ -18,16 +18,14 @@
     <string name="games_error_load">Tidak dapat memuatkan status permainan anda. Sila cuba lagi.</string>
     <string name="games_error_not_logged_in">Belum log masuk. Sila mulakan semula aplikasi.</string>
     <string name="games_error_save">Tidak dapat menyimpan keputusan anda. Sila cuba lagi.</string>
-    <string name="games_memory_info">Hari ini %1$d / %2$d XP</string>
     <string name="games_memory_moves">Langkah %1$d</string>
-    <string name="games_memory_save_failed">Anda menang! Kami tidak dapat menyimpan XP anda. Ketik di sini untuk cuba lagi.</string>
-    <string name="games_memory_saving">Menyimpan mata anda…</string>
+    <string name="games_memory_save_failed">Anda menang! Kami tidak dapat menyimpannya. Ketik di sini untuk cuba lagi.</string>
+    <string name="games_memory_saving">Menyimpan…</string>
     <string name="games_memory_win_full">Siap dalam %1$d langkah  +%2$d XP</string>
-    <string name="games_memory_win_none">Siap dalam %1$d langkah  (had harian dicapai)</string>
-    <string name="games_memory_win_partial">Siap dalam %1$d langkah  +%2$d XP (had harian dicapai)</string>
-    <string name="games_menu_match_the_pairs_20">Padankan pasangan. 20 XP setiap padanan, sehingga 60 sehari.</string>
+    <string name="games_memory_win_none">Siap dalam %1$d langkah. Tiada lagi XP hari ini, datang semula esok</string>
+    <string name="games_menu_match_the_pairs_20">Padankan pasangan. 5 XP setiap kemenangan, 2 kemenangan sehari.</string>
     <string name="games_menu_memory_match">Padanan memori</string>
-    <string name="games_menu_one_free_spin_a">Satu putaran percuma sehari. Menangi 10 hingga 100 XP.</string>
+    <string name="games_menu_one_free_spin_a">Satu putaran percuma sehari. Menangi 2 hingga 15 XP.</string>
     <string name="games_menu_spin_the_wheel">Putar roda</string>
     <string name="games_spin_available">Sedia berputar</string>
     <string name="games_spin_button">Putar</string>
@@ -65,7 +63,7 @@
     <string name="hu_load_error">Mata anda tidak dapat dimuatkan. Semak sambungan anda.</string>
     <string name="hu_location">Lokasi</string>
     <string name="hu_memory">Padan memori</string>
-    <string name="hu_memory_today">%1$d daripada %2$d XP hari ini</string>
+    <string name="hu_memory_today">%1$d daripada %2$d kemenangan XP hari ini</string>
     <string name="hu_mission_progress">%1$s · %2$d daripada %3$d</string>
     <string name="hu_more_ready">%1$d lagi sedia · Lihat Ganjaran</string>
     <string name="hu_n_points_at">%1$d mata di %2$s</string>
@@ -254,4 +252,5 @@
     <string name="badge_cd_ready">%1$s, sedia dituntut</string>
     <string name="badge_cd_earned">%1$s, diperoleh</string>
     <string name="badge_cd_locked">%1$s, terkunci</string>
+    <string name="games_memory_xp_wins">Dimainkan hari ini: %1$d daripada %2$d kemenangan XP</string>
 </resources>

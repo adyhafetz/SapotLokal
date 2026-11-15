@@ -69,7 +69,7 @@ class ChallengesActivity : AppCompatActivity() {
                 binding.tvSpinSub.text = ""; binding.tvMemorySub.text = ""; return@fetchStatus
             }
             binding.tvSpinSub.text = getString(if (status.canSpinToday) R.string.hu_spin_ready else R.string.games_spin_used)
-            binding.tvMemorySub.text = getString(R.string.hu_memory_today, status.memoryPointsToday, AppConfig.MEMORY_MATCH_DAILY_CAP_POINTS)
+            binding.tvMemorySub.text = getString(R.string.hu_memory_today, status.memoryXpWinsToday.coerceAtMost(AppConfig.MEMORY_XP_WINS_PER_DAY), AppConfig.MEMORY_XP_WINS_PER_DAY)
         }
     }
 

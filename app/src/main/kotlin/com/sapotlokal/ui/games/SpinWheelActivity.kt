@@ -36,7 +36,7 @@ class SpinWheelActivity : AppCompatActivity() {
         binding.toolbar.setNavigationOnClickListener { finish() }
         binding.backButton.setOnClickListener { finish() }
 
-        binding.wheel.values = AppConfig.SPIN_WHEEL_SEGMENTS
+        binding.wheel.values = AppConfig.SPIN_XP_SEGMENTS
         binding.spinNowButton.setOnClickListener { onSpinTapped() }
 
         refreshStatus()
@@ -108,7 +108,7 @@ class SpinWheelActivity : AppCompatActivity() {
                 return@fetchStatus
             }
 
-            val segments = AppConfig.SPIN_WHEEL_SEGMENTS
+            val segments = AppConfig.SPIN_XP_SEGMENTS
             val winnerIndex = Random.nextInt(segments.size)
             val pointsWon = segments[winnerIndex]
 
@@ -134,7 +134,7 @@ class SpinWheelActivity : AppCompatActivity() {
         binding.spinNowButton.isEnabled = false
         binding.resultText.text = ""
 
-        val segments = AppConfig.SPIN_WHEEL_SEGMENTS
+        val segments = AppConfig.SPIN_XP_SEGMENTS
         val sweep = 360f / segments.size
         val jitter = (Random.nextFloat() - 0.5f) * sweep * 0.7f // land off-centre
         val desired = -(winnerIndex * sweep) + jitter

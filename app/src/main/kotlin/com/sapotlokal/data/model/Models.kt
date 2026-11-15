@@ -115,12 +115,10 @@ data class LeaderboardMember(
 )
 
 
+/** Shop points only come from visits and are only spent on rewards (games and missions give XP). */
 object PointSource {
     const val SHOP_VISIT    = "shop_visit"
-    const val SPIN_WHEEL    = "spin_wheel"
-    const val MEMORY_MATCH  = "memory_match"
-    const val CHALLENGE     = "challenge"
-    const val REDEMPTION    = "redemption"  // When a voucher is redeemed
+    const val REDEMPTION    = "redemption"  // When a voucher is claimed or redeemed
 }
 
 // ── VOUCHER (reward rule) ──────────────────────────────────────────────────────
@@ -189,16 +187,16 @@ object VoucherStatus {
 // ── GAME ──────────────────────────────────────────────────────────────────────
 /**
  * Stored at: /games/{gameID}
- * Records one game play by a user (Spin the Wheel or Memory Match).
+ * Records one game play by a user (Spin the Wheel or Memory Match). Games pay XP, never shop points.
  */
 data class Game(
     val gameID: String = "",
     val userID: String = "",            // FK → users/{userID}
     val gameType: String = "",          // GameType.SPIN_WHEEL or GameType.MEMORY_MATCH
     val gameAttempt: Int = 0,
-    val gamePointsRewarded: Int = 0,
-    val gameDay: String = "",           // NEW: "yyyy-MM-dd" in AppConfig.GAMES_RESET_TIME_ZONE
-    val gamePlayedAt: Long = 0L         // NEW: epoch ms, for audit/ordering
+    val gameXpRewarded: Int = 0,        // XP this play paid (0 once the daily XP wins are used)
+    val gameDay: String = "",           // "yyyy-MM-dd" in AppConfig.GAMES_RESET_TIME_ZONE
+    val gamePlayedAt: Long = 0L         // epoch ms
 )
 
 object GameType {

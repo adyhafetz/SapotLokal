@@ -38,7 +38,7 @@
           ".validate": "newData.isNumber() && newData.val() >= 1 && newData.val() <= 5 && (!data.exists() || newData.val() >= data.val())"
         },
         "lifetimePoints": {
-          // OLD — still written by games and mission claims; removed in Phases 5, 7 and 8 (replaced by xp).
+          // OLD — nothing writes it any more; removed in Phase 8 with the all-time leaderboard.
           ".validate": "newData.isNumber() && newData.val() >= 0 && (!data.exists() || (newData.val() >= data.val() && newData.val() <= data.val() + 500))"
         },
         "avatar": {
@@ -89,9 +89,8 @@
         //     A shop without pointsPerVisit counts as the default 10.
         //  B) Customer claiming a reward: a redemption row for themselves (checked again on /voucherUsers).
         //  C) Shop owner: a redemption row for their own shop.
-        //  D) OLD — removed in Phases 5 and 7: game and mission rows (empty vendorID, ≤ 250).
-        ".write": "auth != null && newData.exists() && !data.exists() && ((newData.child('userID').val() === auth.uid && newData.child('pointSource').val() === 'shop_visit' && newData.child('pointRedeemedAmount').val() === 0 && newData.child('pointEarnedAmount').val() > 0 && root.child('vendors/' + newData.child('vendorID').val() + '/userID').exists() && ((root.child('vendors/' + newData.child('vendorID').val() + '/pointsPerVisit').exists() && newData.child('pointEarnedAmount').val() <= root.child('vendors/' + newData.child('vendorID').val() + '/pointsPerVisit').val() * 3) || (!root.child('vendors/' + newData.child('vendorID').val() + '/pointsPerVisit').exists() && newData.child('pointEarnedAmount').val() <= 30))) || (newData.child('userID').val() === auth.uid && newData.child('pointSource').val() === 'redemption' && newData.child('pointEarnedAmount').val() === 0 && newData.child('pointRedeemedAmount').val() > 0 && newData.child('pointRedeemedAmount').val() <= 5000) || (newData.child('pointSource').val() === 'redemption' && newData.child('pointEarnedAmount').val() === 0 && newData.child('pointRedeemedAmount').val() > 0 && root.child('vendors/' + newData.child('vendorID').val() + '/userID').val() === auth.uid) || (newData.child('userID').val() === auth.uid && newData.child('pointSource').val() !== 'shop_visit' && newData.child('pointSource').val() !== 'redemption' && newData.child('pointRedeemedAmount').val() === 0 && newData.child('pointEarnedAmount').val() > 0 && newData.child('pointEarnedAmount').val() <= 250))",
-        ".validate": "newData.hasChildren(['userID', 'vendorID', 'pointEarnedAmount', 'pointRedeemedAmount', 'pointSource', 'timestamp'])"
+        ".write": "auth != null && newData.exists() && !data.exists() && ((newData.child('userID').val() === auth.uid && newData.child('pointSource').val() === 'shop_visit' && newData.child('pointRedeemedAmount').val() === 0 && newData.child('pointEarnedAmount').val() > 0 && root.child('vendors/' + newData.child('vendorID').val() + '/userID').exists() && ((root.child('vendors/' + newData.child('vendorID').val() + '/pointsPerVisit').exists() && newData.child('pointEarnedAmount').val() <= root.child('vendors/' + newData.child('vendorID').val() + '/pointsPerVisit').val() * 3) || (!root.child('vendors/' + newData.child('vendorID').val() + '/pointsPerVisit').exists() && newData.child('pointEarnedAmount').val() <= 30))) || (newData.child('userID').val() === auth.uid && newData.child('pointSource').val() === 'redemption' && newData.child('pointEarnedAmount').val() === 0 && newData.child('pointRedeemedAmount').val() > 0 && newData.child('pointRedeemedAmount').val() <= 5000) || (newData.child('pointSource').val() === 'redemption' && newData.child('pointEarnedAmount').val() === 0 && newData.child('pointRedeemedAmount').val() > 0 && root.child('vendors/' + newData.child('vendorID').val() + '/userID').val() === auth.uid))",
+        ".validate": "newData.hasChildren(['userID', 'vendorID', 'pointEarnedAmount', 'pointRedeemedAmount', 'pointSource', 'timestamp']) && newData.child('vendorID').val() !== '' && (newData.child('pointSource').val() === 'shop_visit' || newData.child('pointSource').val() === 'redemption')"
       }
     },
 
@@ -208,8 +207,8 @@
       ".indexOn": ["userID", "gameType"],
       "$gameID": {
         ".write": "auth != null && !data.exists() && newData.child('userID').val() === auth.uid",
-        // OLD field gamePointsRewarded — Phase 7 renames it to gameXpRewarded (≤ 15).
-        ".validate": "newData.hasChildren(['userID','gameType','gameAttempt','gameDay','gamePlayedAt']) && (newData.child('gameType').val() === 'spin_wheel' || newData.child('gameType').val() === 'memory_match') && ((newData.child('gameXpRewarded').isNumber() && newData.child('gameXpRewarded').val() >= 0 && newData.child('gameXpRewarded').val() <= 15) || (newData.child('gamePointsRewarded').isNumber() && newData.child('gamePointsRewarded').val() >= 0 && newData.child('gamePointsRewarded').val() <= 200))"
+        // Games pay XP (the XP itself is the capped /xpEvents game_{gameID} written in the same update).
+        ".validate": "newData.hasChildren(['userID','gameType','gameAttempt','gameXpRewarded','gameDay','gamePlayedAt']) && (newData.child('gameType').val() === 'spin_wheel' || newData.child('gameType').val() === 'memory_match') && newData.child('gameXpRewarded').isNumber() && newData.child('gameXpRewarded').val() >= 0 && newData.child('gameXpRewarded').val() <= 15"
       }
     },
 

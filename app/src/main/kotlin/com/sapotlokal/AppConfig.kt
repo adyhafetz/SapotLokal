@@ -11,8 +11,6 @@ package com.sapotlokal
  * Never hardcode these numbers in an Activity, Fragment, or service.
  *
  * OPEN DECISIONS (from build guide Section 5):
- *   - SPIN_WHEEL_MIN / SPIN_WHEEL_MAX & MEMORY_MATCH_REWARD: confirmed by the game prototype;
- *     flagged for developer sign-off in Phase 6.
  *   - VOUCHER_EXPIRY_DAYS: developer must confirm in Phase 5 before auto-voucher is built.
  */
 object AppConfig {
@@ -102,20 +100,7 @@ object AppConfig {
     /** Largest single raise of users/{uid}/xp in one write. Mirrors the security rules. */
     const val XP_MAX_PER_WRITE: Int = 300
 
-    // ── Games ─────────────────────────────────────────────────────────────────
-
-    /** Point values on the Spin the Wheel segments, in wheel order. One is picked uniformly at random. */
-    val SPIN_WHEEL_SEGMENTS: List<Int> = listOf(5, 10, 15, 20, 25, 30, 40, 50)
-
-    /** Derived from the segments so they can never disagree with the wheel. */
-    val SPIN_WHEEL_MIN_POINTS: Int get() = SPIN_WHEEL_SEGMENTS.min()
-    val SPIN_WHEEL_MAX_POINTS: Int get() = SPIN_WHEEL_SEGMENTS.max()
-
-    /** Points for one Memory Match win (before the daily cap). */
-    const val MEMORY_MATCH_REWARD_POINTS: Int = 20
-
-    /** Max Memory Match points a customer can earn per calendar day (3 wins at 20). */
-    const val MEMORY_MATCH_DAILY_CAP_POINTS: Int = 60
+    // ── Games (XP values live with the other XP numbers above) ─────────────────
 
     /** Timezone used to decide when "a new day" starts for both games. */
     const val GAMES_RESET_TIME_ZONE: String = "Asia/Kuala_Lumpur"
@@ -147,9 +132,9 @@ object AppConfig {
      */
     const val VOUCHER_EXPIRY_DAYS: Int = 30
 
-    // ── OLD tiers — removed in Phases 5, 7 and 8 ─────────────────────────────
-    // Games and mission claims still multiply their points by this tier, and the old all-time
-    // leaderboard reads lifetimePoints. Ranks for customers come from Rank (above), never from this.
+    // ── OLD tiers — removed in Phase 8 ───────────────────────────────────────
+    // Only the old all-time leaderboard still reads lifetimePoints with this; nothing writes it any
+    // more. Ranks for customers come from Rank (above), never from this.
 
     /**
      * Customer loyalty tiers based on Lifetime Accumulated Points.

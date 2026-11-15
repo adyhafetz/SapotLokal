@@ -93,9 +93,9 @@ class MemoryMatchActivity : AppCompatActivity() {
             if (isFinishing || isDestroyed) return@fetchStatus
             if (status != null) {
                 binding.infoText.text = getString(
-                    R.string.games_memory_info,
-                    status.memoryPointsToday,
-                    AppConfig.MEMORY_MATCH_DAILY_CAP_POINTS
+                    R.string.games_memory_xp_wins,
+                    status.memoryXpWinsToday.coerceAtMost(AppConfig.MEMORY_XP_WINS_PER_DAY),
+                    AppConfig.MEMORY_XP_WINS_PER_DAY
                 )
             } else {
                 binding.infoText.text = ""
@@ -191,21 +191,19 @@ class MemoryMatchActivity : AppCompatActivity() {
             if (isFinishing || isDestroyed) return@fetchStatus
             if (status == null) return@fetchStatus showSaveFailed()
 
-            // The daily cap is enforced on the FINAL (post-tier-multiplier) points, inside
-            // PointRepository, so a 2x tier can no longer overshoot it.
-            val room = status.memoryRoomToday
+            // The first MEMORY_XP_WINS_PER_DAY wins a day pay XP; later wins still count for
+            // missions and badges but pay nothing.
             GamesRepository.recordMemoryWin(
-                userID, AppConfig.MEMORY_MATCH_REWARD_POINTS, room, status.memoryAttemptsTotal + 1,
+                userID, status.memoryAttemptsTotal + 1, status.memoryXpWinsLeft,
                 perfect = pendingSaveMoves == GameConfig.MEMORY_EMOJIS.size
             ) { ok, earned ->
                 if (isFinishing || isDestroyed) return@recordMemoryWin
                 if (!ok) return@recordMemoryWin showSaveFailed()
 
-                binding.statusText.text = when {
-                    earned <= 0 -> getString(R.string.games_memory_win_none, pendingSaveMoves)
-                    earned < AppConfig.MEMORY_MATCH_REWARD_POINTS && room < AppConfig.MEMORY_MATCH_REWARD_POINTS ->
-                        getString(R.string.games_memory_win_partial, pendingSaveMoves, earned)
-                    else -> getString(R.string.games_memory_win_full, pendingSaveMoves, earned)
+                binding.statusText.text = if (earned > 0) {
+                    getString(R.string.games_memory_win_full, pendingSaveMoves, earned)
+                } else {
+                    getString(R.string.games_memory_win_none, pendingSaveMoves)
                 }
                 binding.newGameButton.isEnabled = true
                 refreshInfo()

@@ -23,10 +23,10 @@ There are two currencies, and they never mix:
 | `badges/{uid}` | badge id | `unlockedAt, claimedAt` | the customer |
 | `vouchers` | push id | shop rewards: `vendorID, voucherName, voucherDescription, pointsRequired, isActive` | the owner |
 | `voucherUsers` | push id | claimed vouchers: code, status (`active`, `used`, `expired`), expiry, cost snapshot, `claimPointID` | customer (claim), owner (mark used) |
-| `games` | push id | one row per game played: `userID, gameType, gameAttempt, gameDay, gamePlayedAt` and the reward | the customer |
+| `games` | push id | one row per game played: `userID, gameType, gameAttempt, gameXpRewarded, gameDay, gamePlayedAt` | the customer |
 | `shopNotifications` | push id | "shop is open" announcements for the push Cloud Function | the owner |
 
-**Still present until their phase replaces them:** `users/*/lifetimePoints` and `currentTier` (Phases 5, 7 and 8; only the old all-time leaderboard still shows them); game and mission rows in `/points` with an empty `vendorID` (Phases 5 and 7); `games/*/gamePointsRewarded` (Phase 7). The rules mark each of these as OLD.
+**Still present until their phase replaces them:** `users/*/lifetimePoints` and `currentTier` (Phase 8; nothing writes them, only the old all-time leaderboard reads them). The rules mark each of these as OLD.
 
 ## Keys and formats
 

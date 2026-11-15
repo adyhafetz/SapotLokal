@@ -5,14 +5,10 @@ import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.ServerValue
 import com.google.firebase.database.ValueEventListener
 import com.sapotlokal.AppConfig
-import com.sapotlokal.AppConfig.CustomerTier
-import com.sapotlokal.data.model.Game
 import com.sapotlokal.data.model.Point
 import com.sapotlokal.data.model.PointSource
 import com.sapotlokal.data.model.XpEventKey
 import com.sapotlokal.data.model.XpSource
-import java.time.LocalDate
-import java.time.ZoneId
 
 /**
  * PointRepository — all reads and writes to the /points node in Firebase Realtime Database.
@@ -21,10 +17,9 @@ import java.time.ZoneId
  * Centralising those writes here means every screen uses the same logic — no duplicated
  * Firebase paths or business rules scattered across Activities.
  *
- * DUAL LEDGER ARCHITECTURE (Phase 1):
- * - Lifetime Points: Sum of all earned points (never decreased by redemptions). Determines Tier.
- * - Spendable Balance: Total earned minus total redeemed. Used for voucher claims.
- * - Tier Multiplier: Applied dynamically to base points upon earning.
+ * Shop points only (REFRACTOR.md §1.2): every row belongs to one shop. Visits earn them (the
+ * shop's points per visit × the customer's rank bonus); claiming a reward spends them. XP is a
+ * separate thing, written only by XpRepository.
  */
 object PointRepository {
 
@@ -33,95 +28,6 @@ object PointRepository {
         .reference
 
     // ── Write ──────────────────────────────────────────────────────────────────
-
-    /** Game points belong to no shop. See docs/erd-changes.md Change 5. */
-    const val NO_VENDOR_ID = ""
-
-    /** Builds (but does not write) a ledger row for game points. Returns null if no push key could be made. */
-    fun newGamePointEntry(userID: String, source: String, amount: Int): Point? {
-        val key = db.child("points").push().key ?: return null
-        return Point(
-            pointID             = key,
-            userID              = userID,
-            vendorID            = NO_VENDOR_ID,
-            pointEarnedAmount   = amount,
-            pointRedeemedAmount = 0,
-            pointSource         = source
-        )
-    }
-
-    /**
-     * Atomically awards points with the user's current tier multiplier:
-     * 1. Multiplies base points by user tier multiplier: (base * multiplier).toInt()
-     * 2. Appends an earned row to /points
-     * 3. Atomically increments /users/{userID}/lifetimePoints via ServerValue.increment
-     * 4. Updates /users/{userID}/currentTier
-     */
-    fun addPoints(
-        userID: String,
-        basePoints: Int,
-        pointSource: String,
-        vendorID: String = NO_VENDOR_ID,
-        extraUpdates: Map<String, Any?> = emptyMap(),
-        applyMultiplier: Boolean = true,
-        onResult: (success: Boolean, earnedPoints: Int) -> Unit = { _, _ -> }
-    ) {
-        if (userID.isBlank()) {
-            onResult(false, 0)
-            return
-        }
-        if (basePoints <= 0) {
-            onResult(true, 0)
-            return
-        }
-
-        db.child("users").child(userID).addListenerForSingleValueEvent(object : ValueEventListener {
-            override fun onDataChange(snapshot: DataSnapshot) {
-                val currentLifetime = snapshot.child("lifetimePoints").getValue(Long::class.java)?.toInt() ?: 0
-                val tier = CustomerTier.fromLifetimePoints(currentLifetime)
-                val earnedPoints = if (applyMultiplier) (basePoints * tier.multiplier).toInt().coerceAtLeast(1) else basePoints
-                val newLifetime = currentLifetime + earnedPoints
-                val newTier = CustomerTier.fromLifetimePoints(newLifetime)
-
-                val pointRef = db.child("points").push()
-                val pointID = pointRef.key ?: run {
-                    onResult(false, 0)
-                    return
-                }
-
-                val pointRow = Point(
-                    pointID            = pointID,
-                    userID             = userID,
-                    vendorID           = vendorID,
-                    pointEarnedAmount  = earnedPoints,
-                    pointRedeemedAmount = 0,
-                    pointSource        = pointSource,
-                    timestamp          = System.currentTimeMillis()
-                )
-
-                // extraUpdates (e.g. a "claimed" flag) ride in the SAME atomic write, so a reward
-                // can never be marked claimed without its points being recorded (or vice-versa).
-                val updates = hashMapOf<String, Any?>(
-                    "points/$pointID" to pointRow,
-                    "users/$userID/lifetimePoints" to ServerValue.increment(earnedPoints.toLong()),
-                    "users/$userID/currentTier" to newTier.code
-                )
-                updates.putAll(extraUpdates)
-
-                db.updateChildren(updates)
-                    .addOnSuccessListener {
-                        onResult(true, earnedPoints)
-                    }
-                    .addOnFailureListener {
-                        onResult(false, 0)
-                    }
-            }
-
-            override fun onCancelled(error: DatabaseError) {
-                onResult(false, 0)
-            }
-        })
-    }
 
     /** What one valid scan gave: shop points (with the rank bonus), XP, and the rank after it. */
     data class VisitResult(
@@ -257,132 +163,6 @@ object PointRepository {
                 }
             })
     }
-
-    /**
-     * Atomically records a mini-game play and awards points with tier multiplier.
-     */
-    fun awardMiniGamePoints(
-        userID: String,
-        basePoints: Int,
-        gameType: String,
-        attemptNumber: Int,
-        maxEarnedPoints: Int = Int.MAX_VALUE,
-        badgeKind: BadgeRepository.GameKind? = null,
-        topSegment: Boolean = false,
-        perfect: Boolean = false,
-        onResult: (success: Boolean, earnedPoints: Int) -> Unit
-    ) {
-        if (userID.isBlank()) {
-            onResult(false, 0)
-            return
-        }
-        if (badgeKind == null) {
-            writeGame(userID, basePoints, gameType, attemptNumber, maxEarnedPoints, emptyMap(), onResult)
-            return
-        }
-        // Badges a play can earn (Nasib Baik, Otak Cerdas, Combo) ride in the same write.
-        BadgeRepository.readContext(userID) { stats, badges ->
-            val (paths, _) = BadgeRepository.gamePaths(userID, badgeKind, System.currentTimeMillis(), stats, badges, topSegment, perfect)
-            writeGame(userID, basePoints, gameType, attemptNumber, maxEarnedPoints, paths, onResult)
-        }
-    }
-
-    private fun writeGame(
-        userID: String,
-        basePoints: Int,
-        gameType: String,
-        attemptNumber: Int,
-        maxEarnedPoints: Int,
-        badgePaths: Map<String, Any>,
-        onResult: (success: Boolean, earnedPoints: Int) -> Unit
-    ) {
-
-        val todayKey = LocalDate.now(ZoneId.of(AppConfig.GAMES_RESET_TIME_ZONE)).toString()
-        val gameID = db.child("games").push().key ?: run {
-            onResult(false, 0)
-            return
-        }
-
-        if (basePoints <= 0) {
-            val game = Game(
-                gameID = gameID,
-                userID = userID,
-                gameType = gameType,
-                gameAttempt = attemptNumber,
-                gamePointsRewarded = 0,
-                gameDay = todayKey,
-                gamePlayedAt = System.currentTimeMillis()
-            )
-            val week = com.sapotlokal.util.MissionDateUtils.getWeekYearKey()
-            val updates = hashMapOf<String, Any>("games/$gameID" to game)
-            updates.putAll(MissionRepository.gamePaths(userID, todayKey, week))
-            updates.putAll(badgePaths)
-            db.updateChildren(updates)
-                .addOnSuccessListener { onResult(true, 0) }
-                .addOnFailureListener { onResult(false, 0) }
-            return
-        }
-
-        db.child("users").child(userID).addListenerForSingleValueEvent(object : ValueEventListener {
-            override fun onDataChange(snapshot: DataSnapshot) {
-                val currentLifetime = snapshot.child("lifetimePoints").getValue(Long::class.java)?.toInt() ?: 0
-                val tier = CustomerTier.fromLifetimePoints(currentLifetime)
-                // maxEarnedPoints enforces the daily cap AFTER the tier multiplier is applied.
-                val earnedPoints = (basePoints * tier.multiplier).toInt().coerceAtLeast(1)
-                    .coerceAtMost(maxEarnedPoints.coerceAtLeast(1))
-                val newLifetime = currentLifetime + earnedPoints
-                val newTier = CustomerTier.fromLifetimePoints(newLifetime)
-
-                val pointID = db.child("points").push().key ?: run {
-                    onResult(false, 0)
-                    return
-                }
-
-                val game = Game(
-                    gameID = gameID,
-                    userID = userID,
-                    gameType = gameType,
-                    gameAttempt = attemptNumber,
-                    gamePointsRewarded = earnedPoints,
-                    gameDay = todayKey,
-                    gamePlayedAt = System.currentTimeMillis()
-                )
-
-                val pointRow = Point(
-                    pointID            = pointID,
-                    userID             = userID,
-                    vendorID           = NO_VENDOR_ID,
-                    pointEarnedAmount  = earnedPoints,
-                    pointRedeemedAmount = 0,
-                    pointSource        = when (gameType) {
-                        PointSource.SPIN_WHEEL -> PointSource.SPIN_WHEEL
-                        else -> PointSource.MEMORY_MATCH
-                    },
-                    timestamp          = System.currentTimeMillis()
-                )
-
-                val updates = hashMapOf<String, Any?>(
-                    "games/$gameID" to game,
-                    "points/$pointID" to pointRow,
-                    "users/$userID/lifetimePoints" to ServerValue.increment(earnedPoints.toLong()),
-                    "users/$userID/currentTier" to newTier.code
-                )
-                updates.putAll(MissionRepository.gamePaths(userID, todayKey, com.sapotlokal.util.MissionDateUtils.getWeekYearKey()))
-                updates.putAll(badgePaths)
-
-                db.updateChildren(updates)
-                    .addOnSuccessListener { onResult(true, earnedPoints) }
-                    .addOnFailureListener {
-                        onResult(false, 0)
-                    }
-            }
-
-            override fun onCancelled(error: DatabaseError) {
-                onResult(false, 0)
-            }
-        })
-    }
-
 
     // ── Read — one-shot & live ──────────────────────────────────────────────────
 
