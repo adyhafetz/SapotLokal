@@ -1,116 +1,162 @@
 {
   "rules": {
+    // ─────────────────────────────────────────────────────────────────────────
+    // HARDENED RULES. Copy this whole file into Firebase Console →
+    // Realtime Database → Rules → Publish.
+    //
+    // What is (and is NOT) protected — be honest with yourself about this:
+    //  ✔ Role can't change; vendors can only touch their own shop/QR/rules/notifications.
+    //  ✔ Vendors CAN write redemption rows for their own shop (was blocked before).
+    //  ✔ Customers can't mint vouchers with a fake cost, can't edit/delete ledger rows,
+    //    can't write huge point amounts, can't decrease lifetime points.
+    //  ✔ Customers can no longer LIST /qrcodes (only look a code up by its exact value).
+    //  ✘ A determined customer can still write small bogus earn rows for themselves.
+    //    Closing that fully needs a server (Cloud Function) to award points — see docs below.
+    // ─────────────────────────────────────────────────────────────────────────
+
     "users": {
+      // NOTE: readable by all signed-in users because the leaderboard needs names/points.
+      // This also exposes emails and FCM tokens. Moving public fields (name, tier, points)
+      // to a separate /publicProfiles node would fix that (future work).
       ".read": "auth != null",
       "$userID": {
-        // A user can write their own record. Role cannot be changed once set.
         ".write": "auth != null && auth.uid === $userID",
         "role": {
           // role must be 'customer' or 'vendor', and once written it cannot change.
           ".validate": "newData.isString() && (newData.val() === 'customer' || newData.val() === 'vendor') && (!data.exists() || data.val() === newData.val())"
+        },
+        "lifetimePoints": {
+          // Never goes down, and a single write can't add more than 500 (largest legit award is 200).
+          ".validate": "newData.isNumber() && newData.val() >= 0 && (!data.exists() || (newData.val() >= data.val() && newData.val() <= data.val() + 500))"
+        },
+        "avatar": {
+          // Optional profile avatar: one of the five built-in animals.
+          ".validate": "newData.isString() && (newData.val() === '' || newData.val() === 'cat' || newData.val() === 'dog' || newData.val() === 'panda' || newData.val() === 'brown_bear' || newData.val() === 'capybara')"
         }
       }
     },
+
     "vendors": {
       ".read": "auth != null",
       ".indexOn": ["userID"],
       "$vendorID": {
-        // A vendor can write their own shop record.
-        // The rule checks the CURRENT database state, so the USER record must be
-        // committed BEFORE this write (see SignUpVendorActivity: sequential writes).
-        // Condition: authenticated, role is 'vendor', and the userID on the record
-        // matches the authenticated user (prevents a vendor from editing another shop).
-        ".write": "auth != null && root.child('users/' + auth.uid + '/role').val() === 'vendor' && (newData.child('userID').val() === auth.uid)"
+        // The USER record must be committed BEFORE this write (see SignUpVendorActivity).
+        // Create/edit, or DELETE (newData is empty on delete, so the owner is read from the existing record).
+        ".write": "auth != null && root.child('users/' + auth.uid + '/role').val() === 'vendor' && (newData.exists() ? newData.child('userID').val() : data.child('userID').val()) === auth.uid"
       }
     },
-    "qrcodes": {
+
+    "vendorPhotos": {
+      // A shop photo is a small Base64 JPEG, kept apart from /vendors so shop lists stay light.
+      // Only the shop's owner can add, replace or remove it.
       ".read": "auth != null",
+      "$vendorID": {
+        ".write": "auth != null && root.child('vendors/' + $vendorID + '/userID').val() === auth.uid",
+        ".validate": "!newData.exists() || (newData.isString() && newData.val().length < 400000)"
+      }
+    },
+
+    "qrcodes": {
+      // Lookup-by-exact-value only (what ScanActivity does). A customer can no longer
+      // download every live QR code. Vendors never read this node.
+      ".read": "auth != null && query.orderByChild === 'qrcodeValue' && query.equalTo != null",
       ".indexOn": ["vendorID", "isActive", "qrcodeValue"],
       "$qrcodeID": {
-        ".write": "auth != null && root.child('users/' + auth.uid + '/role').val() === 'vendor' && root.child('vendors/' + newData.child('vendorID').val() + '/userID').val() === auth.uid"
+        // Create / update / DELETE, only for a vendor's own shop. On delete newData is empty,
+        // so the vendorID is read from the existing record instead.
+        ".write": "auth != null && root.child('users/' + auth.uid + '/role').val() === 'vendor' && root.child('vendors/' + (newData.exists() ? newData.child('vendorID').val() : data.child('vendorID').val()) + '/userID').val() === auth.uid"
       }
     },
+
     "points": {
       ".read": "auth != null",
       ".indexOn": ["userID", "vendorID"],
       "$pointID": {
-        // Points are append-only (ledger). Once written, a row cannot be changed.
-        ".write": "auth != null && newData.child('userID').val() === auth.uid",
-        ".validate": "!data.exists() || newData.val() === data.val()"
+        // Append-only ledger: rows can be created, never edited or deleted.
+        //  A) A customer writes their OWN earn row: positive amount, no redemption, ≤ 250.
+        //  B) A vendor writes a REDEMPTION row for a customer of THEIR OWN shop.
+        ".write": "auth != null && newData.exists() && !data.exists() && ((newData.child('userID').val() === auth.uid && newData.child('pointRedeemedAmount').val() === 0 && newData.child('pointEarnedAmount').val() > 0 && newData.child('pointEarnedAmount').val() <= 250) || (newData.child('pointSource').val() === 'redemption' && newData.child('pointEarnedAmount').val() === 0 && newData.child('pointRedeemedAmount').val() > 0 && root.child('vendors/' + newData.child('vendorID').val() + '/userID').val() === auth.uid) || (newData.child('userID').val() === auth.uid && newData.child('pointSource').val() === 'redemption' && newData.child('pointEarnedAmount').val() === 0 && newData.child('pointRedeemedAmount').val() > 0 && newData.child('pointRedeemedAmount').val() <= 5000))",
+        ".validate": "newData.hasChildren(['userID', 'pointEarnedAmount', 'pointRedeemedAmount', 'pointSource'])"
       }
     },
+
     "vouchers": {
       ".read": "auth != null",
       ".indexOn": ["vendorID", "isActive"],
       "$voucherID": {
-        // Only the vendor who owns the shop can create/edit reward rules.
-        ".write": "auth != null && root.child('users/' + auth.uid + '/role').val() === 'vendor' && root.child('vendors/' + newData.child('vendorID').val() + '/userID').val() === auth.uid"
+        // Only the vendor who owns the shop can create/edit/delete its reward rules.
+        ".write": "auth != null && root.child('users/' + auth.uid + '/role').val() === 'vendor' && root.child('vendors/' + (newData.exists() ? newData.child('vendorID').val() : data.child('vendorID').val()) + '/userID').val() === auth.uid"
       }
     },
+
     "voucherUsers": {
       ".read": "auth != null",
       ".indexOn": ["userID", "vendorID", "voucherStatus", "voucherCode"],
       "$voucherUserID": {
-        // Customer can CREATE (status must start as 'active'); vendor can UPDATE (mark used).
-        // A customer can never mark their own voucher as used.
-        ".write": "auth != null && ((!data.exists() && newData.child('userID').val() === auth.uid && newData.child('voucherStatus').val() === 'active') || (data.exists() && root.child('vendors/' + data.child('vendorID').val() + '/userID').val() === auth.uid))",
+        // CREATE (customer, by CLAIMING): the same write must also add a matching "redemption" points row (claimPointID),
+        //   because points are deducted at claim. Cost + shop must MATCH the real, active reward rule.
+        // UPDATE (vendor of that shop): mark used.
+        ".write": "auth != null && ((!data.exists() && newData.child('userID').val() === auth.uid && newData.child('voucherStatus').val() === 'active' && newData.child('pointsDeducted').val() === true && root.child('vouchers/' + newData.child('voucherID').val() + '/isActive').val() === true && newData.parent().parent().child('points/' + newData.child('claimPointID').val() + '/userID').val() === auth.uid && newData.parent().parent().child('points/' + newData.child('claimPointID').val() + '/pointRedeemedAmount').val() === newData.child('pointsRequiredSnapshot').val() && newData.child('pointsRequiredSnapshot').val() === root.child('vouchers/' + newData.child('voucherID').val() + '/pointsRequired').val() && newData.child('vendorID').val() === root.child('vouchers/' + newData.child('voucherID').val() + '/vendorID').val()) || (data.exists() && root.child('vendors/' + data.child('vendorID').val() + '/userID').val() === auth.uid))",
         "voucherStatus": {
           // Once marked 'used', it cannot be changed back.
           ".validate": "!(data.val() === 'used' && newData.val() !== 'used')"
         }
       }
     },
+
     "games": {
-      ".read": "auth != null",
+      // Each player may only query THEIR OWN plays (the old per-record read rule was cancelled
+      // out by the parent rule, so everyone could read everything).
+      ".read": "auth != null && query.orderByChild === 'userID' && query.equalTo === auth.uid",
       ".indexOn": ["userID", "gameType"],
       "$gameID": {
-        ".read": "auth != null && data.child('userID').val() === auth.uid",
         ".write": "auth != null && !data.exists() && newData.child('userID').val() === auth.uid",
-        ".validate": "newData.hasChildren(['userID','gameType','gameAttempt','gamePointsRewarded','gameDay','gamePlayedAt']) && (newData.child('gameType').val() === 'spin_wheel' || newData.child('gameType').val() === 'memory_match') && newData.child('gamePointsRewarded').val() >= 0"
+        ".validate": "newData.hasChildren(['userID','gameType','gameAttempt','gamePointsRewarded','gameDay','gamePlayedAt']) && (newData.child('gameType').val() === 'spin_wheel' || newData.child('gameType').val() === 'memory_match') && newData.child('gamePointsRewarded').val() >= 0 && newData.child('gamePointsRewarded').val() <= 200"
       }
     },
-    "challenges": {
-      ".read": "auth != null",
-      "$challengeID": {
-        ".write": "auth != null"
-      }
-    },
-    "userChallenges": {
-      ".read": "auth != null",
-      ".indexOn": ["userID"],
-      "$userChallengeID": {
-        ".write": "auth != null && newData.child('userID').val() === auth.uid"
-      }
-    },
+
+    // /challenges and /userChallenges were REMOVED: the old challenge system was dead code
+    // (the Challenges screen shows Weekly Missions). With no rule, access is denied.
+
     "missions": {
+      // Missions are defined in code (MissionRepository.DEFAULT_MISSIONS); clients can't edit them.
       ".read": "auth != null",
-      "$missionID": {
-        ".write": "auth != null"
-      }
+      ".write": false
     },
+
     "userMissions": {
       ".read": "auth != null",
       ".indexOn": ["userId", "userID", "weekYearKey"],
       "$userMissionID": {
-        ".write": "auth != null"
+        // You can only write YOUR OWN mission records.
+        ".write": "auth != null && newData.exists() && newData.child('userId').val() === auth.uid && (!data.exists() || data.child('userId').val() === auth.uid)",
+        "isClaimed": {
+          // A claimed mission can never be claimed again or un-claimed: once it is true, nothing may write this field,
+          // so a repeated tap can't pay the same reward twice (the points row travels in the same atomic write).
+          ".validate": "!(data.val() === true)"
+        }
       }
     },
+
     "userMissionTracking": {
       ".read": "auth != null",
       "$userId": {
         ".write": "auth != null && auth.uid === $userId"
       }
     },
+
     "shopVisits": {
       ".read": "auth != null",
       "$userId": {
         ".write": "auth != null && auth.uid === $userId"
       }
     },
+
     "shopNotifications": {
       ".read": "auth != null",
       "$notificationId": {
-        ".write": "auth != null"
+        // Only the owner of the shop can announce that shop opening (stops spoofed alerts).
+        ".write": "auth != null && newData.exists() && root.child('vendors/' + newData.child('vendorID').val() + '/userID').val() === auth.uid"
       }
     }
   }

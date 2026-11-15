@@ -1,0 +1,4 @@
+node_modules/
+# Service-account keys give full access to your Firebase project. Never commit them.
+serviceAccountKey*.json
+*-firebase-adminsdk-*.json
