@@ -74,6 +74,7 @@ class MemoryMatchActivity : AppCompatActivity() {
 
         binding.movesText.text = getString(R.string.games_memory_moves, moves)
         binding.statusText.text = ""
+        binding.pairsText.text = getString(com.sapotlokal.R.string.k_pairs, 0, GameConfig.MEMORY_EMOJIS.size)
         binding.statusText.setOnClickListener(null)
         binding.newGameButton.isEnabled = true
 
@@ -108,7 +109,7 @@ class MemoryMatchActivity : AppCompatActivity() {
         for (i in cards.indices) {
             val view = TextView(this).apply {
                 gravity = Gravity.CENTER
-                textSize = 32f
+                textSize = 38f
                 layoutParams = GridLayout.LayoutParams(
                     GridLayout.spec(GridLayout.UNDEFINED),
                     GridLayout.spec(GridLayout.UNDEFINED, 1f)
@@ -130,6 +131,7 @@ class MemoryMatchActivity : AppCompatActivity() {
         if (busy || gameOver || card.faceUp || card.matched) return
 
         card.faceUp = true
+        com.sapotlokal.util.SoundFx.flip()
         flipTo(index)
 
         val first = firstPick
@@ -147,10 +149,14 @@ class MemoryMatchActivity : AppCompatActivity() {
             cards[first].matched = true
             card.matched = true
             matchedPairs++
+            binding.pairsText.text = getString(com.sapotlokal.R.string.k_pairs, matchedPairs, GameConfig.MEMORY_EMOJIS.size)
+            com.sapotlokal.util.SoundFx.match()
             handler.postDelayed({
                 if (isFinishing || isDestroyed) return@postDelayed
                 showState(first)
                 showState(index)
+                pulse(first)
+                pulse(index)
                 if (matchedPairs == GameConfig.MEMORY_EMOJIS.size) onWin()
             }, GameConfig.MEMORY_MATCH_REVEAL_DELAY_MS)
         } else {
@@ -182,27 +188,34 @@ class MemoryMatchActivity : AppCompatActivity() {
             if (isFinishing || isDestroyed) return@fetchStatus
             if (status == null) return@fetchStatus showSaveFailed()
 
-            val award = minOf(AppConfig.MEMORY_MATCH_REWARD_POINTS, status.memoryRoomToday)
-            GamesRepository.recordMemoryWin(userID, award, status.memoryAttemptsTotal + 1) { ok ->
+            // The daily cap is enforced on the FINAL (post-tier-multiplier) points, inside
+            // PointRepository, so a 2x tier can no longer overshoot it.
+            val room = status.memoryRoomToday
+            GamesRepository.recordMemoryWin(
+                userID, AppConfig.MEMORY_MATCH_REWARD_POINTS, room, status.memoryAttemptsTotal + 1
+            ) { ok, earned ->
+                // Hook first: progress must be saved even if the user already left the screen.
+                if (ok) {
+                    com.sapotlokal.data.repository.MissionRepository.recordMemoryMatchEvent(
+                        activity = this@MemoryMatchActivity,
+                        userId = userID,
+                        pointsWon = earned,
+                        moves = pendingSaveMoves
+                    )
+                }
                 if (isFinishing || isDestroyed) return@recordMemoryWin
                 if (!ok) return@recordMemoryWin showSaveFailed()
 
                 binding.statusText.text = when {
-                    award <= 0 -> getString(R.string.games_memory_win_none, pendingSaveMoves)
-                    award < AppConfig.MEMORY_MATCH_REWARD_POINTS ->
-                        getString(R.string.games_memory_win_partial, pendingSaveMoves, award)
-                    else -> getString(R.string.games_memory_win_full, pendingSaveMoves, award)
+                    earned <= 0 -> getString(R.string.games_memory_win_none, pendingSaveMoves)
+                    earned < AppConfig.MEMORY_MATCH_REWARD_POINTS && room < AppConfig.MEMORY_MATCH_REWARD_POINTS ->
+                        getString(R.string.games_memory_win_partial, pendingSaveMoves, earned)
+                    else -> getString(R.string.games_memory_win_full, pendingSaveMoves, earned)
                 }
                 binding.newGameButton.isEnabled = true
                 refreshInfo()
-
-                // Phase 3 Weekly Missions & Gamification Hook
-                com.sapotlokal.data.repository.MissionRepository.recordMemoryMatchEvent(
-                    activity = this@MemoryMatchActivity,
-                    userId = userID,
-                    pointsWon = award,
-                    moves = pendingSaveMoves
-                )
+                binding.confetti.burst(0.4f)
+                com.sapotlokal.util.SoundFx.win()
             }
         }
     }
@@ -211,6 +224,14 @@ class MemoryMatchActivity : AppCompatActivity() {
         binding.statusText.text = getString(R.string.games_memory_save_failed)
         binding.statusText.setOnClickListener { saveWin() }
         binding.newGameButton.isEnabled = true
+    }
+
+    /** A little pop when a pair is found. */
+    private fun pulse(index: Int) {
+        val v = cardViews[index]
+        v.animate().scaleX(1.12f).scaleY(1.12f).setDuration(140).withEndAction {
+            v.animate().scaleX(1f).scaleY(1f).setDuration(180).start()
+        }.start()
     }
 
     private fun flipTo(index: Int) {
@@ -232,6 +253,7 @@ class MemoryMatchActivity : AppCompatActivity() {
                 view.text = card.emoji
                 view.setTextColor(ContextCompat.getColor(this, R.color.game_card_front_text))
                 background.setColor(ContextCompat.getColor(this, R.color.game_card_matched))
+                background.setStroke(dp(2), ContextCompat.getColor(this, R.color.game_card_matched_stroke))
             }
             card.faceUp -> {
                 view.text = card.emoji
@@ -240,7 +262,7 @@ class MemoryMatchActivity : AppCompatActivity() {
                 background.setStroke(dp(2), ContextCompat.getColor(this, R.color.game_card_front_stroke))
             }
             else -> {
-                view.text = "?"
+                view.text = "✦"
                 view.setTextColor(ContextCompat.getColor(this, R.color.game_card_back_text))
                 background.setColor(ContextCompat.getColor(this, R.color.game_card_back))
             }

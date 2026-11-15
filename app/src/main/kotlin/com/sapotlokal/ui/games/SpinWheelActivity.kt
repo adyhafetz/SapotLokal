@@ -75,6 +75,7 @@ class SpinWheelActivity : AppCompatActivity() {
 
     private fun applyStatus(status: GamesRepository.GameStatus) {
         setBusy(false)
+        binding.spinStatusText.text = if (status.canSpinToday) getString(com.sapotlokal.R.string.k_spin_left_today) else getString(com.sapotlokal.R.string.games_spin_come_back)
         if (status.canSpinToday) {
             binding.spinNowButton.isEnabled = true
             binding.spinNowButton.setText(R.string.games_spin_button)
@@ -109,17 +110,31 @@ class SpinWheelActivity : AppCompatActivity() {
             val pointsWon = segments[winnerIndex]
 
             // COMMIT FIRST. Animate only if the write succeeded (prevents free re-spins, C8).
-            GamesRepository.recordSpin(userID, pointsWon, status.spinAttemptsTotal + 1) { ok ->
-                if (isFinishing || isDestroyed) return@recordSpin
+            GamesRepository.recordSpin(userID, pointsWon, status.spinAttemptsTotal + 1) { ok, earned ->
                 if (!ok) {
+                    if (isFinishing || isDestroyed) return@recordSpin
                     setBusy(false)
                     showMessage(R.string.games_error_save)
                     return@recordSpin
                 }
-                animateWheelTo(winnerIndex, pointsWon)
+
+                // Fire the mission/badge hook as soon as the win is committed — NOT at the end
+                // of the animation — so leaving the screen mid-spin can't lose progress.
+                // Passing the Activity is safe: BadgeRepository checks isFinishing/isDestroyed.
+                com.sapotlokal.data.repository.MissionRepository.recordSpinEvent(
+                    activity = this@SpinWheelActivity,
+                    userId = userID,
+                    pointsWon = earned,
+                    segmentPoints = pointsWon
+                )
+
+                if (isFinishing || isDestroyed) return@recordSpin
+                animateWheelTo(winnerIndex, earned)
             }
         }
     }
+
+    private var lastTickIndex = -1
 
     private fun animateWheelTo(winnerIndex: Int, pointsWon: Int) {
         isSpinning = true
@@ -139,24 +154,35 @@ class SpinWheelActivity : AppCompatActivity() {
             .rotation(target)
             .setDuration(GameConfig.SPIN_DURATION_MS)
             .setInterpolator(DecelerateInterpolator())
+            .setUpdateListener {
+                // A tick each time a slice passes the pointer.
+                val n = segments.size
+                val angle = ((-binding.wheel.rotation % 360f) + 360f) % 360f
+                val index = Math.round(angle / sweep) % n
+                if (index != lastTickIndex) {
+                    lastTickIndex = index
+                    com.sapotlokal.util.SoundFx.tick()
+                    binding.wheel.performHapticFeedback(android.view.HapticFeedbackConstants.CLOCK_TICK)
+                }
+            }
             .withEndAction {
                 if (isFinishing || isDestroyed) return@withEndAction
                 isSpinning = false
                 binding.resultText.text = getString(R.string.games_spin_result, pointsWon)
+                binding.resultText.scaleX = 0.6f
+                binding.resultText.scaleY = 0.6f
+                binding.resultText.animate().scaleX(1f).scaleY(1f).setDuration(350)
+                    .setInterpolator(android.view.animation.OvershootInterpolator()).start()
+                binding.confetti.burst(0.45f)
+                com.sapotlokal.util.SoundFx.win()
                 setBusy(false)
                 showSpunToday()
-
-                // Phase 3 Weekly Missions & Gamification Hook
-                com.sapotlokal.data.repository.MissionRepository.recordSpinEvent(
-                    activity = this@SpinWheelActivity,
-                    userId = userID,
-                    pointsWon = pointsWon
-                )
             }
             .start()
     }
 
     private fun showSpunToday() {
+        binding.spinStatusText.text = getString(com.sapotlokal.R.string.games_spin_come_back)
         binding.spinNowButton.isEnabled = false
         binding.spinNowButton.setText(R.string.games_spin_come_back)
     }
