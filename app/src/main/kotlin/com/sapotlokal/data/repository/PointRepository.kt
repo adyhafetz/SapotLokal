@@ -207,6 +207,7 @@ object PointRepository {
             "weeklyVisits/$week/$userID/rank" to rankAfter.level
         )
         updates.putAll(xpPaths)
+        updates.putAll(MissionRepository.visitPaths(userID, vendorID, week))
 
         db.updateChildren(updates)
             .addOnSuccessListener {
@@ -282,7 +283,10 @@ object PointRepository {
                 gameDay = todayKey,
                 gamePlayedAt = System.currentTimeMillis()
             )
-            db.child("games").child(gameID).setValue(game)
+            val week = com.sapotlokal.util.MissionDateUtils.getWeekYearKey()
+            val updates = hashMapOf<String, Any>("games/$gameID" to game)
+            updates.putAll(MissionRepository.gamePaths(userID, todayKey, week))
+            db.updateChildren(updates)
                 .addOnSuccessListener { onResult(true, 0) }
                 .addOnFailureListener { onResult(false, 0) }
             return
@@ -332,6 +336,7 @@ object PointRepository {
                     "users/$userID/lifetimePoints" to ServerValue.increment(earnedPoints.toLong()),
                     "users/$userID/currentTier" to newTier.code
                 )
+                updates.putAll(MissionRepository.gamePaths(userID, todayKey, com.sapotlokal.util.MissionDateUtils.getWeekYearKey()))
 
                 db.updateChildren(updates)
                     .addOnSuccessListener { onResult(true, earnedPoints) }
@@ -346,23 +351,6 @@ object PointRepository {
         })
     }
 
-    /**
-     * Claims a mission or challenge reward with tier multiplier.
-     */
-    fun claimMissionReward(
-        userID: String,
-        basePoints: Int,
-        missionId: String,
-        onResult: (success: Boolean, earnedPoints: Int) -> Unit = { _, _ -> }
-    ) {
-        addPoints(
-            userID = userID,
-            basePoints = basePoints,
-            pointSource = PointSource.CHALLENGE,
-            vendorID = NO_VENDOR_ID,
-            onResult = onResult
-        )
-    }
 
     // ── Read — one-shot & live ──────────────────────────────────────────────────
 

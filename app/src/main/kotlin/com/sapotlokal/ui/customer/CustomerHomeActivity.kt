@@ -53,7 +53,7 @@ class CustomerHomeActivity : AppCompatActivity() {
     private var pointsListener: ValueEventListener? = null
     private var userListener: ValueEventListener? = null
     private var vendorsListener: ValueEventListener? = null
-    private var missionsListener: ValueEventListener? = null
+    private var missions: com.sapotlokal.data.repository.MissionRepository.Listening? = null
     private var vouchersListener: ValueEventListener? = null
     private var rulesListener: ValueEventListener? = null
 
@@ -107,7 +107,6 @@ class CustomerHomeActivity : AppCompatActivity() {
         startListeningToPoints(user.uid)
         checkNotificationPermission(user.uid)
         startListeningToShopNotifications()
-        com.sapotlokal.data.repository.MissionRepository.syncUserMissions(user.uid)
 
         CustomerNav.bind(this, binding.customerNav, CustomerNav.Tab.HOME)
     }
@@ -320,23 +319,18 @@ class CustomerHomeActivity : AppCompatActivity() {
     }
 
     private fun startMissionPreview(uid: String) {
-        if (missionsListener != null) return
-        missionsListener = com.sapotlokal.data.repository.MissionRepository.listenToWeeklyMissions(
-            userId = uid,
-            onUpdate = { list ->
-                val pick = list.filter { !it.isClaimed && !it.isCompleted }
-                    .maxByOrNull { it.progress.toFloat() / it.mission.targetCount.coerceAtLeast(1) }
-                missionLine = pick?.let {
-                    getString(
-                        R.string.hu_mission_progress,
-                        com.sapotlokal.util.ContentText.missionTitle(this, it.mission),
-                        it.progress.coerceAtMost(it.mission.targetCount), it.mission.targetCount
-                    )
-                }
-                bindPlay()
-            },
-            onError = { }
-        )
+        if (missions != null) return
+        missions = com.sapotlokal.data.repository.MissionRepository.listen(uid) { list ->
+            val ready = list.count { it.claimable }
+            // Something to claim beats progress; otherwise the weekly mission closest to done.
+            val pick = list.filter { it.def.weekly && !it.done }.maxByOrNull { it.progress.toFloat() / it.def.target }
+            missionLine = when {
+                ready > 0 -> getString(R.string.play_missions_ready, ready)
+                pick != null -> getString(R.string.hu_mission_progress, getString(pick.def.nameRes, pick.def.target), pick.progressShown, pick.def.target)
+                else -> null
+            }
+            bindPlay()
+        }
     }
 
     // ── Navigation ────────────────────────────────────────────────────────────
@@ -362,7 +356,6 @@ class CustomerHomeActivity : AppCompatActivity() {
         startRewardListeners(uid)
         if (pointsListener == null) startListeningToPoints(uid)
         if (userListener == null) startListeningToUser(uid)
-        com.sapotlokal.data.repository.MissionRepository.syncUserMissions(uid)
     }
 
     override fun onResume() {
@@ -382,8 +375,8 @@ class CustomerHomeActivity : AppCompatActivity() {
         vendorsListener?.let { com.sapotlokal.data.repository.VendorRepository.removeAllVendorsListener(it) }
         vendorsListener = null
         val uid = auth.currentUser?.uid
-        missionsListener?.let { if (uid != null) com.sapotlokal.data.repository.MissionRepository.removeListener(uid, it) }
-        missionsListener = null
+        missions?.stop()
+        missions = null
         vouchersListener?.let { if (uid != null) com.sapotlokal.data.repository.VoucherRepository.removeVouchersListener(uid, it) }
         vouchersListener = null
         rulesListener?.let { com.sapotlokal.data.repository.VoucherRepository.removeAllRulesListener(it) }

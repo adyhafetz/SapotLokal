@@ -118,16 +118,6 @@ class SpinWheelActivity : AppCompatActivity() {
                     return@recordSpin
                 }
 
-                // Fire the mission/badge hook as soon as the win is committed — NOT at the end
-                // of the animation — so leaving the screen mid-spin can't lose progress.
-                // Passing the Activity is safe: BadgeRepository checks isFinishing/isDestroyed.
-                com.sapotlokal.data.repository.MissionRepository.recordSpinEvent(
-                    activity = this@SpinWheelActivity,
-                    userId = userID,
-                    pointsWon = earned,
-                    segmentPoints = pointsWon
-                )
-
                 if (isFinishing || isDestroyed) return@recordSpin
                 animateWheelTo(winnerIndex, earned)
             }

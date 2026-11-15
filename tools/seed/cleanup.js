@@ -61,7 +61,6 @@ async function main() {
   for (const node of [
     "users", "vendors", "vendorPhotos", "vouchers",
     "xpEvents", "userStats", "missionProgress", "badges",
-    "userMissionTracking", "shopVisits", // OLD — drop from this list in Phase 5
   ]) {
     const keys = await keysWithPrefix(db, node);
     mark(node, keys);
@@ -86,7 +85,6 @@ async function main() {
     ["points", "userID"], ["points", "vendorID"],
     ["voucherUsers", "userID"], ["voucherUsers", "vendorID"],
     ["games", "userID"],
-    ["userMissions", "userId"], ["userMissions", "userID"],
     ["qrcodes", "vendorID"],
     ["shopNotifications", "vendorID"],
   ];

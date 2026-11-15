@@ -194,15 +194,6 @@ class MemoryMatchActivity : AppCompatActivity() {
             GamesRepository.recordMemoryWin(
                 userID, AppConfig.MEMORY_MATCH_REWARD_POINTS, room, status.memoryAttemptsTotal + 1
             ) { ok, earned ->
-                // Hook first: progress must be saved even if the user already left the screen.
-                if (ok) {
-                    com.sapotlokal.data.repository.MissionRepository.recordMemoryMatchEvent(
-                        activity = this@MemoryMatchActivity,
-                        userId = userID,
-                        pointsWon = earned,
-                        moves = pendingSaveMoves
-                    )
-                }
                 if (isFinishing || isDestroyed) return@recordMemoryWin
                 if (!ok) return@recordMemoryWin showSaveFailed()
 

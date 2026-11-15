@@ -262,15 +262,6 @@ class ScanActivity : AppCompatActivity() {
             vendorID = vendorID,
             onResult = { result ->
                 if (result != null) {
-                    // Phase 3 Weekly Missions & Gamification Hook
-                    val scanTimestamp = System.currentTimeMillis()
-                    com.sapotlokal.data.repository.MissionRepository.recordShopVisitEvent(
-                        activity = this@ScanActivity,
-                        userId = userID,
-                        vendorId = vendorID,
-                        timestamp = scanTimestamp
-                    )
-
                     com.sapotlokal.util.FollowedShops.follow(this@ScanActivity, vendorID)
                     // Phase 6: Subscribe customer to FCM updates for this shop
                     com.google.firebase.messaging.FirebaseMessaging.getInstance()

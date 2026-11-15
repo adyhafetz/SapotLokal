@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
     Play tab (Hadiah Utama) — one job: "something fun to do".
-    Level score + ticked bar → this week's missions → games → badges → leaderboard → Me & settings.
+    Rank card → missions → games → badges → leaderboard → Me.
 -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -56,61 +56,18 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dp" />
 
-            <!-- Missions -->
+            <!-- Missions (own screen) -->
             <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="26dp"
-                android:baselineAligned="true"
-                android:orientation="horizontal">
-
-                <TextView
-                    style="@style/HU.Text.Title"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:accessibilityHeading="true"
-                    android:text="@string/hu_play_missions" />
-
-                <TextView
-                    android:id="@+id/tvBannerTimer"
-                    style="@style/HU.Text.Small"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    tools:text="9 hours left" />
+                android:id="@+id/rowMissions"
+                style="@style/HU.ListRow"
+                android:layout_marginTop="22dp">
+                <ImageView style="@style/HU.TileIcon" android:src="@drawable/ic_circle_check" />
+                <LinearLayout style="@style/HU.ListRowText">
+                    <TextView style="@style/HU.TileTitle" android:layout_marginTop="0dp" android:text="@string/hu_play_missions" />
+                    <TextView android:id="@+id/tvMissionsSub" style="@style/HU.TileSub" tools:text="2 ready to claim" />
+                </LinearLayout>
+                <ImageView style="@style/HU.Chevron" />
             </LinearLayout>
-
-            <TextView
-                android:id="@+id/tvBannerSubtext"
-                style="@style/HU.Text.Small"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="2dp"
-                tools:text="Collect up to 270 level score" />
-
-            <ProgressBar
-                android:id="@+id/progressBar"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal"
-                android:layout_marginTop="16dp"
-                android:indeterminateTint="@color/hu_accent" />
-
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/rvChallenges"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
-                android:nestedScrollingEnabled="false" />
-
-            <TextView
-                android:id="@+id/tvEmpty"
-                style="@style/HU.Text.Body"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="12dp"
-                android:text="@string/hu_no_missions"
-                android:visibility="gone" />
 
             <!-- Games -->
             <TextView

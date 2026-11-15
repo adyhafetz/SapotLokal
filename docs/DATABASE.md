@@ -19,14 +19,14 @@ There are two currencies, and they never mix:
 | `xpEvents/{uid}` | event key | XP ledger: `amount, source, timestamp` | the customer |
 | `userStats/{uid}` | – | `totalVisits, shopsVisited/{vendorID}, weeksAllMissions, vouchersUsed, lastVisitAt` | the customer |
 | `weeklyVisits/{weekKey}/{uid}` | week, uid | `visits, lastVisitAt, userName, avatar, rank` (the leaderboard's only source) | the customer |
-| `missionProgress/{uid}` | `{missionId}_{weekKey}` or `{missionId}` | `progress, completedAt, claimedAt` | the customer |
+| `missionProgress/{uid}` | `{missionId}_{weekKey}` or `{missionId}` | `progress, claimedAt`; `w_explore_{week}/shops/{vendorID}` and `w_play_{week}/days/{yyyy-MM-dd}` marks written by scans and games | the customer |
 | `badges/{uid}` | badge id | `unlockedAt, claimedAt` | the customer |
 | `vouchers` | push id | shop rewards: `vendorID, voucherName, voucherDescription, pointsRequired, isActive` | the owner |
 | `voucherUsers` | push id | claimed vouchers: code, status (`active`, `used`, `expired`), expiry, cost snapshot, `claimPointID` | customer (claim), owner (mark used) |
 | `games` | push id | one row per game played: `userID, gameType, gameAttempt, gameDay, gamePlayedAt` and the reward | the customer |
 | `shopNotifications` | push id | "shop is open" announcements for the push Cloud Function | the owner |
 
-**Still present until their phase replaces them:** `users/*/lifetimePoints` and `currentTier` (Phases 5, 7 and 8; only the old all-time leaderboard still shows them); `missions`, `userMissions`, `userMissionTracking`, `shopVisits` (Phase 5); game and mission rows in `/points` with an empty `vendorID` (Phases 5 and 7); `games/*/gamePointsRewarded` (Phase 7). The rules mark each of these as OLD.
+**Still present until their phase replaces them:** `users/*/lifetimePoints` and `currentTier` (Phases 5, 7 and 8; only the old all-time leaderboard still shows them); game and mission rows in `/points` with an empty `vendorID` (Phases 5 and 7); `games/*/gamePointsRewarded` (Phase 7). The rules mark each of these as OLD.
 
 ## Keys and formats
 
