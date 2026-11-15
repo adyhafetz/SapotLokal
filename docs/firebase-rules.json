@@ -198,8 +198,8 @@
           ".validate": "!(data.val() === 'used' && newData.val() !== 'used')"
         },
         "voucherUsedAt": {
-          // When the shop marked it used (server time), for "Vouchers used this week". Set once.
-          ".validate": "newData.isNumber() && (data.exists() ? data.val() === newData.val() : newData.val() >= now - 300000 && newData.val() <= now + 300000)"
+          // 0 while unused; when the shop marks it used, the server time (for "Vouchers used this week"). Set once.
+          ".validate": "newData.isNumber() && (data.exists() && data.val() !== 0 ? data.val() === newData.val() : (newData.val() === 0 || (newData.val() >= now - 300000 && newData.val() <= now + 300000)))"
         }
       }
     },
