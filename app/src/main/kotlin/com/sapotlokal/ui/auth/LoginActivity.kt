@@ -34,9 +34,14 @@ class LoginActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityLoginBinding.inflate(layoutInflater)
         setContentView(binding.root)
+        com.sapotlokal.util.AppLanguage.bindToggle(binding.languageToggle.root)
 
         // Customer login button
         binding.btnLogin.setOnClickListener { attemptLogin() }
+
+        binding.tvForgotPassword.setOnClickListener {
+            com.sapotlokal.util.PasswordResetHelper.show(this, binding.etEmail.text.toString().trim())
+        }
 
         // 1. Redirect to Vendor Login
         binding.tvGoToVendorLogin.setOnClickListener {
@@ -115,7 +120,7 @@ class LoginActivity : AppCompatActivity() {
                         auth.signOut()
                         Toast.makeText(
                             this,
-                            "This account is registered as a Vendor. Please login via Vendor Login.",
+                            getString(com.sapotlokal.R.string.k_vendor_account_msg),
                             Toast.LENGTH_LONG
                         ).show()
                     }

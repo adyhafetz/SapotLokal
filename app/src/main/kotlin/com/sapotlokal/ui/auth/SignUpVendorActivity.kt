@@ -9,6 +9,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseAuthUserCollisionException
 import com.google.firebase.database.FirebaseDatabase
 import com.sapotlokal.data.model.User
+import com.sapotlokal.data.model.toSignUpMap
 import com.sapotlokal.data.model.Vendor
 import com.sapotlokal.databinding.ActivitySignupVendorBinding
 import com.sapotlokal.ui.vendor.VendorHomeActivity
@@ -42,6 +43,8 @@ import com.sapotlokal.ui.vendor.VendorHomeActivity
 class SignUpVendorActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivitySignupVendorBinding
+    /** English value of the category picked from the dropdown (what gets saved). */
+    private var selectedCategory: String = ""
     private val auth = FirebaseAuth.getInstance()
     private val db   = FirebaseDatabase.getInstance(com.sapotlokal.AppConfig.DATABASE_URL).reference
 
@@ -49,6 +52,10 @@ class SignUpVendorActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivitySignupVendorBinding.inflate(layoutInflater)
         setContentView(binding.root)
+        com.sapotlokal.util.CategoryPicker.bind(this, binding.etShopCategory, null) {
+            selectedCategory = it
+            binding.tilShopCategory.error = null
+        }
 
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
@@ -74,7 +81,7 @@ class SignUpVendorActivity : AppCompatActivity() {
         val email        = binding.etEmail.text.toString().trim()
         val password     = binding.etPassword.text.toString()
         val shopName     = binding.etShopName.text.toString().trim()
-        val shopCategory = binding.etShopCategory.text.toString().trim()
+        val shopCategory = selectedCategory
         val shopAddress  = binding.etShopAddress.text.toString().trim()
         val ssmNumber    = binding.etSsmNumber.text.toString().trim()
 
@@ -182,20 +189,35 @@ class SignUpVendorActivity : AppCompatActivity() {
         // the PRE-write state of the database — the user record doesn't exist yet,
         // so role is null and the vendor write is denied. Writing USER first
         // commits the role to the DB, then the VENDOR write sees it and succeeds.
-        db.child("users").child(uid).setValue(user)
+        db.child("users").child(uid).setValue(user.toSignUpMap())
             .addOnSuccessListener {
                 // USER record committed — now safe to write VENDOR
                 db.child("vendors").child(vendorId).setValue(vendor)
-                    .addOnSuccessListener { navigateToHome() }
+                    .addOnSuccessListener {
+                        // Best-effort verification email; the app does not block on it.
+                        auth.currentUser?.sendEmailVerification()
+                        navigateToHome()
+                    }
                     .addOnFailureListener {
+                        // Shop record failed: undo the user record AND the Auth account so the
+                        // owner can retry cleanly instead of being stuck with a shop-less vendor.
+                        db.child("users").child(uid).removeValue().addOnCompleteListener {
+                            rollbackAccount()
+                        }
                         setLoading(false)
                         binding.tilEmail.error = getString(com.sapotlokal.R.string.error_generic)
                     }
             }
             .addOnFailureListener {
+                rollbackAccount()
                 setLoading(false)
                 binding.tilEmail.error = getString(com.sapotlokal.R.string.error_generic)
             }
+    }
+
+    /** Deletes the just-created Auth account (and signs out) after a failed profile write. */
+    private fun rollbackAccount() {
+        auth.currentUser?.delete()?.addOnCompleteListener { auth.signOut() }
     }
 
     private fun navigateToHome() {

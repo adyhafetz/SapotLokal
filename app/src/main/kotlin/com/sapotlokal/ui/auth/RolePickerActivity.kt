@@ -32,6 +32,7 @@ class RolePickerActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityRolePickerBinding.inflate(layoutInflater)
         setContentView(binding.root)
+        com.sapotlokal.util.AppLanguage.bindToggle(binding.languageToggle.root)
 
         // Customer card → Customer sign-up form
         binding.cardCustomer.setOnClickListener {

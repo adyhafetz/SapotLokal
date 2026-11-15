@@ -1,95 +1,112 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!--
-    Vendor (Shop Owner) sign-up screen.
-    Fields: name, email, password, shop name, shop category, shop address, SSM number.
-    Build guide: "SSM Registration Number is a required text field on Shop Owner sign-up."
-    Account creation is blocked if SSM field is empty.
--->
 <ScrollView
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fillViewport="true"
-    android:background="@color/colorBackground">
+    android:background="@color/sapot_canvas">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:padding="24dp">
+        android:paddingHorizontal="24dp"
+        android:paddingTop="32dp"
+        android:paddingBottom="36dp">
 
         <TextView
             android:id="@+id/tvTitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
+            android:layout_marginTop="4dp"
+            android:fontFamily="@font/manrope"
             android:text="@string/signup_vendor_title"
-            android:textAppearance="?attr/textAppearanceHeadline5"
-            android:textColor="?attr/colorOnBackground" />
+            android:textColor="@color/sapot_text_primary"
+            android:textSize="24sp"
+            android:textStyle="bold" />
 
         <!-- ── Account Details ──────────────────────────────────── -->
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="24dp"
-            android:text="Account Details"
-            android:textAppearance="?attr/textAppearanceOverline"
-            android:textColor="?attr/colorPrimary" />
+            android:layout_marginTop="28dp"
+            android:fontFamily="@font/dm_sans"
+            android:letterSpacing="0.05"
+            android:text="@string/signup_vendor_account"
+            android:textColor="@color/sapot_text_secondary"
+            android:textSize="11sp"
+            android:textStyle="bold" />
 
         <!-- Name -->
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/tilName"
+            style="@style/Widget.SapotLokal.TextInputLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="12dp"
-            android:hint="@string/label_name"
-            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+            app:boxCornerRadiusBottomEnd="12dp"
+            app:boxCornerRadiusBottomStart="12dp"
+            app:boxCornerRadiusTopEnd="12dp"
+            app:boxCornerRadiusTopStart="12dp"
+            android:hint="@string/label_name">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/etName"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:fontFamily="@font/dm_sans"
                 android:inputType="textPersonName|textCapWords"
-                android:hint="@string/hint_name"
+                android:textColor="@color/sapot_text_primary"
                 android:imeOptions="actionNext" />
         </com.google.android.material.textfield.TextInputLayout>
 
         <!-- Email -->
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/tilEmail"
+            style="@style/Widget.SapotLokal.TextInputLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
-            android:hint="@string/label_email"
-            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+            app:boxCornerRadiusBottomEnd="12dp"
+            app:boxCornerRadiusBottomStart="12dp"
+            app:boxCornerRadiusTopEnd="12dp"
+            app:boxCornerRadiusTopStart="12dp"
+            android:hint="@string/label_email">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/etEmail"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:fontFamily="@font/dm_sans"
                 android:inputType="textEmailAddress"
-                android:hint="@string/hint_email"
+                android:textColor="@color/sapot_text_primary"
                 android:imeOptions="actionNext" />
         </com.google.android.material.textfield.TextInputLayout>
 
         <!-- Password -->
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/tilPassword"
+            style="@style/Widget.SapotLokal.TextInputLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
+            app:boxCornerRadiusBottomEnd="12dp"
+            app:boxCornerRadiusBottomStart="12dp"
+            app:boxCornerRadiusTopEnd="12dp"
+            app:boxCornerRadiusTopStart="12dp"
             android:hint="@string/label_password"
             app:endIconMode="password_toggle"
-            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+            app:endIconTint="@color/sapot_text_secondary">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/etPassword"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:fontFamily="@font/dm_sans"
                 android:inputType="textPassword"
-                android:hint="@string/hint_password"
+                android:textColor="@color/sapot_text_primary"
                 android:imeOptions="actionNext" />
         </com.google.android.material.textfield.TextInputLayout>
 
@@ -99,61 +116,81 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="28dp"
-            android:text="Shop Details"
-            android:textAppearance="?attr/textAppearanceOverline"
-            android:textColor="?attr/colorPrimary" />
+            android:fontFamily="@font/dm_sans"
+            android:letterSpacing="0.05"
+            android:text="@string/signup_vendor_shop"
+            android:textColor="@color/sapot_text_secondary"
+            android:textSize="11sp"
+            android:textStyle="bold" />
 
         <!-- Shop Name -->
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/tilShopName"
+            style="@style/Widget.SapotLokal.TextInputLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="12dp"
-            android:hint="@string/label_shop_name"
-            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+            app:boxCornerRadiusBottomEnd="12dp"
+            app:boxCornerRadiusBottomStart="12dp"
+            app:boxCornerRadiusTopEnd="12dp"
+            app:boxCornerRadiusTopStart="12dp"
+            android:hint="@string/label_shop_name">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/etShopName"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:fontFamily="@font/dm_sans"
                 android:inputType="textCapWords"
-                android:hint="@string/hint_shop_name"
+                android:textColor="@color/sapot_text_primary"
                 android:imeOptions="actionNext" />
         </com.google.android.material.textfield.TextInputLayout>
 
         <!-- Shop Category -->
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/tilShopCategory"
+            style="@style/Widget.SapotLokal.TextInputLayout"
+
+            app:endIconMode="dropdown_menu"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
-            android:hint="@string/label_shop_category"
-            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+            app:boxCornerRadiusBottomEnd="12dp"
+            app:boxCornerRadiusBottomStart="12dp"
+            app:boxCornerRadiusTopEnd="12dp"
+            app:boxCornerRadiusTopStart="12dp"
+            android:hint="@string/label_shop_category">
 
-            <com.google.android.material.textfield.TextInputEditText
+            <com.google.android.material.textfield.MaterialAutoCompleteTextView
                 android:id="@+id/etShopCategory"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:inputType="textCapWords"
-                android:hint="@string/hint_shop_category"
-                android:imeOptions="actionNext" />
+                android:fontFamily="@font/dm_sans"
+                android:inputType="none"
+                android:paddingStart="16dp"
+                android:textColor="@color/sapot_text_primary" />
         </com.google.android.material.textfield.TextInputLayout>
 
         <!-- Shop Address -->
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/tilShopAddress"
+            style="@style/Widget.SapotLokal.TextInputLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
-            android:hint="@string/label_shop_address"
-            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+            app:boxCornerRadiusBottomEnd="12dp"
+            app:boxCornerRadiusBottomStart="12dp"
+            app:boxCornerRadiusTopEnd="12dp"
+            app:boxCornerRadiusTopStart="12dp"
+            android:hint="@string/label_shop_address">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/etShopAddress"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:fontFamily="@font/dm_sans"
                 android:inputType="textMultiLine|textCapSentences"
-                android:hint="@string/hint_shop_address"
+                android:textColor="@color/sapot_text_primary"
                 android:minLines="2"
                 android:imeOptions="actionNext" />
         </com.google.android.material.textfield.TextInputLayout>
@@ -164,46 +201,57 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="28dp"
-            android:text="Business Verification"
-            android:textAppearance="?attr/textAppearanceOverline"
-            android:textColor="?attr/colorPrimary" />
+            android:fontFamily="@font/dm_sans"
+            android:letterSpacing="0.05"
+            android:text="@string/signup_vendor_business"
+            android:textColor="@color/sapot_text_secondary"
+            android:textSize="11sp"
+            android:textStyle="bold" />
 
         <!-- SSM Number — REQUIRED per build guide Rule 6 -->
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/tilSsmNumber"
+            style="@style/Widget.SapotLokal.TextInputLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="12dp"
-            android:hint="@string/label_ssm_number"
-            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+            app:boxCornerRadiusBottomEnd="12dp"
+            app:boxCornerRadiusBottomStart="12dp"
+            app:boxCornerRadiusTopEnd="12dp"
+            app:boxCornerRadiusTopStart="12dp"
+            android:hint="@string/label_ssm_number">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/etSsmNumber"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:fontFamily="@font/dm_sans"
                 android:inputType="textCapCharacters"
-                android:hint="@string/hint_ssm_number"
+                android:textColor="@color/sapot_text_primary"
                 android:imeOptions="actionDone" />
         </com.google.android.material.textfield.TextInputLayout>
 
-        <!-- SSM help text — reassures user it's not auto-checked -->
+        <!-- SSM help text -->
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="6dp"
+            android:fontFamily="@font/dm_sans"
             android:text="@string/ssm_help"
-            android:textAppearance="?attr/textAppearanceCaption"
-            android:textColor="?attr/colorOnSurface"
-            android:alpha="0.7" />
+            android:textColor="@color/sapot_text_secondary"
+            android:textSize="12sp" />
 
         <!-- Sign Up button -->
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btnSignUp"
+            style="@style/Widget.SapotLokal.Button.Primary"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="52dp"
             android:layout_marginTop="28dp"
             android:text="@string/sign_up"
-            android:padding="14dp" />
+            android:textSize="15sp"
+            android:textStyle="bold"
+            app:cornerRadius="@dimen/radius_control" />
 
         <!-- Loading indicator -->
         <ProgressBar
@@ -212,6 +260,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
             android:layout_marginTop="16dp"
+            android:indeterminateTint="@color/sapot_primary"
             android:visibility="gone" />
 
     </LinearLayout>

@@ -9,6 +9,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseAuthUserCollisionException
 import com.google.firebase.database.FirebaseDatabase
 import com.sapotlokal.data.model.User
+import com.sapotlokal.data.model.toSignUpMap
 import com.sapotlokal.databinding.ActivitySignupCustomerBinding
 import com.sapotlokal.ui.customer.CustomerHomeActivity
 
@@ -127,16 +128,20 @@ class SignUpCustomerActivity : AppCompatActivity() {
             userEmail = email,
             role      = "customer"
         )
-        db.child("users").child(uid).setValue(user)
+        db.child("users").child(uid).setValue(user.toSignUpMap())
             .addOnSuccessListener {
+                // Best-effort verification email; the app does not block on it.
+                auth.currentUser?.sendEmailVerification()
                 // Account + database record both written successfully
                 navigateToHome()
             }
             .addOnFailureListener {
-                // Auth account was created but the DB write failed.
-                // The user CAN still log in later — the role will be missing, and
-                // SplashActivity will fall through to LoginActivity. For now show a
-                // generic error and let them try logging in.
+                // Auth account exists but its profile could not be saved. Roll the account back
+                // so the email isn't stuck as "already in use" with a half-created profile —
+                // the user can simply try signing up again.
+                auth.currentUser?.delete()?.addOnCompleteListener {
+                    auth.signOut()
+                }
                 setLoading(false)
                 binding.tilEmail.error = getString(com.sapotlokal.R.string.error_generic)
             }
