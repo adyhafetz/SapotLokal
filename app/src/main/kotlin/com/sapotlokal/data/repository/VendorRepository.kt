@@ -243,40 +243,55 @@ object VendorRepository {
      * Live numbers for the shop owner's Home (this week's visits and points, vouchers used,
      * recent visits). Updates by itself when a customer scans.
      */
+    /** The two live listeners behind the owner Home stats; remove both with [removeAnalyticsListener]. */
+    class AnalyticsListener internal constructor(
+        internal val points: ValueEventListener,
+        internal val vouchers: ValueEventListener
+    )
+
+    /**
+     * Live stats for the owner Home: recomputed when a visit lands in /points or a voucher is
+     * marked used in /voucherUsers (which writes nothing to /points).
+     */
     fun listenToAnalytics(
         vendorID: String,
         onUpdate: (com.sapotlokal.util.VendorAnalytics) -> Unit,
         onError: (String) -> Unit
-    ): ValueEventListener {
-        val listener = object : ValueEventListener {
-            override fun onDataChange(pointsSnap: DataSnapshot) {
-                val points = pointsSnap.children.mapNotNull {
-                    it.getValue(com.sapotlokal.data.model.Point::class.java)
-                }
-                db.child("voucherUsers").orderByChild("vendorID").equalTo(vendorID)
-                    .addListenerForSingleValueEvent(object : ValueEventListener {
-                        override fun onDataChange(vSnap: DataSnapshot) {
-                            val used = vSnap.children.count {
-                                it.child("voucherStatus").getValue(String::class.java)
-                                    .equals(com.sapotlokal.data.model.VoucherStatus.USED, ignoreCase = true)
-                            }
-                            onUpdate(com.sapotlokal.util.VendorAnalyticsCalculator.compute(points, used))
-                        }
-
-                        override fun onCancelled(error: DatabaseError) {
-                            onUpdate(com.sapotlokal.util.VendorAnalyticsCalculator.compute(points, 0))
-                        }
-                    })
+    ): AnalyticsListener {
+        var points: List<com.sapotlokal.data.model.Point>? = null
+        var used: Int? = null
+        fun publish() {
+            val p = points ?: return
+            val u = used ?: return
+            onUpdate(com.sapotlokal.util.VendorAnalyticsCalculator.compute(p, u))
+        }
+        val pointsListener = object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                points = snapshot.children.mapNotNull { it.getValue(com.sapotlokal.data.model.Point::class.java) }
+                publish()
             }
-
             override fun onCancelled(error: DatabaseError) = onError(error.message)
         }
-        db.child("points").orderByChild("vendorID").equalTo(vendorID).addValueEventListener(listener)
-        return listener
+        val vouchersListener = object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                used = snapshot.children.count {
+                    it.child("voucherStatus").getValue(String::class.java)
+                        .equals(com.sapotlokal.data.model.VoucherStatus.USED, ignoreCase = true)
+                }
+                publish()
+            }
+            override fun onCancelled(error: DatabaseError) {
+                used = 0
+                publish()
+            }
+        }
+        db.child("points").orderByChild("vendorID").equalTo(vendorID).addValueEventListener(pointsListener)
+        db.child("voucherUsers").orderByChild("vendorID").equalTo(vendorID).addValueEventListener(vouchersListener)
+        return AnalyticsListener(pointsListener, vouchersListener)
     }
 
-    fun removeAnalyticsListener(vendorID: String, listener: ValueEventListener) {
-        db.child("points").orderByChild("vendorID").equalTo(vendorID).removeEventListener(listener)
+    fun removeAnalyticsListener(vendorID: String, listener: AnalyticsListener) {
+        db.child("points").orderByChild("vendorID").equalTo(vendorID).removeEventListener(listener.points)
+        db.child("voucherUsers").orderByChild("vendorID").equalTo(vendorID).removeEventListener(listener.vouchers)
     }
-
 }

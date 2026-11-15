@@ -10,6 +10,7 @@ import com.sapotlokal.data.model.PointSource
 import com.sapotlokal.data.model.Voucher
 import com.sapotlokal.data.model.VoucherUser
 import com.sapotlokal.data.model.VoucherStatus
+import com.sapotlokal.util.ServerClock
 
 /**
  * VoucherRepository — reads and writes /vouchers (reward rules) and /voucherUsers.
@@ -231,7 +232,7 @@ object VoucherRepository {
                     db.child("voucherUsers").orderByChild("userID").equalTo(userID)
                         .addListenerForSingleValueEvent(object : ValueEventListener {
                             override fun onDataChange(vuSnap: DataSnapshot) {
-                                val nowMs = System.currentTimeMillis()
+                                val nowMs = ServerClock.now()
                                 val alreadyHeld = vuSnap.children.mapNotNull { it.getValue(VoucherUser::class.java) }
                                     .any { vu ->
                                         vu.voucherID == rule.voucherID &&
@@ -387,7 +388,7 @@ object VoucherRepository {
                     }
 
                     // Step 4: expiry date check
-                    val nowMs = System.currentTimeMillis()
+                    val nowMs = ServerClock.now()
                     if (vu.voucherExpiryDate > 0L && vu.voucherExpiryDate < nowMs) {
                         onInvalid("This voucher has expired.")
                         return
@@ -501,7 +502,7 @@ object VoucherRepository {
                 pointEarnedAmount   = 0,
                 pointRedeemedAmount = voucherUser.pointsRequiredSnapshot,
                 pointSource         = PointSource.REDEMPTION,
-                timestamp           = System.currentTimeMillis()
+                timestamp           = ServerClock.now()
             )
         }
 

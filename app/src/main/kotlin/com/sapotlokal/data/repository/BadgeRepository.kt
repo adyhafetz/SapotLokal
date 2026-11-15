@@ -12,6 +12,7 @@ import com.sapotlokal.data.model.GameKind
 import com.sapotlokal.data.model.XpEventKey
 import com.sapotlokal.data.model.XpSource
 import com.sapotlokal.util.MissionDateUtils
+import com.sapotlokal.util.ServerClock
 
 /**
  * BadgeRepository — badges (REFRACTOR.md §3.5, Phase 6).
@@ -86,7 +87,7 @@ object BadgeRepository {
     /** Unlocks [def] on its own write (for badges earned outside a scan or game, e.g. Belanja Diri). */
     fun unlockNow(uid: String, def: BadgeDef) {
         val ref = db.child("badges").child(uid).child(def.id).child("unlockedAt")
-        ref.get().addOnSuccessListener { if (!it.exists()) ref.setValue(System.currentTimeMillis()) }
+        ref.get().addOnSuccessListener { if (!it.exists()) ref.setValue(ServerClock.now()) }
     }
 
     // ── Reading and claiming ──────────────────────────────────────────────────
@@ -122,7 +123,7 @@ object BadgeRepository {
             eventKey = XpEventKey.badge(badge.def.id),
             amount = badge.def.xp,
             source = XpSource.BADGE,
-            extraUpdates = mapOf("badges/$uid/${badge.def.id}/claimedAt" to System.currentTimeMillis()),
+            extraUpdates = mapOf("badges/$uid/${badge.def.id}/claimedAt" to ServerClock.now()),
             onResult = onResult
         )
     }

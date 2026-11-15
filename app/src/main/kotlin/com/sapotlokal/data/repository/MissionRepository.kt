@@ -12,6 +12,7 @@ import com.sapotlokal.data.model.MissionInputs
 import com.sapotlokal.data.model.MissionState
 import com.sapotlokal.data.model.XpSource
 import com.sapotlokal.util.MissionDateUtils
+import com.sapotlokal.util.ServerClock
 
 /**
  * MissionRepository — mission progress and claims (REFRACTOR.md §3.4, Phase 5).
@@ -94,7 +95,7 @@ object MissionRepository {
     fun claim(uid: String, mission: MissionState, all: List<MissionState>, onResult: (XpRepository.Award?) -> Unit) {
         if (!mission.claimable) return onResult(null)
         val def = mission.def
-        val now = System.currentTimeMillis()
+        val now = ServerClock.now()
         val key = def.progressKey(mission.weekKey)
         val extra = hashMapOf<String, Any>(
             "missionProgress/$uid/$key/claimedAt" to now,

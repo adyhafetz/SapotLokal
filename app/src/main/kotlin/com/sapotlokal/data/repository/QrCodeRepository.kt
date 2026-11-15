@@ -6,6 +6,7 @@ import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.ValueEventListener
 import com.sapotlokal.AppConfig
 import com.sapotlokal.data.model.QrCode
+import com.sapotlokal.util.ServerClock
 
 /**
  * QrCodeRepository — reads and validates entries in the /qrcodes node.
@@ -86,7 +87,7 @@ object QrCodeRepository {
                         return
                     }
 
-                    val nowMs = System.currentTimeMillis()
+                    val nowMs = ServerClock.now()
                     Log.d(TAG, "qrcodeExpiryDate=${qrCode.qrcodeExpiryDate}, nowMs=$nowMs, expired=${qrCode.qrcodeExpiryDate < nowMs}")
 
                     if (qrCode.qrcodeExpiryDate < nowMs) {
@@ -142,7 +143,7 @@ object QrCodeRepository {
         onSuccess: (newQrCode: QrCode) -> Unit,
         onError: (String) -> Unit
     ) {
-        val nowMs      = System.currentTimeMillis()
+        val nowMs      = ServerClock.now()
         val expiryMs   = nowMs + (AppConfig.QR_ROTATION_SECONDS * 1_000L)
         val newRef     = db.child("qrcodes").push()
         val newId      = newRef.key ?: run { onError("Failed to generate QR ID"); return }

@@ -9,6 +9,7 @@ import com.sapotlokal.data.model.Point
 import com.sapotlokal.data.model.PointSource
 import com.sapotlokal.data.model.XpEventKey
 import com.sapotlokal.data.model.XpSource
+import com.sapotlokal.util.ServerClock
 
 /**
  * PointRepository — all reads and writes to the /points node in Firebase Realtime Database.
@@ -83,7 +84,7 @@ object PointRepository {
         onResult: (VisitResult?) -> Unit
     ) {
         val pointID = db.child("points").push().key ?: return onResult(null)
-        val now = System.currentTimeMillis()
+        val now = ServerClock.now()
         val standing = XpRepository.standingOf(user)
         val rank = standing.rank
         val points = AppConfig.shopPointsForVisit(perVisit, rank)
@@ -148,7 +149,7 @@ object PointRepository {
         db.child("points").orderByChild("userID").equalTo(userID)
             .addListenerForSingleValueEvent(object : ValueEventListener {
                 override fun onDataChange(snapshot: DataSnapshot) {
-                    val cutoff = System.currentTimeMillis() - cooldownMs
+                    val cutoff = ServerClock.now() - cooldownMs
                     val recent = snapshot.children.any { child ->
                         val p = child.getValue(Point::class.java) ?: return@any false
                         p.pointSource == PointSource.SHOP_VISIT &&

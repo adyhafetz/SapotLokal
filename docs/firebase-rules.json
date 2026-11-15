@@ -11,6 +11,9 @@
     // Without a server a determined customer can still fake SMALL amounts. These rules make that
     // hard, bounded and visible: every XP event has a fixed key that can be written once, every
     // amount is capped, and XP / rank can only go up by a little per write.
+    //
+    // Times written by the app must be within 5 minutes of the server's clock (`now`), so changing
+    // the phone's date can't backdate or postdate a visit, a game or a claim (CLAUDE.md rule 3).
     // ─────────────────────────────────────────────────────────────────────────
 
     "users": {
@@ -87,7 +90,7 @@
         //  B) Customer claiming a reward: a redemption row for themselves (checked again on /voucherUsers).
         //  C) Shop owner: a redemption row for their own shop.
         ".write": "auth != null && newData.exists() && !data.exists() && ((newData.child('userID').val() === auth.uid && newData.child('pointSource').val() === 'shop_visit' && newData.child('pointRedeemedAmount').val() === 0 && newData.child('pointEarnedAmount').val() > 0 && root.child('vendors/' + newData.child('vendorID').val() + '/userID').exists() && ((root.child('vendors/' + newData.child('vendorID').val() + '/pointsPerVisit').exists() && newData.child('pointEarnedAmount').val() <= root.child('vendors/' + newData.child('vendorID').val() + '/pointsPerVisit').val() * 3) || (!root.child('vendors/' + newData.child('vendorID').val() + '/pointsPerVisit').exists() && newData.child('pointEarnedAmount').val() <= 30))) || (newData.child('userID').val() === auth.uid && newData.child('pointSource').val() === 'redemption' && newData.child('pointEarnedAmount').val() === 0 && newData.child('pointRedeemedAmount').val() > 0 && newData.child('pointRedeemedAmount').val() <= 5000) || (newData.child('pointSource').val() === 'redemption' && newData.child('pointEarnedAmount').val() === 0 && newData.child('pointRedeemedAmount').val() > 0 && root.child('vendors/' + newData.child('vendorID').val() + '/userID').val() === auth.uid))",
-        ".validate": "newData.hasChildren(['userID', 'vendorID', 'pointEarnedAmount', 'pointRedeemedAmount', 'pointSource', 'timestamp']) && newData.child('vendorID').val() !== '' && (newData.child('pointSource').val() === 'shop_visit' || newData.child('pointSource').val() === 'redemption')"
+        ".validate": "newData.hasChildren(['userID', 'vendorID', 'pointEarnedAmount', 'pointRedeemedAmount', 'pointSource', 'timestamp']) && newData.child('vendorID').val() !== '' && newData.child('timestamp').val() >= now - 300000 && newData.child('timestamp').val() <= now + 300000 && (newData.child('pointSource').val() === 'shop_visit' || newData.child('pointSource').val() === 'redemption')"
       }
     },
 
@@ -98,7 +101,7 @@
         ".read": "auth != null && auth.uid === $uid",
         "$eventKey": {
           ".write": "auth != null && auth.uid === $uid && !data.exists() && newData.exists()",
-          ".validate": "newData.hasChildren(['amount', 'source', 'timestamp']) && newData.child('amount').isNumber() && newData.child('amount').val() > 0 && newData.child('amount').val() % 1 === 0 && newData.child('source').isString() && newData.child('timestamp').isNumber() && (($eventKey.beginsWith('visit_') && newData.child('amount').val() <= 15) || ($eventKey.beginsWith('game_') && newData.child('amount').val() <= 15) || ($eventKey.beginsWith('wmission_') && newData.child('amount').val() <= 40) || ($eventKey.beginsWith('lmission_') && newData.child('amount').val() <= 300) || ($eventKey.beginsWith('badge_') && newData.child('amount').val() <= 100) || ($eventKey.beginsWith('leaderboard_') && newData.child('amount').val() <= 150))"
+          ".validate": "newData.hasChildren(['amount', 'source', 'timestamp']) && newData.child('amount').isNumber() && newData.child('amount').val() > 0 && newData.child('amount').val() % 1 === 0 && newData.child('source').isString() && newData.child('timestamp').isNumber() && newData.child('timestamp').val() >= now - 300000 && newData.child('timestamp').val() <= now + 300000 && (($eventKey.beginsWith('visit_') && newData.child('amount').val() <= 15) || ($eventKey.beginsWith('game_') && newData.child('amount').val() <= 15) || ($eventKey.beginsWith('wmission_') && newData.child('amount').val() <= 40) || ($eventKey.beginsWith('lmission_') && newData.child('amount').val() <= 300) || ($eventKey.beginsWith('badge_') && newData.child('amount').val() <= 100) || ($eventKey.beginsWith('leaderboard_') && newData.child('amount').val() <= 150))"
         }
       }
     },
@@ -113,7 +116,7 @@
         "shopsVisited": {
           "$vendorID": { ".validate": "newData.val() === true && root.child('vendors/' + $vendorID + '/userID').exists()" }
         },
-        "lastVisitAt": { ".validate": "newData.isNumber()" },
+        "lastVisitAt": { ".validate": "newData.isNumber() && newData.val() >= now - 300000 && newData.val() <= now + 300000" },
         // Badge tracking: which of visit / spin / memory happened each day (Combo) …
         "days": { "$day": {
           ".validate": "$day.matches(/^[0-9]{4}-[0-9]{2}-[0-9]{2}$/)",
@@ -134,7 +137,7 @@
         "$uid": {
           ".write": "auth != null && auth.uid === $uid",
           "visits": { ".validate": "newData.isNumber() && ((!data.exists() && newData.val() === 1) || (data.exists() && newData.val() === data.val() + 1))" },
-          "lastVisitAt": { ".validate": "newData.isNumber()" },
+          "lastVisitAt": { ".validate": "newData.isNumber() && newData.val() >= now - 300000 && newData.val() <= now + 300000" },
           "userName": { ".validate": "newData.isString() && newData.val().length <= 60" },
           "avatar": { ".validate": "newData.isString()" },
           "rank": { ".validate": "newData.isNumber() && newData.val() >= 1 && newData.val() <= 5" },
@@ -154,8 +157,8 @@
           "shops": { "$vendorID": { ".validate": "newData.val() === true && root.child('vendors/' + $vendorID + '/userID').exists()" } },
           // "Play on 3 days": one true per day ("yyyy-MM-dd") a game was played this week.
           "days": { "$day": { ".validate": "newData.val() === true && $day.matches(/^[0-9]{4}-[0-9]{2}-[0-9]{2}$/)" } },
-          "completedAt": { ".validate": "newData.isNumber() && (!data.exists() || data.val() === newData.val())" },
-          "claimedAt": { ".validate": "newData.isNumber() && (!data.exists() || data.val() === newData.val())" }
+          "completedAt": { ".validate": "newData.isNumber() && (data.exists() ? data.val() === newData.val() : newData.val() >= now - 300000 && newData.val() <= now + 300000)" },
+          "claimedAt": { ".validate": "newData.isNumber() && (data.exists() ? data.val() === newData.val() : newData.val() >= now - 300000 && newData.val() <= now + 300000)" }
         }
       }
     },
@@ -167,8 +170,8 @@
         "$badgeId": {
           ".write": "auth != null && auth.uid === $uid",
           ".validate": "$badgeId.matches(/^(langkah_kanan|regular|hantu_malam|combo|nasib_baik|otak_cerdas|belanja_diri|juara_minggu)$/)",
-          "unlockedAt": { ".validate": "newData.isNumber() && (!data.exists() || data.val() === newData.val())" },
-          "claimedAt": { ".validate": "newData.isNumber() && newData.parent().child('unlockedAt').exists() && (!data.exists() || data.val() === newData.val())" }
+          "unlockedAt": { ".validate": "newData.isNumber() && (data.exists() ? data.val() === newData.val() : newData.val() >= now - 300000 && newData.val() <= now + 300000)" },
+          "claimedAt": { ".validate": "newData.parent().child('unlockedAt').exists() && newData.isNumber() && (data.exists() ? data.val() === newData.val() : newData.val() >= now - 300000 && newData.val() <= now + 300000)" }
         }
       }
     },
@@ -204,7 +207,7 @@
       "$gameID": {
         ".write": "auth != null && !data.exists() && newData.child('userID').val() === auth.uid",
         // Games pay XP (the XP itself is the capped /xpEvents game_{gameID} written in the same update).
-        ".validate": "newData.hasChildren(['userID','gameType','gameAttempt','gameXpRewarded','gameDay','gamePlayedAt']) && (newData.child('gameType').val() === 'spin_wheel' || newData.child('gameType').val() === 'memory_match') && newData.child('gameXpRewarded').isNumber() && newData.child('gameXpRewarded').val() >= 0 && newData.child('gameXpRewarded').val() <= 15"
+        ".validate": "newData.hasChildren(['userID','gameType','gameAttempt','gameXpRewarded','gameDay','gamePlayedAt']) && (newData.child('gameType').val() === 'spin_wheel' || newData.child('gameType').val() === 'memory_match') && newData.child('gameXpRewarded').isNumber() && newData.child('gameXpRewarded').val() >= 0 && newData.child('gameXpRewarded').val() <= 15 && newData.child('gamePlayedAt').val() >= now - 300000 && newData.child('gamePlayedAt').val() <= now + 300000"
       }
     },
 

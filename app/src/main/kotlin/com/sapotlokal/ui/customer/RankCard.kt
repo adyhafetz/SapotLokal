@@ -5,6 +5,9 @@ import android.view.LayoutInflater
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.LifecycleOwner
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.sapotlokal.AppConfig.Rank
 import com.sapotlokal.R
@@ -74,20 +77,42 @@ object RankCard {
         ).joinToString(". ")
     }
 
+    /** Highest rank a sheet has been shown for in this app session; stops two open screens both showing it. */
+    private var shownRank = 0
+
     /**
      * Shows the rank-up sheet once per new rank. A customer who has never had a rank recorded as
      * seen (everyone before this feature) is marked quietly instead, so nobody gets a surprise
      * sheet for a rank they already had.
+     *
+     * Home, Play and Me stay alive under the Scan screen and all hear the XP change. The sheet
+     * waits until its screen is in front, so it is never shown (and marked seen) behind another.
      */
     fun maybeShowRankUp(activity: AppCompatActivity, uid: String, standing: XpRepository.Standing) {
         if (activity.isFinishing || activity.isDestroyed) return
-        when {
-            standing.rankSeen == 0 -> XpRepository.markRankSeen(uid, standing.rank)
-            standing.rank.level > standing.rankSeen -> {
-                XpRepository.markRankSeen(uid, standing.rank)
-                showRankUp(activity, standing.rank)
-            }
+        if (standing.rankSeen == 0) return XpRepository.markRankSeen(uid, standing.rank)
+        if (standing.rank.level <= standing.rankSeen) return
+        whenResumed(activity) {
+            if (standing.rank.level <= shownRank) return@whenResumed
+            shownRank = standing.rank.level
+            XpRepository.markRankSeen(uid, standing.rank)
+            showRankUp(activity, standing.rank)
         }
+    }
+
+    private fun whenResumed(activity: AppCompatActivity, action: () -> Unit) {
+        val lifecycle = activity.lifecycle
+        if (lifecycle.currentState.isAtLeast(Lifecycle.State.RESUMED)) return action()
+        lifecycle.addObserver(object : LifecycleEventObserver {
+            override fun onStateChanged(source: LifecycleOwner, event: Lifecycle.Event) {
+                if (event == Lifecycle.Event.ON_RESUME) {
+                    lifecycle.removeObserver(this)
+                    action()
+                } else if (event == Lifecycle.Event.ON_DESTROY) {
+                    lifecycle.removeObserver(this)
+                }
+            }
+        })
     }
 
     private fun showRankUp(activity: AppCompatActivity, rank: Rank) {

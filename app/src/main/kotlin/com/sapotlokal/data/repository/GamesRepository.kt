@@ -8,7 +8,8 @@ import com.sapotlokal.data.model.GameType
 import com.sapotlokal.data.model.XpEventKey
 import com.sapotlokal.data.model.XpSource
 import com.sapotlokal.util.MissionDateUtils
-import java.time.LocalDate
+import com.sapotlokal.util.ServerClock
+import java.time.Instant
 import java.time.ZoneId
 
 /**
@@ -23,7 +24,7 @@ object GamesRepository {
     private val db = FirebaseDatabase.getInstance(AppConfig.DATABASE_URL).reference
 
     fun todayKey(): String =
-        LocalDate.now(ZoneId.of(AppConfig.GAMES_RESET_TIME_ZONE)).toString()
+        Instant.ofEpochMilli(ServerClock.now()).atZone(ZoneId.of(AppConfig.GAMES_RESET_TIME_ZONE)).toLocalDate().toString()
 
     data class GameStatus(
         val spinsToday: Int,
@@ -88,7 +89,7 @@ object GamesRepository {
     ) {
         if (userID.isBlank()) return onResult(false, 0)
         val gameID = db.child("games").push().key ?: return onResult(false, 0)
-        val now = System.currentTimeMillis()
+        val now = ServerClock.now()
         val today = todayKey()
         val game = Game(
             gameID = gameID,

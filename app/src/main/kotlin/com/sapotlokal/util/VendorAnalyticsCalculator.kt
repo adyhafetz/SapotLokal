@@ -27,7 +27,7 @@ object VendorAnalyticsCalculator {
     fun compute(
         points: List<Point>,
         vouchersUsed: Int,
-        nowMs: Long = System.currentTimeMillis()
+        nowMs: Long = ServerClock.now()
     ): VendorAnalytics {
         val weekStart = MissionDateUtils.getWeekStartMillis(nowMs)
         val visits = points.filter { it.pointSource == PointSource.SHOP_VISIT && it.pointEarnedAmount > 0 && it.timestamp > 0L }

@@ -18,6 +18,7 @@ import com.sapotlokal.data.repository.PointRepository
 import com.sapotlokal.data.repository.VendorRepository
 import com.sapotlokal.data.repository.VoucherRepository
 import com.sapotlokal.databinding.ActivityFindShopsBinding
+import com.sapotlokal.util.ServerClock
 
 /**
  * Shops tab (Hadiah Utama). One job: "where can I earn?"
@@ -120,7 +121,7 @@ class FindShopsActivity : AppCompatActivity() {
 
     private fun render() {
         if (allVendors.isEmpty()) return
-        val now = System.currentTimeMillis()
+        val now = ServerClock.now()
         val live = vouchers.filter {
             it.voucherStatus == VoucherStatus.ACTIVE && (it.voucherExpiryDate == 0L || it.voucherExpiryDate > now)
         }

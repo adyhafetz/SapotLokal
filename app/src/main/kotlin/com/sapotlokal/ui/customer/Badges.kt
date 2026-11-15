@@ -120,16 +120,24 @@ object Badges {
                 val before = known
                 known = now
                 if (before == null || activity.isFinishing || activity.isDestroyed) return
-                states.filter { it.unlocked && it.def.id !in before }.forEach { s ->
-                    Snackbar.make(anchor, activity.getString(R.string.badge_unlocked_toast, s.def.title), Snackbar.LENGTH_LONG)
-                        .setAction(R.string.badge_see) { showSheet(activity, uid, s) }
-                        .show()
-                }
+                announce(activity, uid, anchor, states.filter { it.unlocked && it.def.id !in before })
             }
             override fun onCancelled(error: DatabaseError) {}
         }
         FirebaseDatabase.getInstance(AppConfig.DATABASE_URL).reference.child("badges").child(uid).addValueEventListener(l)
         return l
+    }
+
+    /** One Snackbar per new badge, each after the last is gone, so a scan that unlocks two shows both. */
+    private fun announce(activity: Activity, uid: String, anchor: View, unlocked: List<BadgeState>) {
+        val s = unlocked.firstOrNull() ?: return
+        if (activity.isFinishing || activity.isDestroyed) return
+        Snackbar.make(anchor, activity.getString(R.string.badge_unlocked_toast, s.def.title), Snackbar.LENGTH_LONG)
+            .setAction(R.string.badge_see) { showSheet(activity, uid, s) }
+            .addCallback(object : Snackbar.Callback() {
+                override fun onDismissed(bar: Snackbar, event: Int) = announce(activity, uid, anchor, unlocked.drop(1))
+            })
+            .show()
     }
 
     fun stopWatching(uid: String, listener: ValueEventListener?) = BadgeRepository.stopListening(uid, listener)

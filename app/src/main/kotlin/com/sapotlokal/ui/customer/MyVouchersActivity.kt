@@ -26,6 +26,7 @@ import com.sapotlokal.data.repository.VendorRepository
 import com.sapotlokal.data.repository.VoucherRepository
 import com.sapotlokal.databinding.ActivityMyVouchersBinding
 import com.sapotlokal.databinding.DialogVoucherQrBinding
+import com.sapotlokal.util.ServerClock
 import com.sapotlokal.util.VoucherClaimHelper
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -110,7 +111,7 @@ class MyVouchersActivity : AppCompatActivity() {
     private fun render() {
         if (loaded != 7) return
         binding.pbLoading.visibility = View.GONE
-        val now = System.currentTimeMillis()
+        val now = ServerClock.now()
         val live = vouchers.filter { isLive(it, now) }
         val heldRules = live.map { it.voucherID }.toSet()
 

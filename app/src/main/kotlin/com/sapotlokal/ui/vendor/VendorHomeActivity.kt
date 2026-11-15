@@ -15,6 +15,7 @@ import com.sapotlokal.data.repository.VendorRepository
 import com.sapotlokal.databinding.ActivityVendorHomeBinding
 import com.sapotlokal.service.SapotFcmService
 import com.sapotlokal.ui.auth.LoginActivity
+import com.sapotlokal.util.ServerClock
 import com.sapotlokal.util.StatusChip
 import com.sapotlokal.util.VendorAnalytics
 
@@ -31,7 +32,7 @@ class VendorHomeActivity : AppCompatActivity() {
     private var vendorID: String = ""
     private var currentVendor: Vendor? = null
     private var vendorListener: ValueEventListener? = null
-    private var analyticsListener: ValueEventListener? = null
+    private var analyticsListener: VendorRepository.AnalyticsListener? = null
     private val customerNames = mutableMapOf<String, String>()
     private var isProgrammaticUpdate = false
 
@@ -169,7 +170,7 @@ class VendorHomeActivity : AppCompatActivity() {
         a.recentVisits.forEach { p ->
             val row = com.sapotlokal.databinding.ItemOwnerVisitBinding.inflate(layoutInflater, binding.recentRows, false)
             row.tvWhen.text = android.text.format.DateUtils.getRelativeTimeSpanString(
-                p.timestamp, System.currentTimeMillis(), android.text.format.DateUtils.MINUTE_IN_MILLIS
+                p.timestamp, ServerClock.now(), android.text.format.DateUtils.MINUTE_IN_MILLIS
             )
             row.tvPoints.text = getString(R.string.owner_plus_points, p.pointEarnedAmount)
             bindCustomer(row, p.userID)

@@ -50,10 +50,11 @@ There are two currencies, and they never mix:
 - A shop-visit row needs a real shop and earns at most that shop's `pointsPerVisit × 3`.
 - `weeklyVisits/{week}/{uid}/visits` only goes up by 1 per write, and only the owner can write it. `xpEvents`, `userStats`, `missionProgress`, `badges` and `games` are readable only by their owner.
 - `qrcodes` can only be looked up by exact value, so nobody can list live shop codes.
+- Every time the app writes (visit, game, XP event, mission or badge claim, `lastVisitAt`) must be within 5 minutes of the server's clock. The app reads server time through `util/ServerClock` (Firebase's `.info/serverTimeOffset`), so day and week keys, game limits, the 12-hour scan cooldown and QR expiry don't move when someone changes their phone's date.
 - `missionProgress` and `badges` timestamps can be set once and never changed.
 - Claiming a voucher must write the matching redemption row in the same update, at the reward's real cost.
 
-**Known limit:** with no server, a determined customer can still award themselves small amounts. Every award is capped and leaves a trace in `/xpEvents`. Moving awards into Cloud Functions (Blaze plan) would close this gap.
+**Known limit:** with no server, a determined customer with a modified app can still award themselves small amounts, and the rules can't check that a day or week key matches the date. Every award is capped and leaves a trace in `/xpEvents`. Moving awards into Cloud Functions (Blaze plan) would close this gap.
 
 ## Test data
 

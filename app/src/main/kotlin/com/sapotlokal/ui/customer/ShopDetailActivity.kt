@@ -20,6 +20,7 @@ import com.sapotlokal.data.repository.PointRepository
 import com.sapotlokal.data.repository.VendorRepository
 import com.sapotlokal.data.repository.VoucherRepository
 import com.sapotlokal.databinding.ActivityShopDetailBinding
+import com.sapotlokal.util.ServerClock
 import com.sapotlokal.util.VoucherClaimHelper
 
 /**
@@ -117,7 +118,7 @@ class ShopDetailActivity : AppCompatActivity() {
         val name = v.vendorName.ifBlank { getString(R.string.k_local_shop) }
         binding.tvTitle.text = name
 
-        val now = System.currentTimeMillis()
+        val now = ServerClock.now()
         val held = myVouchers.filter {
             it.vendorID == vendorId && it.voucherStatus == VoucherStatus.ACTIVE &&
                 (it.voucherExpiryDate == 0L || it.voucherExpiryDate > now)

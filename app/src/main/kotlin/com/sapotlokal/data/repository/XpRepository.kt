@@ -8,6 +8,7 @@ import com.google.firebase.database.ValueEventListener
 import com.sapotlokal.AppConfig
 import com.sapotlokal.AppConfig.Rank
 import com.sapotlokal.data.model.XpEvent
+import com.sapotlokal.util.ServerClock
 
 /**
  * XpRepository — the customer's XP and rank (REFRACTOR.md §3, §4). The ONLY place XP is written.
@@ -72,7 +73,7 @@ object XpRepository {
         amount: Int,
         source: String,
         current: Standing,
-        now: Long = System.currentTimeMillis()
+        now: Long = ServerClock.now()
     ): Pair<Map<String, Any>, Rank> {
         val after = Rank.fromXp(current.xp + amount)
         return mapOf(
@@ -100,7 +101,7 @@ object XpRepository {
     ) {
         if (uid.isBlank() || amount <= 0) return onResult(null)
         fetchStanding(uid) { standing ->
-            val now = System.currentTimeMillis()
+            val now = ServerClock.now()
             val (paths, after) = awardPaths(uid, eventKey, amount, source, standing, now)
             val updates = HashMap<String, Any>(extraUpdates)
             updates.putAll(paths)

@@ -28,8 +28,8 @@ import com.sapotlokal.databinding.ActivityCustomerHomeBinding
 import com.sapotlokal.databinding.ViewHuFirstScanBinding
 import com.sapotlokal.service.SapotFcmService
 import com.sapotlokal.ui.auth.LoginActivity
+import com.sapotlokal.util.ServerClock
 import com.sapotlokal.util.VoucherClaimHelper
-import java.util.Calendar
 
 /**
  * Customer Home (Hadiah Utama). One job: "is anything ready for me?"
@@ -115,7 +115,7 @@ class CustomerHomeActivity : AppCompatActivity() {
     // ── Header & level ────────────────────────────────────────────────────────
 
     private fun updateGreeting() {
-        val hour = Calendar.getInstance().get(Calendar.HOUR_OF_DAY)
+        val hour = java.time.Instant.ofEpochMilli(ServerClock.now()).atZone(com.sapotlokal.util.MissionDateUtils.KL_ZONE).hour
         binding.tvGreetingTime.setText(
             when (hour) {
                 in 5..11 -> R.string.home_greet_morning
@@ -135,7 +135,7 @@ class CustomerHomeActivity : AppCompatActivity() {
     // ── Rewards logic (shared rules with Rewards and the Shop page) ───────────
 
     private fun liveVouchers(): List<VoucherUser> {
-        val now = System.currentTimeMillis()
+        val now = ServerClock.now()
         return myVouchers.filter {
             it.voucherStatus == VoucherStatus.ACTIVE && (it.voucherExpiryDate == 0L || it.voucherExpiryDate > now)
         }

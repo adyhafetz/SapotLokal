@@ -10,6 +10,7 @@ import com.sapotlokal.data.model.WeeklyVisit
 import com.sapotlokal.data.model.XpEventKey
 import com.sapotlokal.data.model.XpSource
 import com.sapotlokal.util.MissionDateUtils
+import com.sapotlokal.util.ServerClock
 
 /**
  * LeaderboardRepository — the weekly visit race (REFRACTOR.md §3.6, Phase 8).
@@ -68,7 +69,7 @@ object LeaderboardRepository {
     }
 
     /** The last [AppConfig.LEADERBOARD_CLAIM_WEEKS] finished weeks, newest first. */
-    fun claimableWeeks(now: Long = System.currentTimeMillis()): List<String> =
+    fun claimableWeeks(now: Long = ServerClock.now()): List<String> =
         (1..AppConfig.LEADERBOARD_CLAIM_WEEKS).map { MissionDateUtils.getWeekYearKey(now - it * 7L * 24 * 60 * 60 * 1000) }
 
     /** Finds [uid]'s unclaimed top-3 places in the claimable weeks (newest first). */
@@ -97,7 +98,7 @@ object LeaderboardRepository {
         BadgeRepository.readContext(uid) { _, badges ->
             val extra = hashMapOf<String, Any>()
             val hasBadge = (badges?.child(BadgeDef.JUARA_MINGGU.id)?.child("unlockedAt")?.getValue(Long::class.java) ?: 0L) > 0L
-            if (!hasBadge) extra["badges/$uid/${BadgeDef.JUARA_MINGGU.id}/unlockedAt"] = System.currentTimeMillis()
+            if (!hasBadge) extra["badges/$uid/${BadgeDef.JUARA_MINGGU.id}/unlockedAt"] = ServerClock.now()
             XpRepository.award(uid, XpEventKey.leaderboard(prize.weekKey), prize.xp, XpSource.LEADERBOARD, extra, onResult)
         }
     }

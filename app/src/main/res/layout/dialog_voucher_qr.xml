@@ -87,7 +87,7 @@
             android:textColor="@color/hu_ink"
             android:textSize="20sp"
             android:textStyle="bold"
-            tools:text="KOPIKITA200" />
+            tools:text="SAPOT-AB12CD" />
 
         <!-- Expiry Information -->
         <TextView

@@ -152,7 +152,7 @@
     <string name="scan_position_the_qr_code">Position the QR code inside the frame</string>
     <string name="scan_redeem_enter_voucher_code">Enter voucher code</string>
     <string name="scan_redeem_verify">Verify</string>
-    <string name="scan_redeem_voucher_code_e_g">Voucher code (e.g. KOPIKITA200)</string>
+    <string name="scan_redeem_voucher_code_e_g">Voucher code (e.g. SAPOT-AB12CD)</string>
     <string name="scan_shop_code">Shop code</string>
     <string name="scan_starting_camera">Starting camera…</string>
     <string name="scan_your_camera_is_only">Your camera is only used for scanning</string>
