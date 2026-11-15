@@ -160,7 +160,9 @@ data class VoucherUser(
     /** true = the points were spent when the customer claimed it (nothing more is deducted at redeem). */
     val pointsDeducted: Boolean = false,
     /** The points-ledger row that recorded the spend at claim time. */
-    val claimPointID: String = ""
+    val claimPointID: String = "",
+    /** When the shop marked it used (epoch ms, server time); 0 for vouchers used before this was kept. */
+    val voucherUsedAt: Long = 0L
 )
 
 object VoucherStatus {

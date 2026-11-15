@@ -59,20 +59,20 @@
                 android:layout_gravity="center"
                 android:background="@drawable/bg_scan_frame" />
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal"
-                android:layout_marginTop="290dp"
-                android:background="#CCFAFAFA"
-                android:fontFamily="@font/figtree_bold"
-                android:paddingHorizontal="14dp"
-                android:paddingVertical="6dp"
-                android:text="@string/scan_redeem_point_the_camera_at"
-                android:textColor="@color/hu_ink"
-                android:textSize="11sp" />
-
         </FrameLayout>
+
+        <!-- The hint sits under the camera, not on it (same as the customer Scan screen) -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/hu_bg"
+            android:fontFamily="@font/figtree_bold"
+            android:gravity="center"
+            android:paddingHorizontal="20dp"
+            android:paddingVertical="10dp"
+            android:text="@string/scan_redeem_point_the_camera_at"
+            android:textColor="@color/hu_ink"
+            android:textSize="14sp" />
 
         <!-- Manual code entry card (Figma scanner-card manual entry) -->
         <com.google.android.material.card.MaterialCardView

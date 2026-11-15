@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Shop owner Home: shop status, this week in three numbers, recent visits. The QR lives on Show QR. -->
+<!-- Shop owner Home: name, one open/closed switch, this week in three numbers, recent visits (5, then See all). -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
@@ -22,7 +22,7 @@
             android:orientation="vertical"
             android:padding="20dp">
 
-            <!-- Header: shop name + live status pill -->
+            <!-- Header: shop name and its type and address -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -54,15 +54,6 @@
                         android:textSize="13sp" />
                 </LinearLayout>
 
-                <TextView
-                    android:id="@+id/tvStatusBadge"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:fontFamily="@font/figtree_bold"
-                    android:paddingHorizontal="12dp"
-                    android:paddingVertical="5dp"
-                    android:text="@string/vendor_home_open"
-                    android:textSize="12sp" />
             </LinearLayout>
 
             <!-- Open / closed switch -->
@@ -218,13 +209,38 @@
                 android:orientation="vertical" />
 
             <TextView
-                android:id="@+id/tvNoVisits"
-                style="@style/HU.Text.Body"
+                android:id="@+id/btnSeeAllVisits"
+                style="@style/HU.Text.Link"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:background="?attr/selectableItemBackground"
+                android:gravity="center"
+                android:text="@string/owner_see_all_visits"
+                android:visibility="gone" />
+
+            <LinearLayout
+                android:id="@+id/emptyVisits"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="10dp"
-                android:text="@string/owner_no_visits"
-                android:visibility="gone" />
+                android:orientation="vertical"
+                android:visibility="gone">
+
+                <TextView
+                    android:id="@+id/tvNoVisits"
+                    style="@style/HU.Text.Body"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:text="@string/owner_no_visits" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnEmptyShowQr"
+                    style="@style/Widget.HU.Button.Outlined"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:text="@string/owner_nav_show_qr" />
+            </LinearLayout>
         </LinearLayout>
     </ScrollView>
 

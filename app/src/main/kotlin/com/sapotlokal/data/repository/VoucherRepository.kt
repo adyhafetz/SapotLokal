@@ -490,7 +490,8 @@ object VoucherRepository {
         onResult: (success: Boolean) -> Unit
     ) {
         val updates = mutableMapOf<String, Any>(
-            "voucherUsers/${voucherUser.voucherUserID}/voucherStatus" to VoucherStatus.USED
+            "voucherUsers/${voucherUser.voucherUserID}/voucherStatus" to VoucherStatus.USED,
+            "voucherUsers/${voucherUser.voucherUserID}/voucherUsedAt" to ServerClock.now()
         )
         // A claimed voucher was paid for when it was claimed. Older vouchers still deduct here.
         if (!voucherUser.pointsDeducted) {

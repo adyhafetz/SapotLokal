@@ -27,25 +27,26 @@ class VendorAnalyticsTest {
             visit("b", 20, kl("2026-11-15T19:00:00")),
             visit("c", 10, kl("2026-11-08T23:59:00"))  // last Sunday, not this week
         )
-        val r = VendorAnalyticsCalculator.compute(points, vouchersUsed = 3, nowMs = now)
+        val used = listOf(kl("2026-11-10T12:00:00"), kl("2026-11-15T18:00:00"), kl("2026-11-02T12:00:00"))
+        val r = VendorAnalyticsCalculator.compute(points, voucherUsedTimes = used, nowMs = now)
         assertEquals(3, r.weekVisits)
         assertEquals(2, r.weekCustomers)
         assertEquals(43, r.weekPointsGiven)
-        assertEquals(3, r.vouchersUsed)
+        assertEquals(2, r.weekVouchersUsed) // the one from 2 Nov is last week's
     }
 
     @Test
     fun redemptionsAreNotVisits() {
         val spend = Point(userID = "a", vendorID = "v1", pointRedeemedAmount = 10, pointSource = PointSource.REDEMPTION, timestamp = now - 1000)
-        val r = VendorAnalyticsCalculator.compute(listOf(spend), 0, now)
+        val r = VendorAnalyticsCalculator.compute(listOf(spend), emptyList(), now)
         assertEquals(0, r.weekVisits)
         assertEquals(0, r.recentVisits.size)
     }
 
     @Test
     fun recentVisitsAreNewestFirstAndCapped() {
-        val points = (1..15).map { visit("u$it", 10, now - it * 60_000L) }
-        val r = VendorAnalyticsCalculator.compute(points, 0, now)
+        val points = (1..40).map { visit("u$it", 10, now - it * 60_000L) }
+        val r = VendorAnalyticsCalculator.compute(points, emptyList(), now)
         assertEquals(VendorAnalyticsCalculator.RECENT_LIMIT, r.recentVisits.size)
         assertEquals("u1", r.recentVisits.first().userID)
     }

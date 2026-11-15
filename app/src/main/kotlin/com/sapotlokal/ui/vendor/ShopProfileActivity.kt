@@ -71,7 +71,6 @@ class ShopProfileActivity : AppCompatActivity() {
         binding.ivShopPhoto.clipToOutline = true
 
         binding.photoFrame.setOnClickListener { pickPhoto.launch("image/*") }
-        binding.btnChangePhoto.setOnClickListener { pickPhoto.launch("image/*") }
         binding.btnSave.setOnClickListener { saveChanges() }
         binding.rowChangePassword.setOnClickListener { showChangePassword() }
         binding.rowLogout.setOnClickListener { com.sapotlokal.util.AccountActions.confirmLogout(this) }
@@ -93,8 +92,6 @@ class ShopProfileActivity : AppCompatActivity() {
 
     private fun bind(v: Vendor) {
         currentVendor = v
-        binding.tvProfileName.text = v.vendorName
-        binding.tvProfileCategory.text = com.sapotlokal.data.model.ShopCategory.label(this, v.vendorCategory)
         // Fill the form once; later live updates (e.g. the open switch on Home) must not wipe an edit in progress.
         if (!formFilled) {
             populateFields(v)
@@ -114,11 +111,11 @@ class ShopProfileActivity : AppCompatActivity() {
         binding.etShopAddress.setText(vendor.vendorAddress)
         binding.etShopDesc.setText(vendor.vendorDescription)
         binding.etOperatingHours.setText(vendor.operatingHours)
-        binding.etSsmNumber.setText(vendor.ssmNumber)
+        binding.tvSsmNumber.text = vendor.ssmNumber
         bindPointsPerVisit(vendor.pointsPerVisit)
     }
 
-    /** One chip per allowed value; the shop's current value starts selected. */
+    /** One chip per allowed value; the shop's current value starts selected. Tapping one saves it. */
     private fun bindPointsPerVisit(current: Int) {
         val group = binding.chipsPointsPerVisit
         group.removeAllViews()
@@ -130,14 +127,28 @@ class ShopProfileActivity : AppCompatActivity() {
                 tag = value
                 isCheckable = true
                 isChecked = value == selected
+                setOnClickListener { savePointsPerVisit(value) }
             }
             group.addView(chip)
         }
+        showPointsRange(selected)
     }
 
-    private fun selectedPointsPerVisit(): Int =
-        (binding.chipsPointsPerVisit.findViewById<com.google.android.material.chip.Chip>(binding.chipsPointsPerVisit.checkedChipId)?.tag as? Int)
-            ?: AppConfig.DEFAULT_POINTS_PER_VISIT
+    /** "Customers get 20–60 points a visit": the shop's rate up to the top rank's bonus. */
+    private fun showPointsRange(rate: Int) {
+        val top = AppConfig.shopPointsForVisit(rate, AppConfig.Rank.entries.last())
+        binding.tvPointsRange.text = getString(com.sapotlokal.R.string.owner_points_range, rate, top)
+    }
+
+    private fun savePointsPerVisit(value: Int) {
+        showPointsRange(value)
+        VendorRepository.setPointsPerVisit(vendorID, value) { ok ->
+            if (isFinishing || isDestroyed) return@setPointsPerVisit
+            toast(getString(if (ok) com.sapotlokal.R.string.owner_points_saved else com.sapotlokal.R.string.kv_update_failed))
+            if (ok) currentVendor = currentVendor?.copy(pointsPerVisit = value)
+        }
+    }
+
 
     private fun saveChanges() {
         val vendor = currentVendor ?: return
@@ -155,8 +166,7 @@ class ShopProfileActivity : AppCompatActivity() {
             vendorCategory = category,
             vendorAddress = address,
             vendorDescription = binding.etShopDesc.text.toString().trim(),
-            operatingHours = binding.etOperatingHours.text.toString().trim(),
-            pointsPerVisit = selectedPointsPerVisit()
+            operatingHours = binding.etOperatingHours.text.toString().trim()
         )
         setLoading(true)
         VendorRepository.updateVendor(updated) { success, errorMsg ->
@@ -182,11 +192,10 @@ class ShopProfileActivity : AppCompatActivity() {
             if (bmp != null) {
                 binding.ivShopPhoto.setImageBitmap(bmp)
                 binding.photoPlaceholder.visibility = View.GONE
-                binding.btnChangePhoto.text = getString(com.sapotlokal.R.string.kv_change_photo)
+                binding.ivShopPhoto.contentDescription = getString(com.sapotlokal.R.string.kv_change_photo)
             } else {
                 binding.ivShopPhoto.setImageDrawable(null)
                 binding.photoPlaceholder.visibility = View.VISIBLE
-                binding.btnChangePhoto.text = getString(com.sapotlokal.R.string.kv_add_photo)
             }
         }
     }

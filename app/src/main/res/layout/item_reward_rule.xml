@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- A shop reward: name, cost, one line of detail and an on/off switch. Tap the row to edit. -->
+<!-- A shop reward: name, cost, detail, how often it was claimed, and a labelled switch
+     (shown to customers or hidden). Tap the row to edit. -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -47,6 +48,24 @@
             android:ellipsize="end"
             android:maxLines="1"
             tools:text="One regular kopi of your choice" />
+
+        <TextView
+            android:id="@+id/tvClaimed"
+            style="@style/HU.Text.Small"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="2dp"
+            tools:text="Claimed 12 times" />
+
+        <TextView
+            android:id="@+id/tvVisibility"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:fontFamily="@font/figtree_bold"
+            android:textSize="13sp"
+            tools:text="Shown to customers"
+            tools:textColor="@color/hu_ok" />
     </LinearLayout>
 
     <com.google.android.material.switchmaterial.SwitchMaterial

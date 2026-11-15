@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- Show QR: the shop's rotating QR, full screen, in the shop's colour. Opened from the owner's bar. -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -27,15 +28,13 @@
             android:src="@drawable/ic_arrow_back_hu" />
 
         <TextView
-            android:id="@+id/tvShopName"
             style="@style/HU.Text.Screen"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="4dp"
             android:layout_weight="1"
-            android:ellipsize="end"
-            android:maxLines="1"
-            tools:text="Kopi Kita Cafe" />
+            android:accessibilityHeading="true"
+            android:text="@string/owner_nav_show_qr" />
     </LinearLayout>
 
     <Space
@@ -77,16 +76,27 @@
         android:gravity="center"
         tools:text="New code in 45s" />
 
+    <!-- The same code as text: customers whose camera can't scan type it on their Scan tab. -->
     <TextView
-        android:id="@+id/tvDebugValue"
+        android:id="@+id/tvCode"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="14dp"
+        android:fontFamily="@font/figtree_extrabold"
+        android:gravity="center"
+        android:letterSpacing="0.12"
+        android:textColor="@color/hu_ink"
+        android:textIsSelectable="true"
+        android:textSize="34sp"
+        app:fontFamily="@font/figtree_extrabold"
+        tools:text="8JFHTA" />
+
+    <TextView
         style="@style/HU.Text.Small"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
         android:gravity="center"
-        android:textIsSelectable="true"
-        android:visibility="gone"
-        tools:text="Code: 22e5ca8b-45af" />
+        android:text="@string/owner_code_can_type" />
 
     <Space
         android:layout_width="match_parent"

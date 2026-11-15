@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Shop owner Shop tab: photo, shop details (edited in place), account actions and language. -->
+<!-- Shop owner Shop tab: photo (tap to change), points per visit (saves on tap), shop details
+     (Save), account actions, language. -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
@@ -29,7 +30,7 @@
                 android:accessibilityHeading="true"
                 android:text="@string/owner_nav_shop" />
 
-            <!-- Photo + name -->
+            <!-- Photo: the box itself is the button -->
             <com.google.android.material.card.MaterialCardView
                 style="@style/Widget.HU.Card"
                 android:layout_width="match_parent"
@@ -72,6 +73,7 @@
                                 app:tint="@color/hu_soft" />
 
                             <TextView
+                                android:id="@+id/tvPhotoLabel"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_marginTop="6dp"
@@ -82,41 +84,50 @@
                         </LinearLayout>
                     </FrameLayout>
 
-                    <TextView
-                        android:id="@+id/btnChangePhoto"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="8dp"
-                        android:background="?attr/selectableItemBackground"
-                        android:clickable="true"
-                        android:focusable="true"
-                        android:fontFamily="@font/figtree_bold"
-                        android:padding="8dp"
-                        android:text="@string/shop_profile_change_photo"
-                        android:textColor="@color/hu_accent_text"
-                        android:textSize="13sp" />
-
-                    <TextView
-                        android:id="@+id/tvProfileName"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="4dp"
-                        android:fontFamily="@font/figtree_extrabold"
-                        android:textColor="@color/hu_ink"
-                        android:textSize="22sp" />
-
-                    <TextView
-                        android:id="@+id/tvProfileCategory"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="2dp"
-                        android:fontFamily="@font/figtree_medium"
-                        android:textColor="@color/hu_soft"
-                        android:textSize="14sp" />
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
-            <!-- Shop details: edited right here (name, category, address, hours, points per visit) -->
+            <!-- Points per visit: its own card, saved the moment a value is tapped -->
+            <com.google.android.material.card.MaterialCardView
+                style="@style/Widget.HU.Card"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="14dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="16dp">
+
+                    <TextView
+                        style="@style/HU.Text.Title"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:accessibilityHeading="true"
+                        android:text="@string/owner_points_per_visit" />
+
+                    <TextView
+                        android:id="@+id/tvPointsRange"
+                        style="@style/HU.Text.Small"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="2dp"
+                        tools:text="Customers get 20–60 points a visit, depending on their rank." />
+
+                    <!-- Chips are added in code from AppConfig.ALLOWED_POINTS_PER_VISIT -->
+                    <com.google.android.material.chip.ChipGroup
+                        android:id="@+id/chipsPointsPerVisit"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        app:chipSpacingHorizontal="8dp"
+                        app:selectionRequired="true"
+                        app:singleSelection="true" />
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Shop details: edited right here (name, category, address, about, hours) -->
             <com.google.android.material.card.MaterialCardView
                 style="@style/Widget.HU.Card"
                 android:layout_width="match_parent"
@@ -246,52 +257,28 @@
                             android:textColor="@color/hu_ink" />
                     </com.google.android.material.textfield.TextInputLayout>
 
-                    <!-- Points per visit: chips are added in code from AppConfig.ALLOWED_POINTS_PER_VISIT -->
+                    <!-- SSM registration number: shown, never edited -->
                     <TextView
                         style="@style/HU.Text.FieldLabel"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="22dp"
-                        android:text="@string/owner_points_per_visit" />
+                        android:layout_marginTop="18dp"
+                        android:text="@string/shop_settings_ssm_registration_number" />
+
+                    <TextView
+                        android:id="@+id/tvSsmNumber"
+                        style="@style/HU.Text"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="2dp"
+                        android:textIsSelectable="true"
+                        tools:text="SEED-0001" />
 
                     <TextView
                         style="@style/HU.Text.Small"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="2dp"
-                        android:text="@string/owner_points_per_visit_rank" />
-
-                    <com.google.android.material.chip.ChipGroup
-                        android:id="@+id/chipsPointsPerVisit"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="8dp"
-                        app:chipSpacingHorizontal="8dp"
-                        app:selectionRequired="true"
-                        app:singleSelection="true" />
-
-                    <!-- SSM Registration Number (Read-only) -->
-                    <com.google.android.material.textfield.TextInputLayout
-                        android:id="@+id/tilSsmNumber"
-                        style="@style/Widget.HU.TextInputLayout"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="14dp"
-                        app:boxCornerRadiusBottomEnd="12dp"
-                        app:boxCornerRadiusBottomStart="12dp"
-                        app:boxCornerRadiusTopEnd="12dp"
-                        app:boxCornerRadiusTopStart="12dp"
-                        android:enabled="false"
-                        app:helperText="@string/owner_ssm_locked"
-                        android:hint="@string/shop_settings_ssm_registration_number">
-
-                        <com.google.android.material.textfield.TextInputEditText
-                            android:id="@+id/etSsmNumber"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:fontFamily="@font/figtree_medium"
-                            android:inputType="text" />
-                    </com.google.android.material.textfield.TextInputLayout>
+                        android:text="@string/owner_ssm_locked" />
 
                     <!-- Save Button & Progress -->
                     <FrameLayout

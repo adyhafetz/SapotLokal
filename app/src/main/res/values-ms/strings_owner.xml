@@ -5,7 +5,6 @@
     <string name="owner_nav_show_qr">Tunjuk QR</string>
     <string name="owner_nav_redeem">Tebus</string>
     <string name="owner_nav_shop">Kedai</string>
-    <string name="kv_add_photo">Tambah gambar</string>
     <string name="kv_add_reward_rule">Ganjaran baharu</string>
     <string name="kv_bad_image">Tidak dapat guna gambar itu. Cuba gambar lain.</string>
     <string name="kv_camera_failed">Kamera tidak dapat dimulakan. Guna kemasukan manual di bawah.</string>
@@ -46,7 +45,6 @@
     <string name="kv_your_shop">Kedai anda</string>
     <string name="shop_profile_add_a_shop_photo">Tambah gambar kedai</string>
     <string name="shop_profile_change_password">Tukar kata laluan</string>
-    <string name="shop_profile_change_photo">Tukar gambar</string>
     <string name="shop_profile_delete_account">Padam akaun</string>
     <string name="shop_profile_log_out">Log keluar</string>
     <string name="shop_settings_operating_hours">Waktu buka</string>
@@ -55,17 +53,15 @@
     <string name="shop_settings_shop_description_tagline">Tentang kedai anda</string>
     <string name="shop_settings_shop_name">Nama kedai</string>
     <string name="shop_settings_ssm_registration_number">Nombor pendaftaran SSM</string>
-    <string name="store_status_closed_desc">Ditutup kepada pelanggan</string>
-    <string name="store_status_open_desc">Dibuka untuk pelanggan</string>
-    <string name="vendor_home_open">Dibuka</string>
+    <string name="store_status_closed_desc">Ditutup sekarang</string>
+    <string name="store_status_open_desc">Dibuka sekarang</string>
     <string name="vendor_home_open_for_customers">Dibuka untuk pelanggan</string>
     <string name="owner_points_per_visit">Mata setiap lawatan</string>
-    <string name="owner_points_per_visit_rank">Pelanggan berpangkat tinggi dapat sehingga 3x.</string>
     <string name="owner_week_visits">Lawatan minggu ini</string>
     <string name="owner_week_points">Mata diberi minggu ini</string>
-    <string name="owner_vouchers_used">Baucar digunakan</string>
+    <string name="owner_vouchers_used">Baucar digunakan minggu ini</string>
     <string name="owner_recent_visits">Lawatan terkini</string>
-    <string name="owner_no_visits">Belum ada lawatan. Ketik Tunjuk QR supaya pelanggan boleh imbas.</string>
+    <string name="owner_no_visits">Belum ada lawatan. Tunjukkan QR anda supaya pelanggan boleh imbas.</string>
     <string name="owner_plus_points">+%1$d mata</string>
     <string name="owner_a_customer">Seorang pelanggan</string>
     <string name="owner_add_reward">Tambah ganjaran</string>
@@ -80,11 +76,22 @@
     <string name="owner_n_points">%1$d mata</string>
     <string name="owner_qr_cd">Kod QR kedai anda</string>
     <string name="owner_ask_to_scan">Minta pelanggan imbas ini</string>
-    <string name="owner_code_n">Kod: %1$s</string>
     <string name="owner_valid_voucher">Baucar sah</string>
     <string name="owner_for_customer">Untuk %1$s</string>
     <string name="owner_mark_used">Tanda sudah digunakan</string>
     <string name="scan_redeem_point_the_camera_at">Halakan kamera ke QR baucar pelanggan</string>
     <string name="owner_hours_hint">cth. 8:00 pagi - 10:00 malam</string>
     <string name="owner_ssm_locked">Ini tidak boleh diubah</string>
+    <!-- Shop-owner UI review (Phase 12) -->
+    <string name="owner_see_all_visits">Lihat semua lawatan</string>
+    <string name="owner_show_fewer">Tunjuk kurang</string>
+    <string name="owner_not_claimed_yet">Belum dituntut</string>
+    <string name="owner_reward_shown">Ditunjukkan kepada pelanggan</string>
+    <string name="owner_reward_hidden">Disembunyikan: pelanggan tidak boleh menuntutnya</string>
+    <string name="owner_code_can_type">Pelanggan juga boleh taip kod ini</string>
+    <string name="owner_points_range">Pelanggan dapat %1$d–%2$d mata setiap lawatan, ikut pangkat mereka.</string>
+    <string name="owner_points_saved">Mata setiap lawatan disimpan</string>
+    <plurals name="owner_claimed_times">
+        <item quantity="other">Dituntut %d kali</item>
+    </plurals>
 </resources>

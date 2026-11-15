@@ -172,6 +172,13 @@ object VendorRepository {
     /**
      * Toggles vendor open/closed status and records timestamp.
      */
+    /** Saves just the shop's points per visit (one of AppConfig.ALLOWED_POINTS_PER_VISIT). */
+    fun setPointsPerVisit(vendorID: String, value: Int, onResult: (success: Boolean) -> Unit) {
+        if (vendorID.isBlank() || value !in AppConfig.ALLOWED_POINTS_PER_VISIT) return onResult(false)
+        db.child("vendors").child(vendorID).child("pointsPerVisit").setValue(value)
+            .addOnCompleteListener { onResult(it.isSuccessful) }
+    }
+
     fun updateVendorStatus(
         vendorID: String,
         isOpen: Boolean,
@@ -259,7 +266,7 @@ object VendorRepository {
         onError: (String) -> Unit
     ): AnalyticsListener {
         var points: List<com.sapotlokal.data.model.Point>? = null
-        var used: Int? = null
+        var used: List<Long>? = null
         fun publish() {
             val p = points ?: return
             val u = used ?: return
@@ -274,14 +281,14 @@ object VendorRepository {
         }
         val vouchersListener = object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
-                used = snapshot.children.count {
+                used = snapshot.children.filter {
                     it.child("voucherStatus").getValue(String::class.java)
                         .equals(com.sapotlokal.data.model.VoucherStatus.USED, ignoreCase = true)
-                }
+                }.mapNotNull { it.child("voucherUsedAt").getValue(Long::class.java) }
                 publish()
             }
             override fun onCancelled(error: DatabaseError) {
-                used = 0
+                used = emptyList()
                 publish()
             }
         }

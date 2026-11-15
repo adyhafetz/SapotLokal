@@ -16,8 +16,8 @@ import com.sapotlokal.databinding.ActivityVendorHomeBinding
 import com.sapotlokal.service.SapotFcmService
 import com.sapotlokal.ui.auth.LoginActivity
 import com.sapotlokal.util.ServerClock
-import com.sapotlokal.util.StatusChip
 import com.sapotlokal.util.VendorAnalytics
+import com.sapotlokal.util.VendorAnalyticsCalculator
 
 /**
  * VendorHomeActivity — the vendor "Overview" tab, the first screen after a shop owner logs in.
@@ -34,6 +34,9 @@ class VendorHomeActivity : AppCompatActivity() {
     private var vendorListener: ValueEventListener? = null
     private var analyticsListener: VendorRepository.AnalyticsListener? = null
     private val customerNames = mutableMapOf<String, String>()
+    private val customerAvatars = mutableMapOf<String, String>()
+    private var lastAnalytics: VendorAnalytics? = null
+    private var showAllVisits = false
     private var isProgrammaticUpdate = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -49,6 +52,10 @@ class VendorHomeActivity : AppCompatActivity() {
 
         VendorNav.bind(this, binding.vendorNav, VendorNav.Tab.HOME) { vendorID }
         setupStatusSwitch()
+        binding.btnSeeAllVisits.setOnClickListener { showAllVisits = !showAllVisits; bindVisits() }
+        binding.btnEmptyShowQr.setOnClickListener {
+            if (vendorID.isNotBlank()) startActivity(Intent(this, ShowQrActivity::class.java).putExtra(EXTRA_VENDOR_ID, vendorID))
+        }
         SapotFcmService.syncTokenForUser(user.uid)
 
         loadVendor(user.uid)
@@ -136,7 +143,6 @@ class VendorHomeActivity : AppCompatActivity() {
         binding.switchStoreStatus.isChecked = isOpen
         isProgrammaticUpdate = false
 
-        StatusChip.bind(binding.tvStatusBadge, isOpen)
 
         // Primary (cocoa) when open, disabled grey when closed.
         val track = ContextCompat.getColor(this, if (isOpen) R.color.hu_accent else R.color.hu_line)
@@ -163,11 +169,21 @@ class VendorHomeActivity : AppCompatActivity() {
         val fmt = java.text.NumberFormat.getIntegerInstance()
         binding.tvStatVisits.text = fmt.format(a.weekVisits)
         binding.tvStatPoints.text = fmt.format(a.weekPointsGiven)
-        binding.tvStatVouchers.text = fmt.format(a.vouchersUsed)
+        binding.tvStatVouchers.text = fmt.format(a.weekVouchersUsed)
+        lastAnalytics = a
+        bindVisits()
+    }
 
-        binding.tvNoVisits.visibility = if (a.recentVisits.isEmpty()) View.VISIBLE else View.GONE
+    /** The newest visits; "See all visits" shows the rest that Home keeps. */
+    private fun bindVisits() {
+        val a = lastAnalytics ?: return
+        binding.emptyVisits.visibility = if (a.recentVisits.isEmpty()) View.VISIBLE else View.GONE
+        val more = a.recentVisits.size > VendorAnalyticsCalculator.HOME_RECENT
+        binding.btnSeeAllVisits.visibility = if (more) View.VISIBLE else View.GONE
+        binding.btnSeeAllVisits.setText(if (showAllVisits) R.string.owner_show_fewer else R.string.owner_see_all_visits)
         binding.recentRows.removeAllViews()
-        a.recentVisits.forEach { p ->
+        val shown = if (showAllVisits) a.recentVisits else a.recentVisits.take(VendorAnalyticsCalculator.HOME_RECENT)
+        shown.forEach { p ->
             val row = com.sapotlokal.databinding.ItemOwnerVisitBinding.inflate(layoutInflater, binding.recentRows, false)
             row.tvWhen.text = android.text.format.DateUtils.getRelativeTimeSpanString(
                 p.timestamp, ServerClock.now(), android.text.format.DateUtils.MINUTE_IN_MILLIS
@@ -178,21 +194,36 @@ class VendorHomeActivity : AppCompatActivity() {
         }
     }
 
-    /** Shows the customer's name (read once from their public profile) and initials. */
+    /** The customer's name and avatar (read once each from their public profile), else their initials. */
     private fun bindCustomer(row: com.sapotlokal.databinding.ItemOwnerVisitBinding, uid: String) {
         fun show(name: String) {
             row.tvName.text = name
             row.tvInitials.text = com.sapotlokal.ui.customer.ShopStyle.initials(name)
         }
-        customerNames[uid]?.let { return show(it) }
-        show(getString(R.string.owner_a_customer))
-        com.google.firebase.database.FirebaseDatabase.getInstance(com.sapotlokal.AppConfig.DATABASE_URL).reference
-            .child("users").child(uid).child("userName").get()
-            .addOnSuccessListener { snap ->
+        fun showAvatar(id: String) {
+            val avatar = com.sapotlokal.data.model.AvatarDef.fromId(id)
+            row.ivAvatar.visibility = if (avatar != null) View.VISIBLE else View.GONE
+            if (avatar != null) row.ivAvatar.setImageResource(avatar.drawableRes)
+        }
+        val user = com.google.firebase.database.FirebaseDatabase.getInstance(com.sapotlokal.AppConfig.DATABASE_URL).reference
+            .child("users").child(uid)
+        val cachedName = customerNames[uid]
+        if (cachedName != null) show(cachedName) else {
+            show(getString(R.string.owner_a_customer))
+            user.child("userName").get().addOnSuccessListener { snap ->
                 val name = snap.getValue(String::class.java)?.ifBlank { null } ?: return@addOnSuccessListener
                 customerNames[uid] = name
                 if (!isFinishing && !isDestroyed) show(name)
             }
+        }
+        val cachedAvatar = customerAvatars[uid]
+        if (cachedAvatar != null) showAvatar(cachedAvatar) else {
+            user.child("avatar").get().addOnSuccessListener { snap ->
+                val id = snap.getValue(String::class.java).orEmpty()
+                customerAvatars[uid] = id
+                if (!isFinishing && !isDestroyed) showAvatar(id)
+            }
+        }
     }
 
     private fun goToLogin() {

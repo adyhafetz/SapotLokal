@@ -57,6 +57,25 @@ class RewardRulesActivity : AppCompatActivity() {
         }
 
         startListening()
+        listenToClaims()
+    }
+
+    private var claimsListener: com.google.firebase.database.ValueEventListener? = null
+    private val claimsQuery by lazy {
+        com.google.firebase.database.FirebaseDatabase.getInstance(com.sapotlokal.AppConfig.DATABASE_URL).reference
+            .child("voucherUsers").orderByChild("vendorID").equalTo(vendorID)
+    }
+
+    /** "Claimed 12 times" on each reward: every voucher customers claimed here, by reward. */
+    private fun listenToClaims() {
+        claimsListener = claimsQuery.addValueEventListener(object : com.google.firebase.database.ValueEventListener {
+            override fun onDataChange(snapshot: com.google.firebase.database.DataSnapshot) {
+                adapter.claims = snapshot.children
+                    .mapNotNull { it.child("voucherID").getValue(String::class.java) }
+                    .groupingBy { it }.eachCount()
+            }
+            override fun onCancelled(error: com.google.firebase.database.DatabaseError) {}
+        })
     }
 
     private fun setupRecyclerView() {
@@ -110,11 +129,14 @@ class RewardRulesActivity : AppCompatActivity() {
         super.onStop()
         rulesListener?.let { VoucherRepository.removeRulesListener(vendorID, it) }
         rulesListener = null
+        claimsListener?.let { claimsQuery.removeEventListener(it) }
+        claimsListener = null
     }
 
     override fun onStart() {
         super.onStart()
         if (rulesListener == null) startListening()
+        if (claimsListener == null) listenToClaims()
     }
 
 }
