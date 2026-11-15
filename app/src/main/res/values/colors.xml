@@ -25,6 +25,13 @@
     <color name="hu_shop_berry">#A9367F</color>
     <color name="hu_shop_coral">#E86A4A</color>
 
+    <!-- Rank colours (rank badge and rank card only). Rank 5 is ink with an orange ring. -->
+    <color name="hu_rank_1">@color/hu_soft</color>
+    <color name="hu_rank_2">@color/hu_shop_green</color>
+    <color name="hu_rank_3">@color/hu_shop_blue</color>
+    <color name="hu_rank_4">@color/hu_shop_purple</color>
+    <color name="hu_rank_5">@color/hu_ink</color>
+
     <!-- Memory Match cards -->
     <color name="game_card_back">@color/hu_ink</color>
     <color name="game_card_back_text">@color/hu_accent</color>

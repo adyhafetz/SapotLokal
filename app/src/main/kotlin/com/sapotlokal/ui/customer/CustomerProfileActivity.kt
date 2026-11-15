@@ -23,14 +23,11 @@ import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
 import com.sapotlokal.AppConfig
-import com.sapotlokal.AppConfig.CustomerTier
 import com.sapotlokal.R
 import com.sapotlokal.data.model.BadgeDef
-import com.sapotlokal.data.repository.PointRepository
 import com.sapotlokal.databinding.ActivityCustomerProfileBinding
 import com.sapotlokal.databinding.DialogBadgeDetailsBinding
 import com.sapotlokal.ui.auth.LoginActivity
-import java.text.NumberFormat
 import java.util.Locale
 
 /**
@@ -48,7 +45,6 @@ class CustomerProfileActivity : AppCompatActivity() {
     private lateinit var binding: ActivityCustomerProfileBinding
     private val auth = FirebaseAuth.getInstance()
     private var userListener: ValueEventListener? = null
-    private var pointsListener: ValueEventListener? = null
 
     private var currentUserId: String = ""
     private var currentUserName: String = ""
@@ -78,6 +74,9 @@ class CustomerProfileActivity : AppCompatActivity() {
         binding.rvBadges.visibility = View.GONE
         (binding.tvBadgesUnlockedCount.parent as View).visibility = View.GONE
         setupListeners(currentUserId)
+        bindMemberSince()
+        // The rank card sits inside the profile card here, so it is drawn flat (no box in a box).
+        binding.rankCard.root.apply { background = null; foreground = null; setPadding(0, 0, 0, 0) }
         setupActions()
     }
 
@@ -153,6 +152,10 @@ class CustomerProfileActivity : AppCompatActivity() {
                 }
                 unlockedBadgesMap = updatedBadges
                 refreshBadgesGrid()
+
+                val standing = com.sapotlokal.data.repository.XpRepository.standingOf(snapshot)
+                RankCard.bind(binding.rankCard, standing)
+                RankCard.maybeShowRankUp(this@CustomerProfileActivity, userId, standing)
             }
 
             override fun onCancelled(error: DatabaseError) {
@@ -161,58 +164,12 @@ class CustomerProfileActivity : AppCompatActivity() {
         }
         userRef.addValueEventListener(userListener!!)
 
-        // 2. Dual Ledger Points listener
-        pointsListener = PointRepository.listenToPointsForUser(
-            userID = userId,
-            onUpdate = { _, lifetimeEarned, spendableBalance ->
-                updatePointsUi(lifetimeEarned, spendableBalance)
-            },
-            onError = { /* fallback */ }
-        )
     }
 
-    private fun updatePointsUi(lifetimeEarned: Int, spendableBalance: Int) {
-        val tier = CustomerTier.fromLifetimePoints(lifetimeEarned)
-
-        // Member since (from the account's creation date)
+    private fun bindMemberSince() {
         auth.currentUser?.metadata?.creationTimestamp?.takeIf { it > 0L }?.let { created ->
             val month = java.text.SimpleDateFormat("MMMM yyyy", Locale.getDefault()).format(java.util.Date(created))
             binding.tvMemberSince.text = getString(com.sapotlokal.R.string.k_member_since, month)
-        }
-
-        // Tier pill
-        binding.tvTierPill.text = getString(com.sapotlokal.R.string.k_tier_pill, tier.title, tier.ordinal + 1, tier.multiplier)
-
-        // Dual points metrics
-        val formattedLifetime = NumberFormat.getNumberInstance(Locale.US).format(lifetimeEarned)
-        binding.tvSpendablePoints.text = formattedLifetime
-        binding.tvLifetimePoints.text = formattedLifetime
-
-        // Progress bar to next tier
-        val nextTier = tier.nextTier
-        if (nextTier == null) {
-            // Max tier reached
-            binding.progressLevel.progress = 100
-            binding.tvNextTierBadge.text = getString(com.sapotlokal.R.string.k_top_level)
-            binding.tvProgressLabel.text = getString(com.sapotlokal.R.string.k_highest_level, tier.title)
-            binding.tvProgressCount.text = formattedLifetime
-            binding.tvMaxLevelNotice.visibility = View.VISIBLE
-        } else {
-            val tierSpan = nextTier.minPoints - tier.minPoints
-            val earnedInTier = (lifetimeEarned - tier.minPoints).coerceAtLeast(0)
-            val pct = if (tierSpan > 0) {
-                ((earnedInTier.toDouble() / tierSpan.toDouble()) * 100).toInt().coerceIn(0, 100)
-            } else {
-                0
-            }
-            val ptsNeeded = nextTier.minPoints - lifetimeEarned
-            val formattedNext = NumberFormat.getNumberInstance(Locale.US).format(nextTier.minPoints)
-
-            binding.progressLevel.progress = pct
-            binding.tvNextTierBadge.text = getString(com.sapotlokal.R.string.k_next_tier, nextTier.title)
-            binding.tvProgressLabel.text = getString(com.sapotlokal.R.string.hu_level_to_next, ptsNeeded, nextTier.title)
-            binding.tvProgressCount.text = "$formattedLifetime / $formattedNext"
-            binding.tvMaxLevelNotice.visibility = View.GONE
         }
     }
 
@@ -347,17 +304,13 @@ class CustomerProfileActivity : AppCompatActivity() {
                     .removeEventListener(it)
             }
             userListener = null
-            pointsListener?.let {
-                PointRepository.removePointsListener(currentUserId, it)
-            }
-            pointsListener = null
         }
     }
 
     override fun onStart() {
         super.onStart()
         if (currentUserId.isNotBlank()) {
-            if (userListener == null || pointsListener == null) {
+            if (userListener == null) {
                 setupListeners(currentUserId)
             }
         }

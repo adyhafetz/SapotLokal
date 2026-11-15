@@ -211,28 +211,9 @@ object HowPoints {
     }
 }
 
-/** Level ticks and the line under the bar, shared by Home and Play. */
-object LevelDisplay {
-    fun bind(bar: HuTickBar, line: android.widget.TextView, lifetime: Int) {
-        val ctx = bar.context
-        val tier = AppConfig.CustomerTier.fromLifetimePoints(lifetime)
-        val next = tier.nextTier
-        val level = tier.ordinal + 1
-        // One scale from 0 to the next level, ticked at every level threshold on the way.
-        val thresholds = AppConfig.CustomerTier.entries.map { it.minPoints }
-        if (next == null) {
-            bar.set(1, 1, emptyList())
-            line.text = ctx.getString(R.string.hu_level_top, level, tier.title)
-        } else {
-            bar.set(lifetime, next.minPoints, thresholds.filter { it <= next.minPoints })
-            line.text = ctx.getString(R.string.hu_level_line, level, tier.title, next.minPoints - lifetime, next.title)
-        }
-    }
-}
-
 /**
- * Progress bar with labelled ticks (levels on Home and Play, reward costs on a shop page).
- * Values are absolute: [max] is the right end, [value] the fill, [ticks] the marks.
+ * Progress bar with labelled ticks (the rank card, reward costs on a shop page).
+ * [max] is the right end, [value] the fill, [ticks] the marks; [tickLabels] can replace their text.
  */
 class HuTickBar @JvmOverloads constructor(
     context: Context,
@@ -242,6 +223,8 @@ class HuTickBar @JvmOverloads constructor(
     var max: Int = 100
     var value: Int = 0
     var ticks: List<Int> = emptyList()
+    /** Optional text for each tick (same order as [ticks]); the tick value is shown when null. */
+    var tickLabels: List<String>? = null
 
     private val d = resources.displayMetrics.density
     private val track = Paint(Paint.ANTI_ALIAS_FLAG).apply { color = ContextCompat.getColor(context, R.color.hu_line) }
@@ -253,8 +236,8 @@ class HuTickBar @JvmOverloads constructor(
         typeface = ResourcesCompat.getFont(context, R.font.figtree_bold) ?: Typeface.DEFAULT_BOLD
     }
 
-    fun set(value: Int, max: Int, ticks: List<Int>) {
-        this.value = value; this.max = max.coerceAtLeast(1); this.ticks = ticks
+    fun set(value: Int, max: Int, ticks: List<Int>, labels: List<String>? = null) {
+        this.value = value; this.max = max.coerceAtLeast(1); this.ticks = ticks; this.tickLabels = labels
         invalidate()
     }
 
@@ -271,10 +254,10 @@ class HuTickBar @JvmOverloads constructor(
         val fw = (w * value.coerceIn(0, max) / max).coerceAtLeast(if (value > 0) barH else 0f)
         if (fw > 0) canvas.drawRoundRect(RectF(0f, 0f, fw, barH), r, r, fill)
         val y = barH + 6 * d + label.textSize
-        ticks.forEach { t ->
+        ticks.forEachIndexed { i, t ->
             val x = w * t.coerceIn(0, max) / max
             if (t in 1 until max) canvas.drawRect(x - d, 0f, x + d, barH, notch)
-            val text = t.toString()
+            val text = tickLabels?.getOrNull(i) ?: t.toString()
             val tw = label.measureText(text)
             val tx = (x - tw / 2).coerceIn(0f, w - tw)
             canvas.drawText(text, tx, y, label)

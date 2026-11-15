@@ -33,8 +33,12 @@
           // 1–5, never drops (XP never goes down), and only ever one step at a time.
           ".validate": "newData.isNumber() && newData.val() >= 1 && newData.val() <= 5 && newData.val() % 1 === 0 && (!data.exists() || (newData.val() >= data.val() && newData.val() <= data.val() + 1))"
         },
+        "rankSeen": {
+          // Highest rank the customer has been shown a rank-up sheet for. Never goes down.
+          ".validate": "newData.isNumber() && newData.val() >= 1 && newData.val() <= 5 && (!data.exists() || newData.val() >= data.val())"
+        },
         "lifetimePoints": {
-          // OLD — removed in Phase 4 (replaced by xp).
+          // OLD — still written by games and mission claims; removed in Phases 5, 7 and 8 (replaced by xp).
           ".validate": "newData.isNumber() && newData.val() >= 0 && (!data.exists() || (newData.val() >= data.val() && newData.val() <= data.val() + 500))"
         },
         "avatar": {

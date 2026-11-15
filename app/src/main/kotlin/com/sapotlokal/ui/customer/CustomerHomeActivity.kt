@@ -17,7 +17,6 @@ import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
 import com.sapotlokal.AppConfig
-import com.sapotlokal.AppConfig.CustomerTier
 import com.sapotlokal.R
 import com.sapotlokal.data.model.Vendor
 import com.sapotlokal.data.model.Voucher
@@ -43,7 +42,7 @@ import java.util.Calendar
  * 4. Up to three of the customer's shops as stacked colour cards with cup stamps.
  * 5. Today in Play: free spin and the nearest mission, opening the Play tab.
  *
- * Also keeps lifetime points in /users repaired, syncs the FCM token, asks for notification
+ * Also shows the rank-up sheet once per new rank, syncs the FCM token, asks for notification
  * permission, and raises "shop is open" alerts for shops the customer follows.
  */
 class CustomerHomeActivity : AppCompatActivity() {
@@ -59,7 +58,6 @@ class CustomerHomeActivity : AppCompatActivity() {
     private var rulesListener: ValueEventListener? = null
 
     private var currentUserName = ""
-    private var currentUserTier = CustomerTier.FRESHIE
     private var currentAvatarId = ""
     private var myRank = AppConfig.Rank.JIRAN_BARU
 
@@ -70,9 +68,6 @@ class CustomerHomeActivity : AppCompatActivity() {
     private var allRules: List<Voucher> = emptyList()
     private var missionLine: String? = null
     private var spinReady: Boolean? = null
-
-    /** lifetimePoints as last read from /users/{uid}; Int.MAX_VALUE until the first read so we never "repair" blindly. */
-    private var storedLifetimePoints = Int.MAX_VALUE
 
     /** Vendors this customer has earned points at — only their "now OPEN" alerts are shown. */
     @Volatile private var followedVendorIds: Set<String> = emptySet()
@@ -94,12 +89,10 @@ class CustomerHomeActivity : AppCompatActivity() {
         val prefs = getSharedPreferences("sapot_user_prefs", MODE_PRIVATE)
         currentUserName = prefs.getString("cached_user_name", "").orEmpty()
         currentAvatarId = prefs.getString("cached_user_avatar", "").orEmpty()
-        val cachedTier = prefs.getString("cached_user_tier", CustomerTier.FRESHIE.code)
-        currentUserTier = CustomerTier.entries.firstOrNull { it.code == cachedTier } ?: CustomerTier.FRESHIE
         updateGreeting()
 
         binding.btnMe.setOnClickListener { openMe() }
-        binding.levelBlock.setOnClickListener { startActivity(Intent(this, ChallengesActivity::class.java)) }
+        binding.rankCard.root.setOnClickListener { startActivity(Intent(this, ChallengesActivity::class.java)) }
         binding.btnHowPoints.setOnClickListener { HowPoints.show(this) }
         binding.btnAllShops.setOnClickListener { startActivity(Intent(this, FindShopsActivity::class.java)) }
         binding.tvMoreReady.setOnClickListener { openRewards() }
@@ -137,13 +130,6 @@ class CustomerHomeActivity : AppCompatActivity() {
         val avatar = com.sapotlokal.data.model.AvatarDef.fromId(currentAvatarId)
         if (avatar != null) binding.ivAvatar.setImageResource(avatar.drawableRes)
         else binding.ivAvatar.setImageResource(R.drawable.ic_user_round)
-    }
-
-    private fun bindLevel(lifetime: Int) {
-        val tier = CustomerTier.fromLifetimePoints(lifetime)
-        binding.tvLevelScore.text = java.text.NumberFormat.getIntegerInstance().format(lifetime)
-        LevelDisplay.bind(binding.levelBar, binding.tvLevelLine, lifetime)
-        binding.levelBlock.contentDescription = getString(R.string.hu_level_cd, lifetime, tier.ordinal + 1, tier.title)
     }
 
     // ── Rewards logic (shared rules with Rewards and the Shop page) ───────────
@@ -275,31 +261,15 @@ class CustomerHomeActivity : AppCompatActivity() {
     private fun startListeningToPoints(uid: String) {
         pointsListener = PointRepository.listenToPointsForUser(
             userID = uid,
-            onUpdate = { perShop, lifetime, _ ->
+            onUpdate = { perShop, _, _ ->
                 followedVendorIds = perShop.keys.filter { it.isNotBlank() }.toSet()
                 lastPerShop = perShop
                 pointsLoaded = true
                 binding.errorBlock.visibility = View.GONE
-                onLifetime(lifetime)
                 refreshAll()
             },
             onError = { if (!pointsLoaded) binding.errorBlock.visibility = View.VISIBLE }
         )
-    }
-
-    private fun onLifetime(lifetime: Int) {
-        val tier = CustomerTier.fromLifetimePoints(lifetime)
-        currentUserTier = tier
-        bindLevel(lifetime)
-        cacheUser()
-        // REPAIR ONLY: fix a stored lifetimePoints that is BEHIND the ledger (older accounts).
-        auth.currentUser?.uid?.let { uid ->
-            if (lifetime > storedLifetimePoints) {
-                storedLifetimePoints = lifetime
-                FirebaseDatabase.getInstance(AppConfig.DATABASE_URL).reference.child("users").child(uid)
-                    .updateChildren(hashMapOf<String, Any>("lifetimePoints" to lifetime, "currentTier" to tier.code))
-            }
-        }
     }
 
     private fun startListeningToUser(uid: String) {
@@ -309,9 +279,10 @@ class CustomerHomeActivity : AppCompatActivity() {
                 val name = snapshot.child("userName").getValue(String::class.java)?.trim().orEmpty()
                 currentAvatarId = snapshot.child("avatar").getValue(String::class.java).orEmpty()
                 if (name.isNotBlank()) currentUserName = name
-                storedLifetimePoints = snapshot.child("lifetimePoints").getValue(Long::class.java)?.toInt() ?: 0
-                val rank = com.sapotlokal.data.repository.XpRepository.standingOf(snapshot).rank
-                if (rank != myRank) { myRank = rank; refreshAll() }
+                val standing = com.sapotlokal.data.repository.XpRepository.standingOf(snapshot)
+                RankCard.bind(binding.rankCard, standing)
+                RankCard.maybeShowRankUp(this@CustomerHomeActivity, uid, standing)
+                if (standing.rank != myRank) { myRank = standing.rank; refreshAll() }
                 updateGreeting()
                 cacheUser()
             }
@@ -323,7 +294,6 @@ class CustomerHomeActivity : AppCompatActivity() {
     private fun cacheUser() {
         getSharedPreferences("sapot_user_prefs", MODE_PRIVATE).edit()
             .putString("cached_user_name", currentUserName)
-            .putString("cached_user_tier", currentUserTier.code)
             .putString("cached_user_avatar", currentAvatarId)
             .apply()
     }

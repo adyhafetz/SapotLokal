@@ -147,7 +147,9 @@ object AppConfig {
      */
     const val VOUCHER_EXPIRY_DAYS: Int = 30
 
-    // ── Tiers (Gamification Overhaul) ─────────────────────────────────────────
+    // ── OLD tiers — removed in Phases 5, 7 and 8 ─────────────────────────────
+    // Games and mission claims still multiply their points by this tier, and the old all-time
+    // leaderboard reads lifetimePoints. Ranks for customers come from Rank (above), never from this.
 
     /**
      * Customer loyalty tiers based on Lifetime Accumulated Points.
@@ -175,29 +177,6 @@ object AppConfig {
                 return entries.lastOrNull { points >= it.minPoints } ?: FRESHIE
             }
         }
-    }
-
-    // ── Levels ────────────────────────────────────────────────────────────────
-
-    /**
-     * Lifetime-earned points required to reach each tier.
-     * Level/Tier is computed from EARNED points only - it never goes down when a voucher
-     * is redeemed.
-     */
-    val LEVEL_THRESHOLDS: List<Int> = CustomerTier.entries.map { it.minPoints }
-
-    /**
-     * Returns the level (1-indexed) for a given lifetime-earned point total.
-     */
-    fun levelForPoints(lifetimePoints: Int): Int {
-        return CustomerTier.fromLifetimePoints(lifetimePoints).ordinal + 1
-    }
-
-    /**
-     * Returns the point threshold to reach the NEXT tier, or null if already at max.
-     */
-    fun nextLevelThreshold(lifetimePoints: Int): Int? {
-        return CustomerTier.fromLifetimePoints(lifetimePoints).nextTier?.minPoints
     }
 
     // ── Spin the Wheel daily limit ─────────────────────────────────────────────

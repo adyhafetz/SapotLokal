@@ -78,73 +78,23 @@
                 </LinearLayout>
             </LinearLayout>
 
-            <!-- Level score -->
-            <LinearLayout
-                android:id="@+id/levelBlock"
+            <!-- Rank card (shared with Play and Me) -->
+            <include
+                android:id="@+id/rankCard"
+                layout="@layout/view_rank_card"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="18dp"
+                android:layout_marginTop="18dp" />
+
+            <TextView
+                android:id="@+id/btnHowPoints"
+                style="@style/HU.Text.Link"
+                android:layout_width="wrap_content"
+                android:layout_height="48dp"
+                android:layout_gravity="end"
                 android:background="?attr/selectableItemBackground"
-                android:clickable="true"
-                android:focusable="true"
-                android:orientation="vertical">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:baselineAligned="true"
-                    android:importantForAccessibility="no"
-                    android:orientation="horizontal">
-
-                    <TextView
-                        android:id="@+id/tvLevelScore"
-                        style="@style/HU.Text.Big"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        tools:text="530" />
-
-                    <TextView
-                        style="@style/HU.Text.Small"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="8dp"
-                        android:fontFamily="@font/figtree_bold"
-                        android:text="@string/hu_level_score"
-                        android:textSize="15sp"
-                        app:fontFamily="@font/figtree_bold" />
-
-                    <Space
-                        android:layout_width="0dp"
-                        android:layout_height="1dp"
-                        android:layout_weight="1" />
-
-                    <TextView
-                        android:id="@+id/btnHowPoints"
-                        style="@style/HU.Text.Link"
-                        android:layout_width="wrap_content"
-                        android:layout_height="48dp"
-                        android:background="?attr/selectableItemBackground"
-                        android:gravity="center_vertical"
-                        android:importantForAccessibility="yes"
-                        android:text="@string/hu_how_points_work" />
-                </LinearLayout>
-
-                <com.sapotlokal.ui.customer.HuTickBar
-                    android:id="@+id/levelBar"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="10dp"
-                    android:importantForAccessibility="no" />
-
-                <TextView
-                    android:id="@+id/tvLevelLine"
-                    style="@style/HU.Text.Small"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="4dp"
-                    android:importantForAccessibility="no"
-                    tools:text="Level 2 Steady Buyer · 70 to Trend Setter" />
-            </LinearLayout>
+                android:gravity="center_vertical"
+                android:text="@string/hu_how_points_work" />
 
             <!-- The one big reward card (or first-scan card) -->
             <FrameLayout

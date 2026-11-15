@@ -19,8 +19,6 @@
     <string name="customer_bottom_nav_shops">Kedai</string>
     <string name="customer_home_games">Permainan</string>
     <string name="customer_home_leaderboard_2">Papan pendahulu</string>
-    <string name="customer_home_level_points">XP</string>
-    <string name="customer_home_top_level_reached">Pangkat tertinggi dicapai</string>
     <string name="customer_profile_badges">Lencana</string>
     <string name="customer_profile_change_password">Tukar kata laluan</string>
     <string name="customer_profile_delete_account">Padam akaun</string>
@@ -74,11 +72,7 @@
     <string name="hu_how_points_title">Cara mata berfungsi</string>
     <string name="hu_how_points_work">Cara mata berfungsi</string>
     <string name="hu_keep_going">Teruskan</string>
-    <string name="hu_level_cd">%1$d XP. Pangkat %2$d, %3$s.</string>
-    <string name="hu_level_line">Pangkat %1$d %2$s · %3$d lagi ke %4$s</string>
     <string name="hu_level_score">XP</string>
-    <string name="hu_level_to_next">%1$d XP lagi ke %2$s</string>
-    <string name="hu_level_top">Pangkat %1$d %2$s · pangkat tertinggi</string>
     <string name="hu_load_error">Mata anda tidak dapat dimuatkan. Semak sambungan anda.</string>
     <string name="hu_location">Lokasi</string>
     <string name="hu_memory">Padan memori</string>
@@ -161,7 +155,6 @@
     <string name="k_error_rankings">Tidak dapat memuatkan kedudukan: %1$s</string>
     <string name="k_expired">Tamat tempoh</string>
     <string name="k_expires_on">Tamat %1$s</string>
-    <string name="k_highest_level">Pangkat tertinggi: %1$s</string>
     <string name="k_hours_not_specified">Waktu operasi tidak dinyatakan</string>
     <string name="k_local_merchant">Kedai tempatan</string>
     <string name="k_local_shop">Kedai tempatan</string>
@@ -179,7 +172,6 @@
     <string name="k_n_unlocked">%1$d / %2$d dibuka</string>
     <string name="k_name_empty">Nama tidak boleh kosong</string>
     <string name="k_need_more_pts">Perlu %1$d mata lagi</string>
-    <string name="k_next_tier">Seterusnya: %1$s</string>
     <string name="k_no_expiry">Tiada tarikh tamat</string>
     <string name="k_no_map_app">Tiada aplikasi peta pada peranti ini</string>
     <string name="k_not_enough_points">Mata tidak mencukupi</string>
@@ -211,8 +203,6 @@
     <string name="k_status_locked_pill">🔒 DIKUNCI</string>
     <string name="k_status_unlocked_pill">✓ DIBUKA</string>
     <string name="k_terms_heading">Terma &amp; syarat</string>
-    <string name="k_tier_pill">%1$s · Pangkat %2$d · %3$sx mata</string>
-    <string name="k_top_level">Pangkat tertinggi</string>
     <string name="k_top50_not_reached">%1$s · Belum mencapai 50 teratas</string>
     <string name="k_type_daily">Harian</string>
     <string name="k_type_explore">Teroka</string>
@@ -262,4 +252,12 @@
     <string name="scan_xp">+%1$d XP</string>
     <string name="hu_points_rule">%1$d mata setiap lawatan · Hanya dikira di sini</string>
     <string name="hu_points_rule_you">%1$d mata setiap lawatan, %2$d untuk anda · Hanya dikira di sini</string>
+    <string name="rank_top">Pangkat tertinggi</string>
+    <string name="rank_xp_to_next">%1$s XP lagi ke %2$s</string>
+    <string name="rank_bonus_line">Pangkat anda memberi %1$sx mata di setiap kedai</string>
+    <string name="rank_bonus_first">Capai %1$s untuk %2$sx mata di setiap kedai</string>
+    <string name="rank_card_cd">%1$s, pangkat %2$d, %3$s XP</string>
+    <string name="rank_up_title">Anda kini %1$s</string>
+    <string name="rank_up_body">%1$sx mata di setiap kedai</string>
+    <string name="rank_up_button">Mantap</string>
 </resources>

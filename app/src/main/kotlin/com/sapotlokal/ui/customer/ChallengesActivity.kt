@@ -16,7 +16,6 @@ import com.sapotlokal.data.model.UserMission
 import com.sapotlokal.data.model.WeeklyMissionWithProgress
 import com.sapotlokal.data.repository.GamesRepository
 import com.sapotlokal.data.repository.MissionRepository
-import com.sapotlokal.data.repository.PointRepository
 import com.sapotlokal.databinding.ActivityChallengesBinding
 import com.sapotlokal.service.SapotFcmService
 import com.sapotlokal.ui.games.MemoryMatchActivity
@@ -33,7 +32,7 @@ class ChallengesActivity : AppCompatActivity() {
     private val auth = FirebaseAuth.getInstance()
     private lateinit var adapter: ChallengeAdapter
     private var missionsListener: ValueEventListener? = null
-    private var pointsListener: ValueEventListener? = null
+    private var xpListener: ValueEventListener? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -86,14 +85,10 @@ class ChallengesActivity : AppCompatActivity() {
             }
         )
 
-        pointsListener = PointRepository.listenToPointsForUser(
-            userID = user.uid,
-            onUpdate = { _, lifetime, _ ->
-                binding.tvLevelScore.text = java.text.NumberFormat.getIntegerInstance().format(lifetime)
-                LevelDisplay.bind(binding.levelBar, binding.tvLevelLine, lifetime)
-            },
-            onError = { }
-        )
+        xpListener = com.sapotlokal.data.repository.XpRepository.listenStanding(user.uid) { standing ->
+            RankCard.bind(binding.rankCard, standing)
+            RankCard.maybeShowRankUp(this, user.uid, standing)
+        }
 
         val badgeAdapter = BadgeAdapter { badge, unlocked -> showBadge(badge, unlocked) }
         binding.rvBadges.layoutManager = androidx.recyclerview.widget.GridLayoutManager(this, 2)
@@ -173,6 +168,6 @@ class ChallengesActivity : AppCompatActivity() {
         super.onDestroy()
         val uid = auth.currentUser?.uid ?: return
         missionsListener?.let { MissionRepository.removeListener(uid, it) }
-        pointsListener?.let { PointRepository.removePointsListener(uid, it) }
+        com.sapotlokal.data.repository.XpRepository.stopListening(uid, xpListener)
     }
 }

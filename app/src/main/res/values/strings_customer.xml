@@ -19,8 +19,6 @@
     <string name="customer_bottom_nav_shops">Shops</string>
     <string name="customer_home_games">Games</string>
     <string name="customer_home_leaderboard_2">Leaderboard</string>
-    <string name="customer_home_level_points">XP</string>
-    <string name="customer_home_top_level_reached">Top rank reached</string>
     <string name="customer_profile_badges">Badges</string>
     <string name="customer_profile_change_password">Change password</string>
     <string name="customer_profile_delete_account">Delete account</string>
@@ -74,11 +72,7 @@
     <string name="hu_how_points_title">How points work</string>
     <string name="hu_how_points_work">How points work</string>
     <string name="hu_keep_going">Keep going</string>
-    <string name="hu_level_cd">%1$d XP. Rank %2$d, %3$s.</string>
-    <string name="hu_level_line">Rank %1$d %2$s · %3$d to %4$s</string>
     <string name="hu_level_score">XP</string>
-    <string name="hu_level_to_next">%1$d XP to %2$s</string>
-    <string name="hu_level_top">Rank %1$d %2$s · top rank</string>
     <string name="hu_load_error">Couldn\'t load your points. Check your connection.</string>
     <string name="hu_location">Location</string>
     <string name="hu_memory">Memory match</string>
@@ -161,7 +155,6 @@
     <string name="k_error_rankings">Could not load rankings: %1$s</string>
     <string name="k_expired">Expired</string>
     <string name="k_expires_on">Expires %1$s</string>
-    <string name="k_highest_level">Highest rank: %1$s</string>
     <string name="k_hours_not_specified">Hours not specified</string>
     <string name="k_local_merchant">Local shop</string>
     <string name="k_local_shop">Local shop</string>
@@ -179,7 +172,6 @@
     <string name="k_n_unlocked">%1$d / %2$d unlocked</string>
     <string name="k_name_empty">Name cannot be empty</string>
     <string name="k_need_more_pts">Need %1$d more points</string>
-    <string name="k_next_tier">Next: %1$s</string>
     <string name="k_no_expiry">No expiry date</string>
     <string name="k_no_map_app">No map app found on this device</string>
     <string name="k_not_enough_points">Not enough points</string>
@@ -211,8 +203,6 @@
     <string name="k_status_locked_pill">🔒 LOCKED</string>
     <string name="k_status_unlocked_pill">✓ UNLOCKED</string>
     <string name="k_terms_heading">Terms &amp; conditions</string>
-    <string name="k_tier_pill">%1$s · Rank %2$d · %3$sx points</string>
-    <string name="k_top_level">Top rank</string>
     <string name="k_top50_not_reached">%1$s · Top 50 not reached yet</string>
     <string name="k_type_daily">Daily</string>
     <string name="k_type_explore">Explore</string>
@@ -262,4 +252,12 @@
     <string name="scan_xp">+%1$d XP</string>
     <string name="hu_points_rule">%1$d points a visit · They count here only</string>
     <string name="hu_points_rule_you">%1$d points a visit, %2$d for you · They count here only</string>
+    <string name="rank_top">Top rank</string>
+    <string name="rank_xp_to_next">%1$s XP to %2$s</string>
+    <string name="rank_bonus_line">Your rank gives %1$sx points at every shop</string>
+    <string name="rank_bonus_first">Reach %1$s for %2$sx points at every shop</string>
+    <string name="rank_card_cd">%1$s, rank %2$d, %3$s XP</string>
+    <string name="rank_up_title">You\'re now %1$s</string>
+    <string name="rank_up_body">%1$sx points at every shop</string>
+    <string name="rank_up_button">Nice</string>
 </resources>

@@ -120,99 +120,13 @@
                         android:textSize="13sp"
                         tools:text="customer@example.com" />
 
-                    <TextView
-                        android:id="@+id/tvTierPill"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="14dp"
-                        android:background="@drawable/bg_hu_icon_tile"
-                        android:fontFamily="@font/figtree_medium"
-                        android:paddingHorizontal="12dp"
-                        android:paddingVertical="6dp"
-                        android:textColor="@color/hu_ink"
-                        android:textSize="12sp"
-                        android:textStyle="bold"
-                        tools:text="Freshie · Level 1" />
-
-                    <TextView
-                        android:id="@+id/tvSpendablePoints"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="20dp"
-                        android:fontFamily="@font/figtree_bold"
-                        android:text="0"
-                        android:textColor="@color/hu_ink"
-                        android:textSize="40sp"
-                        android:textStyle="bold" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:fontFamily="@font/figtree_medium"
-                        android:text="@string/customer_home_level_points"
-                        android:textColor="@color/hu_soft"
-                        android:textSize="13sp" />
-
-                    <TextView
-                        android:id="@+id/tvLifetimePoints"
-                        android:layout_width="0dp"
-                        android:layout_height="0dp"
-                        android:visibility="gone" />
-
-                    <RelativeLayout
+                    <!-- Rank (shared rank card, drawn flat inside this card) -->
+                    <include
+                        android:id="@+id/rankCard"
+                        layout="@layout/view_rank_card"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="22dp">
-
-                        <TextView
-                            android:id="@+id/tvNextTierBadge"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:fontFamily="@font/figtree_medium"
-                            android:textColor="@color/hu_soft"
-                            android:textSize="12sp" />
-
-                        <TextView
-                            android:id="@+id/tvProgressCount"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_alignParentEnd="true"
-                            android:fontFamily="@font/figtree_medium"
-                            android:textColor="@color/hu_ink"
-                            android:textSize="12sp"
-                            android:textStyle="bold" />
-                    </RelativeLayout>
-
-                    <ProgressBar
-                        android:id="@+id/progressLevel"
-                        style="?android:attr/progressBarStyleHorizontal"
-                        android:layout_width="match_parent"
-                        android:layout_height="6dp"
-                        android:layout_marginTop="8dp"
-                        android:max="100"
-                        android:progress="0"
-                        android:progressDrawable="@drawable/bg_hu_progress" />
-
-                    <TextView
-                        android:id="@+id/tvProgressLabel"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="8dp"
-                        android:fontFamily="@font/figtree_medium"
-                        android:textColor="@color/hu_soft"
-                        android:textSize="12sp" />
-
-                    <TextView
-                        android:id="@+id/tvMaxLevelNotice"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="4dp"
-                        android:fontFamily="@font/figtree_medium"
-                        android:text="@string/customer_home_top_level_reached"
-                        android:textColor="@color/hu_ink"
-                        android:textSize="12sp"
-                        android:textStyle="bold"
-                        android:visibility="gone" />
+                        android:layout_marginTop="16dp" />
 
                     <com.google.android.material.button.MaterialButton
                         android:id="@+id/btnEditProfile"

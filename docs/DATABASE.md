@@ -11,7 +11,7 @@ There are two currencies, and they never mix:
 
 | Node | Key | What it holds | Who writes |
 |---|---|---|---|
-| `users` | uid | `userID, userName, userEmail, role, avatar, xp, rank, fcmToken` | the user |
+| `users` | uid | `userID, userName, userEmail, role, avatar, xp, rank, rankSeen, fcmToken` | the user |
 | `vendors` | vendorID (= owner uid) | shop details, `isOpen`, `operatingHours`, **`pointsPerVisit`** (5, 10, 15, 20, 25, 30, 40 or 50) | the owner |
 | `vendorPhotos` | vendorID | one small Base64 JPEG | the owner |
 | `qrcodes` | push id | rotating shop QR values | the owner |
@@ -26,7 +26,7 @@ There are two currencies, and they never mix:
 | `games` | push id | one row per game played: `userID, gameType, gameAttempt, gameDay, gamePlayedAt` and the reward | the customer |
 | `shopNotifications` | push id | "shop is open" announcements for the push Cloud Function | the owner |
 
-**Still present until their phase replaces them:** `users/*/lifetimePoints` and `currentTier` (Phase 4); `missions`, `userMissions`, `userMissionTracking`, `shopVisits` (Phase 5); game and mission rows in `/points` with an empty `vendorID` (Phases 5 and 7); `games/*/gamePointsRewarded` (Phase 7). The rules mark each of these as OLD.
+**Still present until their phase replaces them:** `users/*/lifetimePoints` and `currentTier` (Phases 5, 7 and 8; only the old all-time leaderboard still shows them); `missions`, `userMissions`, `userMissionTracking`, `shopVisits` (Phase 5); game and mission rows in `/points` with an empty `vendorID` (Phases 5 and 7); `games/*/gamePointsRewarded` (Phase 7). The rules mark each of these as OLD.
 
 ## Keys and formats
 
