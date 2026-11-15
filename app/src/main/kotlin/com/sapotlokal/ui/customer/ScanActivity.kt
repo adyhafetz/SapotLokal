@@ -260,8 +260,8 @@ class ScanActivity : AppCompatActivity() {
         PointRepository.recordShopVisit(
             userID   = userID,
             vendorID = vendorID,
-            onResult = { success, earned, bonusNote ->
-                if (success) {
+            onResult = { result ->
+                if (result != null) {
                     // Phase 3 Weekly Missions & Gamification Hook
                     val scanTimestamp = System.currentTimeMillis()
                     com.sapotlokal.data.repository.MissionRepository.recordShopVisitEvent(
@@ -283,7 +283,7 @@ class ScanActivity : AppCompatActivity() {
                         }
 
                     mainHandler.post {
-                        showSuccessOverlay(vendorName, earned, bonusNote)
+                        showSuccessOverlay(vendorName, result)
                     }
                 } else {
                     mainHandler.post {
@@ -297,18 +297,18 @@ class ScanActivity : AppCompatActivity() {
 
     // ── UI helpers ────────────────────────────────────────────────────────────
 
-    private fun showSuccessOverlay(vendorName: String, earned: Int, bonusNote: String? = null) {
-        // `earned` already includes the tier multiplier (10 base × 1.0–2.0).
-        binding.tvPointsAwarded.text = getString(com.sapotlokal.R.string.points_awarded, earned)
-        binding.tvShopName.text      = if (bonusNote != null) vendorName + "\n" + bonusNote else vendorName
-        binding.tvShopName.gravity   = android.view.Gravity.CENTER
+    private fun showSuccessOverlay(vendorName: String, result: PointRepository.VisitResult) {
+        binding.tvPointsAwarded.text = if (result.rankBonus > 1.0) {
+            getString(com.sapotlokal.R.string.scan_points_at_bonus, result.points, vendorName, com.sapotlokal.util.RankText.bonus(result.rankBonus))
+        } else {
+            getString(com.sapotlokal.R.string.scan_points_at, result.points, vendorName)
+        }
+        binding.tvXpAwarded.text = getString(com.sapotlokal.R.string.scan_xp, result.xp)
         binding.successOverlay.visibility = View.VISIBLE
+        binding.successOverlay.startAnimation(AnimationUtils.loadAnimation(this, android.R.anim.fade_in))
 
-        val anim = AnimationUtils.loadAnimation(this, android.R.anim.fade_in)
-        binding.successOverlay.startAnimation(anim)
-
-        // Auto-close after 2 seconds and return to CustomerHomeActivity
-        mainHandler.postDelayed({ finish() }, if (bonusNote != null) 3000L else 2000L)
+        // Back to where the customer came from once they have read it.
+        mainHandler.postDelayed({ finish() }, 2500L)
     }
 
     private fun showError(message: String) {

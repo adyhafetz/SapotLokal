@@ -41,11 +41,7 @@ class VendorTransactionAdapter :
                 binding.iconContainer.background = ContextCompat.getDrawable(
                     context, R.drawable.bg_pill_yellow
                 )
-                binding.tvTxTitle.text = when (point.pointSource) {
-                    PointSource.FIRST_VISIT_BONUS -> binding.root.context.getString(com.sapotlokal.R.string.kv_tx_first_visit)
-                    PointSource.STREAK_BONUS -> binding.root.context.getString(com.sapotlokal.R.string.kv_tx_streak)
-                    else -> binding.root.context.getString(com.sapotlokal.R.string.kv_tx_visit)
-                }
+                binding.tvTxTitle.text = binding.root.context.getString(com.sapotlokal.R.string.kv_tx_visit)
                 binding.tvTxPoints.text = binding.root.context.getString(com.sapotlokal.R.string.kv_plus_pts, point.pointEarnedAmount)
                 binding.tvTxPoints.setTextColor(ContextCompat.getColor(context, R.color.hu_ok))
             } else {

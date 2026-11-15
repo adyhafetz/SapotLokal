@@ -47,6 +47,12 @@ class RankEconomyTest {
     }
 
     @Test
+    fun rankBonusLabelsDropTrailingZeros() {
+        val labels = Rank.entries.map { com.sapotlokal.util.RankText.bonus(it.pointsBonus) }
+        assertEquals(listOf("1", "1.25", "1.5", "2", "3"), labels)
+    }
+
+    @Test
     fun everyAllowedRateStaysWithinTheRulesCap() {
         // Rules allow pointEarnedAmount ≤ pointsPerVisit × 3; the top bonus is exactly 3x.
         for (rate in AppConfig.ALLOWED_POINTS_PER_VISIT) for (rank in Rank.entries) {

@@ -223,7 +223,7 @@
             android:id="@+id/successOverlay"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:background="#F2FAFAFA"
+            android:background="@color/hu_bg"
             android:clickable="true"
             android:gravity="center"
             android:orientation="vertical"
@@ -248,19 +248,19 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
                 android:fontFamily="@font/figtree_bold"
-                android:text="@string/scan_10_points"
                 android:textColor="@color/hu_ink"
-                android:textSize="32sp"
-                android:textStyle="bold" />
+                android:gravity="center"
+                android:paddingHorizontal="24dp"
+                android:textSize="26sp" />
 
             <TextView
-                android:id="@+id/tvShopName"
+                android:id="@+id/tvXpAwarded"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="6dp"
-                android:fontFamily="@font/figtree_medium"
-                android:textColor="@color/hu_soft"
-                android:textSize="16sp" />
+                android:fontFamily="@font/figtree_bold"
+                android:textColor="@color/hu_accent_text"
+                android:textSize="18sp" />
         </LinearLayout>
 
         <!-- Error message -->

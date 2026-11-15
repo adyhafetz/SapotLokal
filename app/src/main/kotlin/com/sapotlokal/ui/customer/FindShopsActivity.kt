@@ -41,6 +41,7 @@ class FindShopsActivity : AppCompatActivity() {
     private var rules: List<Voucher> = emptyList()
     private var vouchers: List<VoucherUser> = emptyList()
     private var query = ""
+    private var myRank = com.sapotlokal.AppConfig.Rank.JIRAN_BARU
     private var category = ALL
     private var scope = Scope.ALL
 
@@ -73,6 +74,7 @@ class FindShopsActivity : AppCompatActivity() {
     private fun startListeners() {
         binding.progressBar.visibility = View.VISIBLE
         if (userId.isNotBlank()) {
+            com.sapotlokal.data.repository.XpRepository.fetchStanding(userId) { myRank = it.rank; render() }
             pointsListener = PointRepository.listenToPointsForUser(
                 userID = userId,
                 onUpdate = { shopPoints, _, _ ->
@@ -155,7 +157,7 @@ class FindShopsActivity : AppCompatActivity() {
                 getString(if (v.isOpen) R.string.hu_open else R.string.hu_closed)
             ).filterNotNull().joinToString(" · ")
             val card = ShopCard.inflate(container)
-            ShopCard.bind(card, v, v.vendorID, bal, isReady, nextRule(v.vendorID), readyReward = ready, meta = meta)
+            ShopCard.bind(card, v, v.vendorID, bal, isReady, nextRule(v.vendorID), readyReward = ready, meta = meta, perVisit = ShopStyle.perVisit(v, myRank))
             if (bal == 0 && !isReady) card.tvStatus.text = "$meta · ${getString(R.string.hu_new_to_you)}"
             card.root.setOnClickListener {
                 startActivity(Intent(this, ShopDetailActivity::class.java).putExtra(ShopDetailActivity.EXTRA_VENDOR_ID, v.vendorID))

@@ -122,8 +122,6 @@ object PointSource {
     const val MEMORY_MATCH  = "memory_match"
     const val CHALLENGE     = "challenge"
     const val REDEMPTION    = "redemption"  // When a voucher is redeemed
-    const val FIRST_VISIT_BONUS = "first_visit_bonus"
-    const val STREAK_BONUS      = "streak_bonus"
 }
 
 // ── VOUCHER (reward rule) ──────────────────────────────────────────────────────

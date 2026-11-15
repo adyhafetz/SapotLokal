@@ -61,6 +61,7 @@ class CustomerHomeActivity : AppCompatActivity() {
     private var currentUserName = ""
     private var currentUserTier = CustomerTier.FRESHIE
     private var currentAvatarId = ""
+    private var myRank = AppConfig.Rank.JIRAN_BARU
 
     private var pointsLoaded = false
     private var lastPerShop: Map<String, Int> = emptyMap()
@@ -253,7 +254,7 @@ class CustomerHomeActivity : AppCompatActivity() {
         held.forEachIndexed { i, (vendorId, balance) ->
             val card = ShopCard.inflate(container)
             val readyRule = claimableRules().firstOrNull { it.vendorID == vendorId }
-            ShopCard.bind(card, vendorsById[vendorId], vendorId, balance, vendorId in claimShops, nextRewardAt(vendorId), readyReward = readyRule)
+            ShopCard.bind(card, vendorsById[vendorId], vendorId, balance, vendorId in claimShops, nextRewardAt(vendorId), readyReward = readyRule, perVisit = ShopStyle.perVisit(vendorsById[vendorId], myRank))
             card.root.setOnClickListener { openShop(vendorId) }
             container.addView(card.root, LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT
@@ -309,6 +310,8 @@ class CustomerHomeActivity : AppCompatActivity() {
                 currentAvatarId = snapshot.child("avatar").getValue(String::class.java).orEmpty()
                 if (name.isNotBlank()) currentUserName = name
                 storedLifetimePoints = snapshot.child("lifetimePoints").getValue(Long::class.java)?.toInt() ?: 0
+                val rank = com.sapotlokal.data.repository.XpRepository.standingOf(snapshot).rank
+                if (rank != myRank) { myRank = rank; refreshAll() }
                 updateGreeting()
                 cacheUser()
             }

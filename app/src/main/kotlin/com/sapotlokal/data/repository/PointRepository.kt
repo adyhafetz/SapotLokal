@@ -9,6 +9,8 @@ import com.sapotlokal.AppConfig.CustomerTier
 import com.sapotlokal.data.model.Game
 import com.sapotlokal.data.model.Point
 import com.sapotlokal.data.model.PointSource
+import com.sapotlokal.data.model.XpEventKey
+import com.sapotlokal.data.model.XpSource
 import java.time.LocalDate
 import java.time.ZoneId
 
@@ -121,91 +123,96 @@ object PointRepository {
         })
     }
 
+    /** What one valid scan gave: shop points (with the rank bonus), XP, and the rank after it. */
+    data class VisitResult(
+        val points: Int,
+        val basePoints: Int,
+        val rankBonus: Double,
+        val xp: Int,
+        val rankBefore: AppConfig.Rank,
+        val rankAfter: AppConfig.Rank
+    )
+
     /**
-     * Records a shop visit (with the tier multiplier) and then any shop bonuses it unlocks:
-     *   - first visit to this shop: +AppConfig.FIRST_VISIT_BONUS_POINTS
-     *   - visits on AppConfig.WEEKLY_STREAK_VISIT_DAYS different days this week: +WEEKLY_STREAK_BONUS_POINTS
-     *     (once per shop per week)
-     * Bonuses are shop points (they carry this shop's vendorID) and are not multiplied.
-     * [onResult] gets the TOTAL earned and a short note such as "First visit bonus +20" (or null).
+     * Records one shop visit in ONE atomic write (REFRACTOR.md §4.1):
+     *   points/{id}                     shop points = shop's pointsPerVisit × the customer's rank bonus
+     *   xpEvents + users/xp + users/rank AppConfig.VISIT_XP, flat (see XpRepository.awardPaths)
+     *   userStats/{uid}                 totalVisits +1, shopsVisited/{vendorID}, lastVisitAt
+     *   weeklyVisits/{week}/{uid}       visits +1 for the leaderboard
+     * The caller checks the cooldown first (hasRecentShopVisit). [onResult] gets null on failure.
      */
     fun recordShopVisit(
         userID: String,
         vendorID: String,
-        onResult: (success: Boolean, earnedPoints: Int, bonusNote: String?) -> Unit
+        onResult: (VisitResult?) -> Unit
     ) {
-        // Look at the customer's history at this shop BEFORE writing today's visit.
-        db.child("points").orderByChild("userID").equalTo(userID)
-            .addListenerForSingleValueEvent(object : ValueEventListener {
-                override fun onDataChange(snapshot: DataSnapshot) {
-                    val zone = ZoneId.of(AppConfig.GAMES_RESET_TIME_ZONE)
-                    val weekStart = com.sapotlokal.util.MissionDateUtils.getWeekStartMillis()
-                    val here = snapshot.children.mapNotNull { it.getValue(Point::class.java) }
-                        .filter { it.vendorID == vendorID }
-                    val visits = here.filter { it.pointSource == PointSource.SHOP_VISIT }
-                    val isFirstVisit = visits.isEmpty()
-                    val today = LocalDate.now(zone)
-                    val daysThisWeek = visits.filter { it.timestamp >= weekStart }
-                        .map { java.time.Instant.ofEpochMilli(it.timestamp).atZone(zone).toLocalDate() }
-                        .toMutableSet().apply { add(today) }
-                    val streakAlreadyPaid = here.any {
-                        it.pointSource == PointSource.STREAK_BONUS && it.timestamp >= weekStart
-                    }
-                    val streakEarned = !streakAlreadyPaid && daysThisWeek.size >= AppConfig.WEEKLY_STREAK_VISIT_DAYS
+        if (userID.isBlank() || vendorID.isBlank()) return onResult(null)
+        db.child("users").child(userID).addListenerForSingleValueEvent(object : ValueEventListener {
+            override fun onDataChange(user: DataSnapshot) {
+                db.child("vendors").child(vendorID).child("pointsPerVisit")
+                    .addListenerForSingleValueEvent(object : ValueEventListener {
+                        override fun onDataChange(rate: DataSnapshot) {
+                            val perVisit = rate.getValue(Long::class.java)?.toInt()
+                                ?.takeIf { it in AppConfig.ALLOWED_POINTS_PER_VISIT }
+                                ?: AppConfig.DEFAULT_POINTS_PER_VISIT
+                            writeVisit(userID, vendorID, perVisit, user, onResult)
+                        }
+                        override fun onCancelled(error: DatabaseError) = onResult(null)
+                    })
+            }
+            override fun onCancelled(error: DatabaseError) = onResult(null)
+        })
+    }
 
-                    addPoints(
-                        userID = userID,
-                        basePoints = AppConfig.POINTS_PER_SHOP_VISIT,
-                        pointSource = PointSource.SHOP_VISIT,
-                        vendorID = vendorID
-                    ) { ok, visitPoints ->
-                        if (!ok) {
-                            onResult(false, 0, null)
-                            return@addPoints
-                        }
-                        val notes = mutableListOf<String>()
-                        var total = visitPoints
-                        fun finish() = onResult(true, total, notes.joinToString(" · ").ifEmpty { null })
-                        fun awardStreak() {
-                            if (!streakEarned) { finish(); return }
-                            addPoints(
-                                userID = userID,
-                                basePoints = AppConfig.WEEKLY_STREAK_BONUS_POINTS,
-                                pointSource = PointSource.STREAK_BONUS,
-                                vendorID = vendorID,
-                                applyMultiplier = false
-                            ) { bonusOk, bonus ->
-                                if (bonusOk && bonus > 0) {
-                                    total += bonus
-                                    notes.add("Weekly streak bonus +$bonus")
-                                }
-                                finish()
-                            }
-                        }
-                        if (isFirstVisit) {
-                            addPoints(
-                                userID = userID,
-                                basePoints = AppConfig.FIRST_VISIT_BONUS_POINTS,
-                                pointSource = PointSource.FIRST_VISIT_BONUS,
-                                vendorID = vendorID,
-                                applyMultiplier = false
-                            ) { bonusOk, bonus ->
-                                if (bonusOk && bonus > 0) {
-                                    total += bonus
-                                    notes.add("First visit bonus +$bonus")
-                                }
-                                awardStreak()
-                            }
-                        } else {
-                            awardStreak()
-                        }
-                    }
-                }
+    private fun writeVisit(
+        userID: String,
+        vendorID: String,
+        perVisit: Int,
+        user: DataSnapshot,
+        onResult: (VisitResult?) -> Unit
+    ) {
+        val pointID = db.child("points").push().key ?: return onResult(null)
+        val now = System.currentTimeMillis()
+        val standing = XpRepository.standingOf(user)
+        val rank = standing.rank
+        val points = AppConfig.shopPointsForVisit(perVisit, rank)
+        val (xpPaths, rankAfter) = XpRepository.awardPaths(
+            uid = userID,
+            eventKey = XpEventKey.visit(pointID),
+            amount = AppConfig.VISIT_XP,
+            source = XpSource.VISIT,
+            current = standing,
+            now = now
+        )
+        val week = com.sapotlokal.util.MissionDateUtils.getWeekYearKey(now)
+        val updates = hashMapOf<String, Any>(
+            "points/$pointID" to Point(
+                pointID = pointID,
+                userID = userID,
+                vendorID = vendorID,
+                pointEarnedAmount = points,
+                pointRedeemedAmount = 0,
+                pointSource = PointSource.SHOP_VISIT,
+                timestamp = now,
+                basePoints = perVisit,
+                rankBonus = rank.pointsBonus
+            ),
+            "userStats/$userID/totalVisits" to ServerValue.increment(1),
+            "userStats/$userID/shopsVisited/$vendorID" to true,
+            "userStats/$userID/lastVisitAt" to now,
+            "weeklyVisits/$week/$userID/visits" to ServerValue.increment(1),
+            "weeklyVisits/$week/$userID/lastVisitAt" to now,
+            "weeklyVisits/$week/$userID/userName" to (user.child("userName").getValue(String::class.java) ?: "").take(60),
+            "weeklyVisits/$week/$userID/avatar" to (user.child("avatar").getValue(String::class.java) ?: ""),
+            "weeklyVisits/$week/$userID/rank" to rankAfter.level
+        )
+        updates.putAll(xpPaths)
 
-                override fun onCancelled(error: DatabaseError) {
-                    onResult(false, 0, null)
-                }
-            })
+        db.updateChildren(updates)
+            .addOnSuccessListener {
+                onResult(VisitResult(points, perVisit, rank.pointsBonus, AppConfig.VISIT_XP, rank, rankAfter))
+            }
+            .addOnFailureListener { onResult(null) }
     }
 
     /**

@@ -64,10 +64,8 @@
     <string name="kv_shop_not_found">Kedai tidak ditemui</string>
     <string name="kv_shop_not_found_user">Tidak menjumpai kedai untuk akaun ini</string>
     <string name="kv_shop_updated">Profil kedai dikemas kini ✓</string>
-    <string name="kv_tx_first_visit">Bonus kunjungan pertama</string>
     <string name="kv_tx_redeemed">Baucar ditebus</string>
     <string name="kv_tx_spent">Mata digunakan</string>
-    <string name="kv_tx_streak">Bonus rentetan mingguan</string>
     <string name="kv_tx_visit">Imbasan kunjungan pelanggan</string>
     <string name="kv_update_failed">Tidak dapat mengemas kini profil</string>
     <string name="kv_vs_last_month">%1$s berbanding bulan lalu</string>
@@ -112,4 +110,6 @@
     <string name="vt_create_voucher">Cipta Baucar Kedai</string>
     <string name="vt_shop_settings">Tetapan Kedai</string>
     <string name="vt_walk_in_qr">Kod QR Daftar Masuk</string>
+    <string name="owner_points_per_visit">Mata setiap lawatan</string>
+    <string name="owner_points_per_visit_rank">Pelanggan berpangkat tinggi dapat sehingga 3x.</string>
 </resources>

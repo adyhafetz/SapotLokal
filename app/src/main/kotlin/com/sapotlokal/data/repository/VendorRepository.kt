@@ -159,7 +159,8 @@ object VendorRepository {
             "vendorCategory" to vendor.vendorCategory,
             "vendorAddress" to vendor.vendorAddress,
             "vendorDescription" to vendor.vendorDescription,
-            "operatingHours" to vendor.operatingHours
+            "operatingHours" to vendor.operatingHours,
+            "pointsPerVisit" to vendor.pointsPerVisit
         )
 
         db.child("vendors").child(vendor.vendorID)

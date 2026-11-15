@@ -40,6 +40,7 @@ class ShopDetailActivity : AppCompatActivity() {
     private var vendorId = ""
     private var vendor: Vendor? = null
     private var balance = 0
+    private var myRank = AppConfig.Rank.JIRAN_BARU
     private var rules: List<Voucher> = emptyList()
     private var myVouchers: List<VoucherUser> = emptyList()
 
@@ -94,6 +95,7 @@ class ShopDetailActivity : AppCompatActivity() {
         )
         val uid = auth.currentUser?.uid
         if (!uid.isNullOrBlank()) {
+            com.sapotlokal.data.repository.XpRepository.fetchStanding(uid) { myRank = it.rank; render() }
             pointsListener = PointRepository.listenToPointsForUser(
                 userID = uid,
                 onUpdate = { perShop, _, _ -> balance = perShop[vendorId] ?: 0; render() },
@@ -130,12 +132,18 @@ class ShopDetailActivity : AppCompatActivity() {
             ShopCategory.label(this, v.vendorCategory).ifBlank { null },
             getString(if (v.isOpen) R.string.hu_open else R.string.hu_closed)
         ).filterNotNull().joinToString(" · ")
-        ShopCard.bind(card, v, vendorId, balance, claimable != null || held.isNotEmpty(), next, readyReward = claimable, meta = meta)
+        ShopCard.bind(card, v, vendorId, balance, claimable != null || held.isNotEmpty(), next, readyReward = claimable, meta = meta, perVisit = ShopStyle.perVisit(v, myRank))
         card.root.isClickable = false
         card.root.foreground = null
         binding.shopCardSlot.addView(card.root)
 
-        binding.tvPointsRule.text = getString(R.string.hu_points_here_only, AppConfig.POINTS_PER_SHOP_VISIT, name)
+        val rate = v.pointsPerVisit.takeIf { it in AppConfig.ALLOWED_POINTS_PER_VISIT } ?: AppConfig.DEFAULT_POINTS_PER_VISIT
+        val mine = ShopStyle.perVisit(v, myRank)
+        binding.tvPointsRule.text = if (mine > rate) {
+            getString(R.string.hu_points_rule_you, rate, mine)
+        } else {
+            getString(R.string.hu_points_rule, rate)
+        }
 
         // Bar ticked at this shop's reward costs
         val costs = rules.map { it.pointsRequired }.filter { it > 0 }.distinct()

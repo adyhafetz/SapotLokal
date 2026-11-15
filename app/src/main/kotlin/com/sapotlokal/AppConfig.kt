@@ -102,15 +102,6 @@ object AppConfig {
     /** Largest single raise of users/{uid}/xp in one write. Mirrors the security rules. */
     const val XP_MAX_PER_WRITE: Int = 300
 
-    // ── Points ────────────────────────────────────────────────────────────────
-
-    /**
-     * Points a Customer earns each time they scan a valid Shop QR code.
-     * Source: Flowchart says 10; Simple Guide says "e.g. 20". Default = 10 (Flowchart wins).
-     * Build guide Open Decision #1.
-     */
-    const val POINTS_PER_SHOP_VISIT: Int = 10
-
     // ── Games ─────────────────────────────────────────────────────────────────
 
     /** Point values on the Spin the Wheel segments, in wheel order. One is picked uniformly at random. */
@@ -155,17 +146,6 @@ object AppConfig {
      * Placeholder: 30 days.
      */
     const val VOUCHER_EXPIRY_DAYS: Int = 30
-
-    // ── Shop bonuses ──────────────────────────────────────────────────────────
-
-    /** Extra shop points the first time a customer scans at a shop. */
-    const val FIRST_VISIT_BONUS_POINTS: Int = 20
-
-    /** Visits on this many different days in one week at the same shop earn the weekly bonus. */
-    const val WEEKLY_STREAK_VISIT_DAYS: Int = 3
-
-    /** Extra shop points for completing the weekly visit streak at a shop (once per shop per week). */
-    const val WEEKLY_STREAK_BONUS_POINTS: Int = 20
 
     // ── Tiers (Gamification Overhaul) ─────────────────────────────────────────
 

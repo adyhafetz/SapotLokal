@@ -60,18 +60,13 @@ object ShopStyle {
         }
     }
 
-    /** Visits (stamps) needed for a reward, and how many are already filled. */
-    fun stamps(balance: Int, cost: Int): Pair<Int, Int> {
-        val per = AppConfig.POINTS_PER_SHOP_VISIT.coerceAtLeast(1)
-        val visits = ((cost + per - 1) / per).coerceAtLeast(1)
-        val earned = balance / per
-        // Up to MAX_STAMPS cups fit on a phone card; longer rewards scale down proportionally.
-        if (visits <= MAX_STAMPS) return visits to earned.coerceIn(0, visits)
-        val filled = (earned.toLong() * MAX_STAMPS / visits).toInt().coerceIn(0, MAX_STAMPS)
-        return MAX_STAMPS to filled
-    }
+    const val MAX_STAMPS = 8
 
-    private const val MAX_STAMPS = 8
+    /** Shop points this customer gets per visit at [vendor]: the shop's rate × their rank bonus. */
+    fun perVisit(vendor: Vendor?, rank: AppConfig.Rank): Int {
+        val rate = vendor?.pointsPerVisit?.takeIf { it in AppConfig.ALLOWED_POINTS_PER_VISIT } ?: AppConfig.DEFAULT_POINTS_PER_VISIT
+        return AppConfig.shopPointsForVisit(rate, rank)
+    }
 
     /** Draws a row of kopi-cup stamps into [row]. */
     fun fillStamps(row: LinearLayout, total: Int, filled: Int, tint: Int) {
@@ -107,7 +102,8 @@ object ShopCard {
         nextReward: Voucher?,
         showStatus: Boolean = true,
         readyReward: Voucher? = null,
-        meta: String? = null
+        meta: String? = null,
+        perVisit: Int = AppConfig.DEFAULT_POINTS_PER_VISIT
     ) {
         val ctx = b.root.context
         val c = ShopStyle.colors(ctx, vendorId)
@@ -120,23 +116,20 @@ object ShopCard {
         b.tvPoints.text = ctx.getString(R.string.hu_n_pts, balance)
         b.tvPoints.setTextColor(c.on)
 
-        // Ready shops show the cups of the reward they can claim (all full); others the next one.
-        // One cup = one visit: show visits earned toward the next reward still to reach, so filled
-        // and empty cups always agree with "1 visit = 10 points". Only when every reward is reached
-        // do the cups show the ready reward, all full.
+        // One cup = one visit at this customer's rate here ([perVisit] = shop points per visit × rank
+        // bonus), so "visits to go" is true for them. A ready shop shows the visits made, all full.
+        val per = perVisit.coerceAtLeast(1)
         val cost = when {
             nextReward != null -> nextReward.pointsRequired
             readyReward != null -> readyReward.pointsRequired
-            else -> AppConfig.POINTS_PER_SHOP_VISIT * 5
+            else -> per * 5
         }
-        val per = AppConfig.POINTS_PER_SHOP_VISIT.coerceAtLeast(1)
         val earned = balance / per
         val (total, filled) = if (ready) {
-            // A ready shop shows the visits you have made there, all full: no unexplained empty cups.
-            val n = earned.coerceIn(1, 8)
+            val n = earned.coerceIn(1, ShopStyle.MAX_STAMPS)
             n to n
         } else {
-            val visits = ((cost + per - 1) / per).coerceIn(1, 8)
+            val visits = ((cost + per - 1) / per).coerceIn(1, ShopStyle.MAX_STAMPS)
             visits to earned.coerceAtMost(visits)
         }
         ShopStyle.fillStamps(b.stamps, total, filled, c.on)

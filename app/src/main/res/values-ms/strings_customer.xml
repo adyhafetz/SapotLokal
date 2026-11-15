@@ -70,7 +70,7 @@
     <string name="hu_got_it">Faham</string>
     <string name="hu_history">Sudah digunakan dan tamat tempoh</string>
     <string name="hu_hours">Waktu: %1$s</string>
-    <string name="hu_how_points_body">Mata adalah milik satu kedai. Setiap lawatan yang diimbas memberi 10 mata di kedai itu, ditunjukkan sebagai satu cawan.\n\nApabila mata anda di sesebuah kedai mencukupi, anda boleh menuntut ganjarannya. Menuntut terus menggunakan mata itu dan memberi anda baucar untuk ditunjukkan di kaunter.\n\nXP anda berbeza. Ia bertambah dengan setiap lawatan, misi dan permainan, dan menaikkan pangkat anda. Ia tidak boleh menebus ganjaran, dan menggunakan mata tidak akan menurunkannya.</string>
+    <string name="hu_how_points_body">Mata adalah milik satu kedai. Setiap lawatan yang diimbas memberi mata kedai itu, ditunjukkan sebagai satu cawan. Pangkat lebih tinggi memberi lebih banyak.\n\nApabila mata anda di sesebuah kedai mencukupi, anda boleh menuntut ganjarannya. Menuntut terus menggunakan mata itu dan memberi anda baucar untuk ditunjukkan di kaunter.\n\nXP anda berbeza. Ia bertambah dengan setiap lawatan, misi dan permainan, dan menaikkan pangkat anda. Ia tidak boleh menebus ganjaran, dan menggunakan mata tidak akan menurunkannya.</string>
     <string name="hu_how_points_title">Cara mata berfungsi</string>
     <string name="hu_how_points_work">Cara mata berfungsi</string>
     <string name="hu_keep_going">Teruskan</string>
@@ -105,7 +105,6 @@
     <string name="hu_play_me_sub">Profil, kata laluan, log keluar</string>
     <string name="hu_play_missions">Misi minggu ini</string>
     <string name="hu_play_title">Main</string>
-    <string name="hu_points_here_only">1 lawatan = %1$d mata · Mata dikira di %2$s sahaja</string>
     <string name="hu_ready">Sedia</string>
     <string name="hu_reward_ready">Ganjaran sedia dituntut</string>
     <string name="hu_rewards_here">Ganjaran di sini</string>
@@ -234,9 +233,7 @@
     <string name="leaderboard_no_points_yet_this">Belum ada mata minggu ini.</string>
     <string name="memory_match_new_game">Permainan baharu</string>
     <string name="nav_tab_selected_cd">%1$s, dipilih</string>
-    <string name="points_awarded">+%d Mata!</string>
     <string name="pts_label_long">mata</string>
-    <string name="scan_10_points">+10 mata</string>
     <string name="scan_confirm_code">Sahkan kod</string>
     <string name="scan_enter_a_code">Masukkan kod</string>
     <string name="scan_look_for_the_sapotlokal">Cari QR SapotLokal di kedai tempatan. Setiap kunjungan memberi mata.</string>
@@ -260,4 +257,9 @@
     <string name="voucher_qr_done">Selesai</string>
     <string name="voucher_qr_show_this_qr_code">Tunjukkan kod QR ini kepada juruwang untuk menebus ganjaran anda.</string>
     <string name="voucher_qr_voucher_code">KOD BAUCAR</string>
+    <string name="scan_points_at">+%1$d mata di %2$s</string>
+    <string name="scan_points_at_bonus">+%1$d mata di %2$s (%3$sx)</string>
+    <string name="scan_xp">+%1$d XP</string>
+    <string name="hu_points_rule">%1$d mata setiap lawatan · Hanya dikira di sini</string>
+    <string name="hu_points_rule_you">%1$d mata setiap lawatan, %2$d untuk anda · Hanya dikira di sini</string>
 </resources>

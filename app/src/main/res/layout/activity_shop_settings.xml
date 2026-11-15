@@ -170,6 +170,30 @@
                     android:textColor="@color/hu_ink" />
             </com.google.android.material.textfield.TextInputLayout>
 
+            <!-- Points per visit: chips are added in code from AppConfig.ALLOWED_POINTS_PER_VISIT -->
+            <TextView
+                style="@style/HU.Text.FieldLabel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="22dp"
+                android:text="@string/owner_points_per_visit" />
+
+            <TextView
+                style="@style/HU.Text.Small"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
+                android:text="@string/owner_points_per_visit_rank" />
+
+            <com.google.android.material.chip.ChipGroup
+                android:id="@+id/chipsPointsPerVisit"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                app:chipSpacingHorizontal="8dp"
+                app:selectionRequired="true"
+                app:singleSelection="true" />
+
             <!-- SSM Registration Number (Read-only) -->
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/tilSsmNumber"

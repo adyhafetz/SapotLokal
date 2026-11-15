@@ -306,7 +306,7 @@ Start fresh. Delete first, then make sure it still builds.
 
 **Done when:**
 - [ ] A shop set to 20 points gives a rank-3 customer 30 points.
-- [ ] No `/points` row is written without a `vendorID`.
+- [ ] No shop-visit or bonus row is written without a `vendorID`. (Game and mission rows move to XP in Phases 5 and 7.)
 - [ ] Changing points per visit doesn't change any balance that was already earned.
 
 ### Phase 4: XP and ranks

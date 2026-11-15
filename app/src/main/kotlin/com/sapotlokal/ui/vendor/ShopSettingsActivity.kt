@@ -1,5 +1,6 @@
 package com.sapotlokal.ui.vendor
 
+import com.sapotlokal.AppConfig
 import android.os.Bundle
 import android.view.View
 import android.widget.Toast
@@ -99,7 +100,29 @@ class ShopSettingsActivity : AppCompatActivity() {
         binding.etShopDesc.setText(vendor.vendorDescription)
         binding.etOperatingHours.setText(vendor.operatingHours)
         binding.etSsmNumber.setText(vendor.ssmNumber)
+        bindPointsPerVisit(vendor.pointsPerVisit)
     }
+
+    /** One chip per allowed value; the shop's current value starts selected. */
+    private fun bindPointsPerVisit(current: Int) {
+        val group = binding.chipsPointsPerVisit
+        group.removeAllViews()
+        val selected = current.takeIf { it in AppConfig.ALLOWED_POINTS_PER_VISIT } ?: AppConfig.DEFAULT_POINTS_PER_VISIT
+        AppConfig.ALLOWED_POINTS_PER_VISIT.forEach { value ->
+            val chip = com.google.android.material.chip.Chip(this).apply {
+                id = android.view.View.generateViewId()
+                text = value.toString()
+                tag = value
+                isCheckable = true
+                isChecked = value == selected
+            }
+            group.addView(chip)
+        }
+    }
+
+    private fun selectedPointsPerVisit(): Int =
+        (binding.chipsPointsPerVisit.findViewById<com.google.android.material.chip.Chip>(binding.chipsPointsPerVisit.checkedChipId)?.tag as? Int)
+            ?: AppConfig.DEFAULT_POINTS_PER_VISIT
 
     private fun saveChanges() {
         val vendor = currentVendor ?: return
@@ -139,7 +162,8 @@ class ShopSettingsActivity : AppCompatActivity() {
             vendorCategory = category,
             vendorAddress = address,
             vendorDescription = desc,
-            operatingHours = hours
+            operatingHours = hours,
+            pointsPerVisit = selectedPointsPerVisit()
         )
 
         setLoading(true)

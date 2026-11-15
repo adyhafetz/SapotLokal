@@ -64,10 +64,8 @@
     <string name="kv_shop_not_found">Shop not found</string>
     <string name="kv_shop_not_found_user">Could not find a shop for this account</string>
     <string name="kv_shop_updated">Shop profile updated ✓</string>
-    <string name="kv_tx_first_visit">First visit bonus</string>
     <string name="kv_tx_redeemed">Voucher redeemed</string>
     <string name="kv_tx_spent">Points spent</string>
-    <string name="kv_tx_streak">Weekly streak bonus</string>
     <string name="kv_tx_visit">Customer visit scan</string>
     <string name="kv_update_failed">Could not update the profile</string>
     <string name="kv_vs_last_month">%1$s vs last month</string>
@@ -112,4 +110,6 @@
     <string name="vt_create_voucher">Create Shop Voucher</string>
     <string name="vt_shop_settings">Shop Settings</string>
     <string name="vt_walk_in_qr">Walk-in QR Code</string>
+    <string name="owner_points_per_visit">Points per visit</string>
+    <string name="owner_points_per_visit_rank">Customers with a higher rank get up to 3x.</string>
 </resources>

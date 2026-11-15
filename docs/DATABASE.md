@@ -26,7 +26,7 @@ There are two currencies, and they never mix:
 | `games` | push id | one row per game played: `userID, gameType, gameAttempt, gameDay, gamePlayedAt` and the reward | the customer |
 | `shopNotifications` | push id | "shop is open" announcements for the push Cloud Function | the owner |
 
-**Still present until their phase replaces them:** `users/*/lifetimePoints` and `currentTier` (Phase 4); `missions`, `userMissions`, `userMissionTracking`, `shopVisits` (Phase 5); game, mission and bonus rows in `/points` with an empty `vendorID` (Phases 3, 5 and 7); `games/*/gamePointsRewarded` (Phase 7). The rules mark each of these as OLD.
+**Still present until their phase replaces them:** `users/*/lifetimePoints` and `currentTier` (Phase 4); `missions`, `userMissions`, `userMissionTracking`, `shopVisits` (Phase 5); game and mission rows in `/points` with an empty `vendorID` (Phases 5 and 7); `games/*/gamePointsRewarded` (Phase 7). The rules mark each of these as OLD.
 
 ## Keys and formats
 
