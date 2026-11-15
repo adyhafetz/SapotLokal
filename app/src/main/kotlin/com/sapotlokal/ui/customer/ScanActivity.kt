@@ -262,7 +262,7 @@ class ScanActivity : AppCompatActivity() {
             onResult = { result ->
                 if (result != null) {
                     com.sapotlokal.util.FollowedShops.follow(this@ScanActivity, vendorID)
-                    // Phase 6: Subscribe customer to FCM updates for this shop
+                    // Follow this shop for "now open" notifications
                     com.google.firebase.messaging.FirebaseMessaging.getInstance()
                         .subscribeToTopic("shop_${vendorID}")
                         .addOnSuccessListener {

@@ -18,7 +18,7 @@ import com.sapotlokal.databinding.ItemHuShopCardBinding
 import kotlin.math.abs
 
 /**
- * Hadiah Utama building blocks shared by the customer screens: each shop's fixed colour,
+ * Building blocks shared by the customer screens: each shop's fixed colour,
  * the shop card, the reward card and the reward row.
  */
 object ShopStyle {
@@ -196,7 +196,7 @@ object HowPoints {
 }
 
 
-/** Filter chip in the Hadiah Utama style: ink when selected, quiet grey fill otherwise. */
+/** Filter chip: ink when selected, quiet grey fill otherwise. */
 object HuChip {
     fun make(context: Context, label: String, checked: Boolean, onClick: () -> Unit): com.google.android.material.chip.Chip {
         val states = arrayOf(intArrayOf(android.R.attr.state_checked), intArrayOf())

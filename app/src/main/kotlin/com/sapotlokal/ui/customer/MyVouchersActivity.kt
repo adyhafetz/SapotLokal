@@ -36,7 +36,7 @@ import java.util.Date
 import java.util.Locale
 
 /**
- * Rewards tab (Hadiah Utama). One job: "what can I claim or use?"
+ * Rewards tab. One job: "what can I claim or use?"
  * Three sections with one vocabulary:
  *  - Ready: rewards the customer has enough points for at that shop → Claim (spends points now).
  *  - My vouchers: claimed vouchers → Show QR at the counter; used and expired ones listed after.

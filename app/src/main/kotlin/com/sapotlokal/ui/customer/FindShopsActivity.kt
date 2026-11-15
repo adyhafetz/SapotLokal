@@ -21,7 +21,7 @@ import com.sapotlokal.databinding.ActivityFindShopsBinding
 import com.sapotlokal.util.ServerClock
 
 /**
- * Shops tab (Hadiah Utama). One job: "where can I earn?"
+ * Shops tab. One job: "where can I earn?"
  * Search, a scope filter (My shops · Open now · All), category chips built from the shops that
  * exist, then one stacked colour card per shop: points, cup stamps, open status, next reward.
  * Shops where the customer holds points come first; ready ones first of all.

@@ -273,7 +273,7 @@ class SapotFcmService : FirebaseMessagingService() {
 
         createNotificationChannels()
 
-        // Phase 6: Handle shop_status notification type
+        // "Shop is open/closed" notifications
         val type = remoteMessage.data["type"]
         if (type == "shop_status") {
             val vendorId = remoteMessage.data["vendorId"] ?: remoteMessage.data["vendorID"] ?: ""

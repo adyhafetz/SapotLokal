@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-    Rewards tab (Hadiah Utama) — one job: "what can I claim or use?"
+    Rewards tab — one job: "what can I claim or use?"
     Title → three sections as chips: Ready (claim) · My vouchers (show QR) · Working towards.
 -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"

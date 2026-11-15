@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-    Play tab (Hadiah Utama) — one job: "something fun to do".
+    Play tab — one job: "something fun to do".
     Rank card → missions → games → leaderboard. Me (and badges) opens from Home.
 -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"

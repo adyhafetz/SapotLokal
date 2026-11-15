@@ -15,7 +15,7 @@ import com.sapotlokal.data.repository.QrCodeRepository
 import com.sapotlokal.databinding.ActivityShowQrBinding
 
 /**
- * ShowQrActivity — Phase 4: Rotating Shop QR Code screen.
+ * ShowQrActivity — the shop's rotating QR code and its 6-character code.
  *
  * HOW THE 60-SECOND ROTATION WORKS:
  *   1. On open, [publishAndStartCountdown] calls QrCodeRepository.publishNewCode().

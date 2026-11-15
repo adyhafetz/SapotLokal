@@ -31,7 +31,7 @@ import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 
 /**
- * ScanToRedeemActivity — Phase 4: Shop owner redeems a customer's voucher.
+ * ScanToRedeemActivity — the shop owner redeems a customer's voucher.
  *
  * TWO WAYS TO SUBMIT A VOUCHER CODE:
  *   1. Camera scan (ML Kit) — preferred; same scanning pipeline as ScanActivity.

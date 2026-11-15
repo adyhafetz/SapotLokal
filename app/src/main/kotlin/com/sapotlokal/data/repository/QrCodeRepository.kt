@@ -11,8 +11,8 @@ import com.sapotlokal.util.ServerClock
 /**
  * QrCodeRepository — reads and validates entries in the /qrcodes node.
  *
- * Phase 3: validation only (the customer side reads codes).
- * Phase 4: the shop owner side WRITES new rotating codes here.
+ * Customers validate scanned or typed codes here.
+ * The shop owner's Show QR screen writes the rotating codes here.
  *
  * HOW QR VALIDATION WORKS (build guide Section 3.1 + Rule 43):
  *   The customer's app receives a string from the camera scan.
