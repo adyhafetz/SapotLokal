@@ -1,6 +1,8 @@
 # SapotLokal database
 
-Firebase Realtime Database `sapotlokal-app-default-rtdb` (asia-southeast1). Security rules: [firebase-rules.json](firebase-rules.json). The plan behind this shape: [REFRACTOR.md §4](../REFRACTOR.md).
+Firebase Realtime Database (asia-southeast1; the address is `AppConfig.DATABASE_URL`). Security rules: [firebase-rules.json](firebase-rules.json). The plan behind this shape: [REFRACTOR.md §4](../REFRACTOR.md).
+
+**Coming from the old app version?** [SETUP.md](SETUP.md) explains the differences, and `npm run migrate` in `tools/seed` moves existing data to this shape.
 
 There are two currencies, and they never mix:
 

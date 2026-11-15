@@ -122,6 +122,12 @@ object AppConfig {
      */
     const val QR_ROTATION_SECONDS: Long = 60L
 
+    /** Length of the rotating shop code shown under the QR, which customers can also type. */
+    const val SHOP_CODE_LENGTH: Int = 6
+
+    /** Characters a shop code is made of: no 0/O, 1/I or L, so it reads and types cleanly. */
+    const val SHOP_CODE_ALPHABET: String = "ABCDEFGHJKMNPQRSTUVWXYZ23456789"
+
     // ── Vouchers ──────────────────────────────────────────────────────────────
 
     /**

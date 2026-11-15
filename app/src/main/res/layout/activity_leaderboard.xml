@@ -47,14 +47,14 @@
                     android:layout_marginStart="4dp"
                     android:layout_weight="1"
                     android:accessibilityHeading="true"
-                    android:text="@string/missions_this_week" />
+                    android:text="@string/hu_play_leaderboard" />
 
                 <TextView
                     android:id="@+id/tvResets"
                     style="@style/HU.Text.Small"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    tools:text="3 hours left" />
+                    tools:text="This week · 3 hours left" />
             </LinearLayout>
 
             <LinearLayout

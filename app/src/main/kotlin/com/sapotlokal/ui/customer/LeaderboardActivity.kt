@@ -33,7 +33,9 @@ class LeaderboardActivity : AppCompatActivity() {
         binding = ActivityLeaderboardBinding.inflate(layoutInflater)
         setContentView(binding.root)
         binding.btnBack.setOnClickListener { finish() }
-        binding.tvResets.text = MissionDateUtils.formatTimeRemaining(this, MissionDateUtils.getWeekExpiresAtMillis())
+        binding.tvResets.text = getString(
+            R.string.lb_this_week_left, MissionDateUtils.formatTimeRemaining(this, MissionDateUtils.getWeekExpiresAtMillis())
+        )
 
         // Your own row sits on the pale orange wash, flush with the bottom of the screen.
         binding.meRow.root.apply {
@@ -60,11 +62,15 @@ class LeaderboardActivity : AppCompatActivity() {
         binding.rows.removeAllViews()
         top.drop(3).forEach { e ->
             val row = ItemLeaderboardRowBinding.inflate(LayoutInflater.from(this), binding.rows, false)
-            bindRow(row, e, e.userName)
+            val isMe = e.uid == me?.uid
+            bindRow(row, e, if (isMe) getString(R.string.lb_you) else e.userName)
+            if (isMe) row.root.backgroundTintList = ContextCompat.getColorStateList(this, R.color.hu_accent_tint)
             binding.rows.addView(row.root)
         }
 
+        // The "You" bar is only for when your own row isn't already in the list above.
         val mine = binding.meRow
+        mine.root.visibility = if (me != null && top.any { it.uid == me.uid }) View.GONE else View.VISIBLE
         if (me == null) {
             mine.tvPlace.text = "–"
             setAvatar(mine.ivAvatar, null)

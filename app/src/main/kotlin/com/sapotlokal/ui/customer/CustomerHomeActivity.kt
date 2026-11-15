@@ -32,14 +32,15 @@ import com.sapotlokal.util.ServerClock
 import com.sapotlokal.util.VoucherClaimHelper
 
 /**
- * Customer Home (Hadiah Utama). One job: "is anything ready for me?"
+ * Customer Home. One job: "what can I do now?"
  *
- * 1. Header: time-of-day greeting and name; tapping it opens Me (profile).
- * 2. Level score with a bar ticked at each level (level score never buys rewards).
- * 3. One big reward card: a reward to claim now (claiming spends that shop's points at claim
+ * 1. Header: time-of-day greeting and name (opens Me) and a rank chip (opens Play).
+ * 2. Any unclaimed top-3 prize.
+ * 3. One reward card: a reward to claim now (claiming spends that shop's points at claim
  *    time via [VoucherClaimHelper]), else a claimed voucher to show, else the closest reward.
  *    A brand-new customer sees a "Scan your first shop" card instead.
- * 4. Up to three of the customer's shops as stacked colour cards with cup stamps.
+ * 4. Recently visited: every shop the customer has been to, newest visit first, as a row of
+ *    photo cards (ShopCard). "See all" opens Shops on the Visited filter.
  * 5. Today in Play: free spin and the nearest mission, opening the Play tab.
  *
  * Also shows the rank-up sheet once per new rank, syncs the FCM token, asks for notification
@@ -59,10 +60,11 @@ class CustomerHomeActivity : AppCompatActivity() {
 
     private var currentUserName = ""
     private var currentAvatarId = ""
-    private var myRank = AppConfig.Rank.JIRAN_BARU
 
     private var pointsLoaded = false
     private var lastPerShop: Map<String, Int> = emptyMap()
+    /** Shops visited at least once → time of the latest visit. Kept even when the points are spent. */
+    private var lastVisitAt: Map<String, Long> = emptyMap()
     private var vendorsById: Map<String, Vendor> = emptyMap()
     private var myVouchers: List<VoucherUser> = emptyList()
     private var allRules: List<Voucher> = emptyList()
@@ -92,9 +94,10 @@ class CustomerHomeActivity : AppCompatActivity() {
         updateGreeting()
 
         binding.btnMe.setOnClickListener { openMe() }
-        binding.rankCard.root.setOnClickListener { startActivity(Intent(this, ChallengesActivity::class.java)) }
-        binding.btnHowPoints.setOnClickListener { HowPoints.show(this) }
-        binding.btnAllShops.setOnClickListener { startActivity(Intent(this, FindShopsActivity::class.java)) }
+        binding.tvRankChip.setOnClickListener { startActivity(Intent(this, ChallengesActivity::class.java)) }
+        binding.btnAllShops.setOnClickListener {
+            startActivity(Intent(this, FindShopsActivity::class.java).putExtra(FindShopsActivity.EXTRA_VISITED, true))
+        }
         binding.tvMoreReady.setOnClickListener { openRewards() }
         binding.playStrip.setOnClickListener { startActivity(Intent(this, ChallengesActivity::class.java)) }
         binding.btnRetry.setOnClickListener {
@@ -168,8 +171,7 @@ class CustomerHomeActivity : AppCompatActivity() {
         val vouchers = liveVouchers()
         val readyCount = claimable.size + vouchers.size
 
-        val hasAnyPoints = lastPerShop.any { it.key.isNotBlank() && it.value > 0 }
-        if (!hasAnyPoints && vouchers.isEmpty()) {
+        if (lastVisitAt.isEmpty() && vouchers.isEmpty()) {
             val first = ViewHuFirstScanBinding.inflate(LayoutInflater.from(this), slot, true)
             first.btnFirstScan.setOnClickListener { startActivity(Intent(this, ScanActivity::class.java)) }
             binding.tvMoreReady.visibility = View.GONE
@@ -184,8 +186,8 @@ class CustomerHomeActivity : AppCompatActivity() {
                 val balance = lastPerShop[rule.vendorID] ?: 0
                 val shop = shopName(rule.vendorID)
                 RewardCard.bind(
-                    card, rule.vendorID, shop, rule.pointsRequired, rule.voucherName,
-                    getString(R.string.hu_uses_points_at, rule.pointsRequired, balance, shop),
+                    card, rule.vendorID, shop, rule.voucherName,
+                    getString(R.string.hu_you_have_points, balance),
                     getString(R.string.hu_claim, rule.pointsRequired)
                 ) {
                     val uid = auth.currentUser?.uid ?: return@bind
@@ -193,7 +195,7 @@ class CustomerHomeActivity : AppCompatActivity() {
                 }
             }
             voucher != null -> RewardCard.bind(
-                card, voucher.vendorID, shopName(voucher.vendorID), voucher.pointsRequiredSnapshot,
+                card, voucher.vendorID, shopName(voucher.vendorID),
                 voucher.voucherTitle.ifBlank { getString(R.string.k_reward) },
                 getString(R.string.hu_voucher_detail), getString(R.string.hu_show_qr)
             ) { openRewards() }
@@ -208,10 +210,11 @@ class CustomerHomeActivity : AppCompatActivity() {
                 }
                 val remaining = (next.pointsRequired - (lastPerShop[next.vendorID] ?: 0)).coerceAtLeast(1)
                 RewardCard.bind(
-                    card, next.vendorID, shopName(next.vendorID), next.pointsRequired, next.voucherName,
-                    getString(R.string.hu_next_detail, remaining), getString(R.string.hu_see_shop)
-                ) { openShop(next.vendorID) }
-                // "See shop" is a quiet outlined action; Claim stays the only orange button.
+                    card, next.vendorID, shopName(next.vendorID), next.voucherName,
+                    getString(R.string.hu_next_detail, remaining), getString(R.string.hu_scan_a_shop)
+                ) { startActivity(Intent(this, ScanActivity::class.java)) }
+                card.root.setOnClickListener { openShop(next.vendorID) }
+                // Scanning is a quiet outlined action here; Claim stays the only orange button.
                 card.btnAction.backgroundTintList = android.content.res.ColorStateList.valueOf(getColor(R.color.hu_bg))
                 card.btnAction.setStrokeColorResource(R.color.hu_line)
                 card.btnAction.strokeWidth = dp(2)
@@ -231,20 +234,31 @@ class CustomerHomeActivity : AppCompatActivity() {
     private fun bindShops() {
         val container = binding.shopCards
         container.removeAllViews()
-        val claimShops = claimableRules().map { it.vendorID }.toSet() + liveVouchers().map { it.vendorID }
-        val held = lastPerShop.filter { it.key.isNotBlank() && it.value > 0 }
-            .toList()
-            .sortedWith(compareByDescending<Pair<String, Int>> { it.first in claimShops }.thenByDescending { it.second })
+        // Newest visit first; the reward card above already covers anything ready to claim.
+        val recent = lastVisitAt.filterKeys { it.isNotBlank() && vendorsById.containsKey(it) }
+            .entries.sortedByDescending { it.value }
+            .map { it.key }
             .take(HOME_SHOP_CARDS)
-        binding.shopsHeader.visibility = if (held.isEmpty()) View.GONE else View.VISIBLE
-        held.forEachIndexed { i, (vendorId, balance) ->
+        binding.shopsHeader.visibility = if (recent.isEmpty()) View.GONE else View.VISIBLE
+        binding.shopRow.visibility = binding.shopsHeader.visibility
+        val vouchers = liveVouchers()
+        recent.forEachIndexed { i, vendorId ->
             val card = ShopCard.inflate(container)
-            val readyRule = claimableRules().firstOrNull { it.vendorID == vendorId }
-            ShopCard.bind(card, vendorsById[vendorId], vendorId, balance, vendorId in claimShops, nextRewardAt(vendorId), readyReward = readyRule, perVisit = ShopStyle.perVisit(vendorsById[vendorId], myRank))
+            ShopCard.bind(
+                card, vendorsById[vendorId], vendorId, lastPerShop[vendorId] ?: 0,
+                readyReward = claimableRules().firstOrNull { it.vendorID == vendorId },
+                holdsVoucher = vouchers.any { it.vendorID == vendorId },
+                nextReward = nextRewardAt(vendorId),
+                visited = true
+            )
             card.root.setOnClickListener { openShop(vendorId) }
-            container.addView(card.root, LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT
-            ).apply { topMargin = dp(if (i == 0) 10 else 10) })
+            // One shop fills the row; with more, each card leaves a peek of the next so the row reads as scrollable.
+            val params = if (recent.size == 1) {
+                LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f)
+            } else {
+                LinearLayout.LayoutParams(dp(HOME_CARD_WIDTH_DP), LinearLayout.LayoutParams.WRAP_CONTENT)
+            }
+            container.addView(card.root, params.apply { if (i > 0) marginStart = dp(12) })
         }
     }
 
@@ -261,6 +275,7 @@ class CustomerHomeActivity : AppCompatActivity() {
     private fun startListeningToPoints(uid: String) {
         pointsListener = PointRepository.listenToPointsForUser(
             userID = uid,
+            onVisits = { lastVisitAt = it },
             onUpdate = { perShop, _, _ ->
                 followedVendorIds = perShop.keys.filter { it.isNotBlank() }.toSet()
                 lastPerShop = perShop
@@ -280,9 +295,13 @@ class CustomerHomeActivity : AppCompatActivity() {
                 currentAvatarId = snapshot.child("avatar").getValue(String::class.java).orEmpty()
                 if (name.isNotBlank()) currentUserName = name
                 val standing = com.sapotlokal.data.repository.XpRepository.standingOf(snapshot)
-                RankCard.bind(binding.rankCard, standing)
+                binding.tvRankChip.text = getString(
+                    R.string.hu_rank_chip, standing.rank.level, java.text.NumberFormat.getIntegerInstance().format(standing.xp)
+                )
+                binding.tvRankChip.contentDescription = getString(
+                    R.string.rank_card_cd, standing.rank.title, standing.rank.level, java.text.NumberFormat.getIntegerInstance().format(standing.xp)
+                )
                 RankCard.maybeShowRankUp(this@CustomerHomeActivity, uid, standing)
-                if (standing.rank != myRank) { myRank = standing.rank; refreshAll() }
                 updateGreeting()
                 cacheUser()
             }
@@ -333,7 +352,7 @@ class CustomerHomeActivity : AppCompatActivity() {
             // Something to claim beats progress; otherwise the weekly mission closest to done.
             val pick = list.filter { it.def.weekly && !it.done }.maxByOrNull { it.progress.toFloat() / it.def.target }
             missionLine = when {
-                ready > 0 -> getString(R.string.play_missions_ready, ready)
+                ready > 0 -> resources.getQuantityString(R.plurals.hu_missions_to_claim, ready, ready)
                 pick != null -> getString(R.string.hu_mission_progress, getString(pick.def.nameRes, pick.def.target), pick.progressShown, pick.def.target)
                 else -> null
             }
@@ -463,6 +482,7 @@ class CustomerHomeActivity : AppCompatActivity() {
     private fun dp(v: Int): Int = (v * resources.displayMetrics.density).toInt()
 
     private companion object {
-        const val HOME_SHOP_CARDS = 3
+        const val HOME_SHOP_CARDS = 6
+        const val HOME_CARD_WIDTH_DP = 264
     }
 }

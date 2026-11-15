@@ -16,9 +16,8 @@ import com.sapotlokal.ui.games.MemoryMatchActivity
 import com.sapotlokal.ui.games.SpinWheelActivity
 
 /**
- * Play tab (Hadiah Utama). Everything fun in one place: level score with a ticked bar, this
- * missions, the two games and the leaderboard.
- * Level score never buys rewards; that rule is explained by "How points work".
+ * Play tab. Everything fun in one place: the full rank card (the only one in the app), any
+ * top-3 prize, missions, the two games and the leaderboard.
  */
 class ChallengesActivity : AppCompatActivity() {
 
@@ -38,10 +37,10 @@ class ChallengesActivity : AppCompatActivity() {
             finish(); return
         }
 
-        binding.btnHowPoints.setOnClickListener { HowPoints.show(this) }
         binding.cardSpin.setOnClickListener { startActivity(Intent(this, SpinWheelActivity::class.java)) }
         binding.cardMemory.setOnClickListener { startActivity(Intent(this, MemoryMatchActivity::class.java)) }
         binding.rowLeaderboard.setOnClickListener { startActivity(Intent(this, LeaderboardActivity::class.java)) }
+        binding.tvLeaderboardSub.text = AppConfig.LEADERBOARD_XP.let { getString(R.string.lb_prizes, it[0], it[1], it[2]) }
 
         binding.rowMissions.setOnClickListener { startActivity(Intent(this, MissionsActivity::class.java)) }
         missions = MissionRepository.listen(user.uid) { list ->

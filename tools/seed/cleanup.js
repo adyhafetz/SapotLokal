@@ -8,8 +8,8 @@
 
 const fs = require("fs");
 const admin = require("firebase-admin");
+const { databaseUrl } = require("./shared");
 
-const DATABASE_URL = "https://sapotlokal-app-default-rtdb.asia-southeast1.firebasedatabase.app";
 const PREFIX = "seed_";
 
 function fail(message) {
@@ -43,6 +43,7 @@ async function main() {
     fail("Set GOOGLE_APPLICATION_CREDENTIALS to the path of your service-account key file (see README.md).");
   }
   const key = JSON.parse(fs.readFileSync(keyPath, "utf8"));
+  const DATABASE_URL = databaseUrl(key.project_id);
   admin.initializeApp({ credential: admin.credential.cert(key), databaseURL: DATABASE_URL });
   const db = admin.database();
 

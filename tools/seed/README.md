@@ -1,4 +1,16 @@
-# SapotLokal seed data
+# SapotLokal data scripts
+
+Three scripts that talk to your Firebase project with admin access:
+
+| Script | Does |
+|---|---|
+| `npm run migrate` | Moves data from the old app version to the current database shape. See [docs/SETUP.md](../../docs/SETUP.md) step 5. |
+| `npm run seed` | Adds test data (below). |
+| `npm run cleanup` | Removes the test data. |
+
+All three print the project and database they will use, and write nothing until you add `-- --yes`.
+
+## Seed data
 
 Creates test data in your Firebase project: **10 shops, 15 rewards and 10 customers**, with logins, shop visits,
 XP across all 5 ranks, weekly leaderboard rows and a few claimed vouchers. One command removes it all again.
@@ -19,6 +31,12 @@ Everything the seeder creates has an id starting with `seed_`, so cleanup never 
    (this folder's `.gitignore` already ignores it) and never share it.
    - Firebase Console > Project settings (gear icon) > **Service accounts** > **Generate new private key**.
    - Save the file as `C:\Projects\SapotLokal\tools\seed\serviceAccountKey.json`.
+4. The scripts find your database from the key's project id, assuming the **asia-southeast1** location. If your
+   database is somewhere else, set its address first (Realtime Database > Data tab, the link at the top):
+
+   ```powershell
+   $env:DATABASE_URL = "https://<your-database-address>"
+   ```
 
 ## Seed
 
@@ -73,9 +91,21 @@ Notes:
   them: the script prints this week's and last week's top 3 when it finishes.
 - Shop points for each visit are worked out the way the app does: the shop's points per visit × the customer's rank bonus.
 - XP above what a customer's visits are worth is a starting balance with no event rows behind it.
-- Shop photos are not seeded; shops show the placeholder. Add real ones from the shop-owner app.
+- Shop photos are not seeded; shop cards show the shop's colour and initials. Add real photos from the shop-owner app (Shop tab).
 - A shop's QR code is created only while its owner has the app open, as usual.
 - Re-running `seed` is safe. It overwrites the same ids and refreshes the timestamps.
+
+## Migrate old data
+
+```powershell
+cd C:\Projects\SapotLokal\tools\seed
+$env:GOOGLE_APPLICATION_CREDENTIALS = "C:\Projects\SapotLokal\tools\seed\serviceAccountKey.json"
+npm run migrate            # dry run: prints what would change
+npm run migrate -- --yes   # makes the changes (back up first!)
+```
+
+The full list of changes is at the top of `migrate.js`. It keeps every account, shop, reward, voucher and shop-points
+balance, and is safe to run twice.
 
 ## Change the data
 

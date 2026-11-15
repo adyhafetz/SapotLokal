@@ -68,8 +68,6 @@ class CustomerProfileActivity : AppCompatActivity() {
         setupBadgesGrid()
         setupListeners(currentUserId)
         bindMemberSince()
-        // The rank card sits inside the profile card here, so it is drawn flat (no box in a box).
-        binding.rankCard.root.apply { background = null; foreground = null; setPadding(0, 0, 0, 0) }
         setupActions()
     }
 
@@ -128,7 +126,10 @@ class CustomerProfileActivity : AppCompatActivity() {
                 com.sapotlokal.util.AvatarUi.bind(binding.ivAvatar, binding.tvAvatarInitials, currentAvatarId)
 
                 val standing = com.sapotlokal.data.repository.XpRepository.standingOf(snapshot)
-                RankCard.bind(binding.rankCard, standing)
+                binding.tvRankRow.text = getString(
+                    com.sapotlokal.R.string.hu_rank_row, standing.rank.level, standing.rank.title,
+                    java.text.NumberFormat.getIntegerInstance().format(standing.xp)
+                )
                 RankCard.maybeShowRankUp(this@CustomerProfileActivity, userId, standing)
             }
 
@@ -152,9 +153,10 @@ class CustomerProfileActivity : AppCompatActivity() {
             finish()
         }
 
-        binding.btnViewLeaderboard.setOnClickListener { HowPoints.show(this) }
+        binding.btnHowItWorks.setOnClickListener { HowPoints.show(this) }
+        binding.tvRankRow.setOnClickListener { startActivity(android.content.Intent(this, ChallengesActivity::class.java)) }
 
-        binding.btnEditProfile.setOnClickListener {
+        binding.tvUserName.setOnClickListener {
             MaterialAlertDialogBuilder(this)
                 .setTitle(getString(com.sapotlokal.R.string.k_edit_profile))
                 .setItems(arrayOf(getString(com.sapotlokal.R.string.k_change_name), getString(com.sapotlokal.R.string.k_choose_avatar))) { _, which ->

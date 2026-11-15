@@ -111,10 +111,28 @@ object QrCodeRepository {
     // ── Phase 4 — Vendor writes ───────────────────────────────────────────────
 
     /**
+     * Removes [qrId] so it can no longer be scanned. Used when the vendor leaves the QR screen —
+     * the code must NOT stay valid while the screen isn't visible. Failures are only logged:
+     * the code still expires by itself after QR_ROTATION_SECONDS.
+     */
+    private val codeRandom = java.security.SecureRandom()
+
+    /** A short code a person can read off the owner's screen and type: no 0/O, 1/I or L. */
+    fun newShopCode(): String = buildString {
+        repeat(AppConfig.SHOP_CODE_LENGTH) { append(AppConfig.SHOP_CODE_ALPHABET[codeRandom.nextInt(AppConfig.SHOP_CODE_ALPHABET.length)]) }
+    }
+
+    fun deleteCode(qrId: String) {
+        db.child("qrcodes").child(qrId).removeValue()
+            .addOnFailureListener { Log.w(TAG, "Could not delete QR code $qrId", it) }
+    }
+
+    /**
      * Publishes a new rotating QR code for [vendorID].
      *
      * HOW ROTATION WORKS:
-     *   1. Generate a new random [qrcodeValue] (UUID-based).
+     *   1. Generate a new random short [qrcodeValue] ([newShopCode]): the QR holds it, and a
+     *      customer whose camera won't scan can type it.
      *   2. Push a new /qrcodes entry: isActive=true, expiryDate=now+QR_ROTATION_SECONDS.
      *   3. In the same updateChildren() batch, set the old code's isActive=false.
      *
@@ -127,16 +145,6 @@ object QrCodeRepository {
      * @param onSuccess    Called with the new QrCode on success
      * @param onError      Called with a readable message on failure
      */
-    /**
-     * Removes [qrId] so it can no longer be scanned. Used when the vendor leaves the QR screen —
-     * the code must NOT stay valid while the screen isn't visible. Failures are only logged:
-     * the code still expires by itself after QR_ROTATION_SECONDS.
-     */
-    fun deleteCode(qrId: String) {
-        db.child("qrcodes").child(qrId).removeValue()
-            .addOnFailureListener { Log.w(TAG, "Could not delete QR code $qrId", it) }
-    }
-
     fun publishNewCode(
         vendorID: String,
         previousQrId: String?,
@@ -147,7 +155,7 @@ object QrCodeRepository {
         val expiryMs   = nowMs + (AppConfig.QR_ROTATION_SECONDS * 1_000L)
         val newRef     = db.child("qrcodes").push()
         val newId      = newRef.key ?: run { onError("Failed to generate QR ID"); return }
-        val newValue   = java.util.UUID.randomUUID().toString()
+        val newValue   = newShopCode()
 
         val newCode = QrCode(
             qrcodeID           = newId,

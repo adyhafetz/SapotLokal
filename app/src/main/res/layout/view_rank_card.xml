@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-    Rank card (BRAND_DESIGN.md §6): rank badge, rank name, the big XP number, a ticked bar to the
+    Rank card (BRAND_DESIGN.md §6): rank badge, rank name, the big XP number, a bar to the
     next rank, how far to go, and what the rank gives. Bound by RankCard.bind.
 -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
@@ -66,11 +66,12 @@
             android:textSize="15sp" />
     </LinearLayout>
 
-    <com.sapotlokal.ui.customer.HuTickBar
+    <com.google.android.material.progressindicator.LinearProgressIndicator
         android:id="@+id/rankBar"
+        style="@style/Widget.HU.Progress"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
+        android:layout_marginTop="12dp"
         android:importantForAccessibility="no" />
 
     <TextView

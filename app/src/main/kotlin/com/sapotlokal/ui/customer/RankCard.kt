@@ -18,7 +18,7 @@ import com.sapotlokal.util.RankText
 import java.text.NumberFormat
 
 /**
- * The rank card (BRAND_DESIGN.md §6) shown on Home, Play and Me, and the rank-up sheet.
+ * The rank card (BRAND_DESIGN.md §6), shown in full on Play only, and the rank-up sheet.
  * Both read users/{uid}/xp through XpRepository; nothing else decides a customer's rank.
  */
 object RankCard {
@@ -57,10 +57,11 @@ object RankCard {
             b.rankBar.visibility = View.GONE
             b.tvToNext.text = ctx.getString(R.string.rank_top)
         } else {
-            // Just this rank's stretch, labelled with real XP: "1,500 … 3,500".
+            // Just this rank's stretch; "x XP to next" below says how far.
             val span = next.minXp - rank.minXp
             b.rankBar.visibility = View.VISIBLE
-            b.rankBar.set(standing.xp - rank.minXp, span, listOf(0, span), listOf(fmt(rank.minXp), fmt(next.minXp)))
+            b.rankBar.max = span
+            b.rankBar.progress = (standing.xp - rank.minXp).coerceIn(0, span)
             b.tvToNext.text = ctx.getString(R.string.rank_xp_to_next, fmt(next.minXp - standing.xp), next.title)
         }
 

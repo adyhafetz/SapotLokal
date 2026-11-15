@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-    Customer Home (Hadiah Utama) — one job: "is anything ready for me?"
-    Header (name opens Me) → level score with ticked bar → one big reward card
-    → more-ready link → your top shops → Today in Play → bottom bar.
+    Customer Home — one job: "what can I do now?"
+    Header (name opens Me, rank chip opens Play) → top-3 prize if any → one reward card (claim,
+    show a voucher, or the next reward with Scan) → your shops as a row of photo cards → Today in
+    Play → bottom bar. The full rank card lives on Play; How it works lives on Me.
 -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -76,32 +77,30 @@
                         android:textSize="24sp"
                         tools:text="Farah Hassan" />
                 </LinearLayout>
+
+                <TextView
+                    android:id="@+id/tvRankChip"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:background="@drawable/bg_hu_pill"
+                    android:backgroundTint="@color/hu_fill"
+                    android:fontFamily="@font/figtree_bold"
+                    android:minHeight="36dp"
+                    android:gravity="center_vertical"
+                    android:paddingHorizontal="12dp"
+                    android:textColor="@color/hu_ink"
+                    android:textSize="13sp"
+                    app:fontFamily="@font/figtree_bold"
+                    tools:text="Rank 2 · 1,075 XP" />
             </LinearLayout>
-
-            <!-- Rank card (shared with Play and Me) -->
-            <include
-                android:id="@+id/rankCard"
-                layout="@layout/view_rank_card"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="18dp" />
-
-            <TextView
-                android:id="@+id/btnHowPoints"
-                style="@style/HU.Text.Link"
-                android:layout_width="wrap_content"
-                android:layout_height="48dp"
-                android:layout_gravity="end"
-                android:background="?attr/selectableItemBackground"
-                android:gravity="center_vertical"
-                android:text="@string/hu_how_points_work" />
 
             <!-- Unclaimed weekly top-3 prize (PrizeCard) -->
             <FrameLayout
                 android:id="@+id/prizeSlot"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
+                android:layout_marginTop="18dp"
                 android:visibility="gone" />
 
             <!-- The one big reward card (or first-scan card) -->
@@ -119,7 +118,7 @@
                 android:background="?attr/selectableItemBackground"
                 android:gravity="center"
                 android:visibility="gone"
-                tools:text="2 more ready · See Rewards"
+                tools:text="See 2 more in Rewards"
                 tools:visibility="visible" />
 
             <!-- Load error -->
@@ -163,7 +162,7 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:accessibilityHeading="true"
-                    android:text="@string/hu_your_shops" />
+                    android:text="@string/hu_recently_visited" />
 
                 <TextView
                     android:id="@+id/btnAllShops"
@@ -172,14 +171,23 @@
                     android:layout_height="48dp"
                     android:background="?attr/selectableItemBackground"
                     android:gravity="center_vertical"
-                    android:text="@string/hu_all_shops" />
+                    android:text="@string/hu_see_all" />
             </LinearLayout>
 
-            <LinearLayout
-                android:id="@+id/shopCards"
+            <HorizontalScrollView
+                android:id="@+id/shopRow"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical" />
+                android:fillViewport="true"
+                android:scrollbars="none">
+
+                <LinearLayout
+                    android:id="@+id/shopCards"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:paddingTop="10dp" />
+            </HorizontalScrollView>
 
             <!-- Today in Play -->
             <LinearLayout
@@ -222,7 +230,7 @@
                         style="@style/HU.Text.Small"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        tools:text="Free spin ready · Loyal Supporter 1 of 2" />
+                        tools:text="Free spin ready · 1 mission to claim" />
                 </LinearLayout>
 
                 <ImageView

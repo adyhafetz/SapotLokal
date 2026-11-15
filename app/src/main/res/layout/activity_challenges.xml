@@ -38,15 +38,6 @@
                     android:layout_weight="1"
                     android:accessibilityHeading="true"
                     android:text="@string/hu_play_title" />
-
-                <TextView
-                    android:id="@+id/btnHowPoints"
-                    style="@style/HU.Text.Link"
-                    android:layout_width="wrap_content"
-                    android:layout_height="48dp"
-                    android:background="?attr/selectableItemBackground"
-                    android:gravity="center_vertical"
-                    android:text="@string/hu_how_points_work" />
             </LinearLayout>
 
             <include
@@ -121,7 +112,7 @@
                 <ImageView style="@style/HU.TileIcon" android:src="@drawable/ic_star" />
                 <LinearLayout style="@style/HU.ListRowText">
                     <TextView style="@style/HU.TileTitle" android:text="@string/hu_play_leaderboard" />
-                    <TextView style="@style/HU.TileSub" android:text="@string/hu_play_leaderboard_sub" />
+                    <TextView android:id="@+id/tvLeaderboardSub" style="@style/HU.TileSub" tools:text="Top 3 win 150, 100 and 75 XP" />
                 </LinearLayout>
                 <ImageView style="@style/HU.Chevron" />
             </LinearLayout>

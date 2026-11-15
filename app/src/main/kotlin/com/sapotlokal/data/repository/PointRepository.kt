@@ -228,11 +228,14 @@ object PointRepository {
         userID: String,
         onUpdate: (perShopBalance: Map<String, Int>, lifetimeEarned: Int, spendableBalance: Int) -> Unit,
         onError: (String) -> Unit,
-        onWeekly: ((earnedThisWeek: Int) -> Unit)? = null
+        onWeekly: ((earnedThisWeek: Int) -> Unit)? = null,
+        onVisits: ((lastVisitAt: Map<String, Long>) -> Unit)? = null
     ): ValueEventListener {
         val listener = object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
                 val perShop = mutableMapOf<String, Int>()
+                // Every shop with a visit, even when its points are all spent: "Visited" means been there.
+                val lastVisit = mutableMapOf<String, Long>()
                 var lifetimeEarned = 0
                 var weekly = 0
                 val weekStart = com.sapotlokal.util.MissionDateUtils.getWeekStartMillis()
@@ -244,6 +247,9 @@ object PointRepository {
                     if (p.timestamp >= weekStart) weekly += p.pointEarnedAmount
                     lifetimeEarned += p.pointEarnedAmount
                     totalRedeemed += p.pointRedeemedAmount
+                    if (p.vendorID.isNotBlank() && p.pointSource == PointSource.SHOP_VISIT) {
+                        lastVisit[p.vendorID] = maxOf(lastVisit[p.vendorID] ?: 0L, p.timestamp)
+                    }
                     if (p.vendorID.isNotBlank()) {
                         val current = perShop.getOrDefault(p.vendorID, 0)
                         perShop[p.vendorID] =
@@ -253,6 +259,7 @@ object PointRepository {
 
                 val spendableBalance = (lifetimeEarned - totalRedeemed).coerceAtLeast(0)
                 onWeekly?.invoke(weekly)
+                onVisits?.invoke(lastVisit)
                 onUpdate(perShop, lifetimeEarned, spendableBalance)
             }
 

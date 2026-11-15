@@ -12,34 +12,11 @@
 const fs = require("fs");
 const path = require("path");
 const admin = require("firebase-admin");
+const { databaseUrl, DAY, VISIT_XP, rankFor, weekKey } = require("./shared");
 
-const DATABASE_URL = "https://sapotlokal-app-default-rtdb.asia-southeast1.firebasedatabase.app";
-const DAY = 24 * 60 * 60 * 1000;
-const KL_OFFSET = 8 * 60 * 60 * 1000; // Asia/Kuala_Lumpur is UTC+8 all year
 const VOUCHER_EXPIRY_DAYS = 30; // AppConfig.VOUCHER_EXPIRY_DAYS
-const VISIT_XP = 15; // AppConfig.VISIT_XP
 const ALLOWED_POINTS_PER_VISIT = [5, 10, 15, 20, 25, 30, 40, 50]; // AppConfig.ALLOWED_POINTS_PER_VISIT
-
-// AppConfig.Rank: minimum XP and shop-points bonus for ranks 1–5.
-const RANKS = [
-  { level: 1, minXp: 0, bonus: 1.0 },
-  { level: 2, minXp: 400, bonus: 1.25 },
-  { level: 3, minXp: 1500, bonus: 1.5 },
-  { level: 4, minXp: 3500, bonus: 2.0 },
-  { level: 5, minXp: 7000, bonus: 3.0 },
-];
-const rankFor = (xp) => RANKS.filter((r) => xp >= r.minXp).pop();
 const shopPoints = (rate, rank) => Math.floor(rate * rank.bonus + 0.5); // AppConfig.shopPointsForVisit
-
-// ISO week key in Malaysia time, e.g. "2026-W46" (same as MissionDateUtils.getWeekYearKey).
-function weekKey(ms) {
-  const d = new Date(ms + KL_OFFSET);
-  const day = (d.getUTCDay() + 6) % 7; // Monday = 0
-  const thursday = new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate() - day + 3));
-  const firstThursday = new Date(Date.UTC(thursday.getUTCFullYear(), 0, 4));
-  const week = 1 + Math.round(((thursday - firstThursday) / DAY - 3 + ((firstThursday.getUTCDay() + 6) % 7)) / 7);
-  return `${thursday.getUTCFullYear()}-W${String(week).padStart(2, "0")}`;
-}
 
 function fail(message) {
   console.error("\n" + message + "\n");
@@ -60,9 +37,10 @@ async function main() {
   for (const v of seed.vendors) {
     if (!ALLOWED_POINTS_PER_VISIT.includes(v.pointsPerVisit)) fail(`Shop ${v.key}: pointsPerVisit must be one of ${ALLOWED_POINTS_PER_VISIT}.`);
   }
+  const projectId = JSON.parse(fs.readFileSync(keyPath, "utf8")).project_id;
+  const DATABASE_URL = databaseUrl(projectId);
   const credential = admin.credential.cert(JSON.parse(fs.readFileSync(keyPath, "utf8")));
   admin.initializeApp({ credential, databaseURL: DATABASE_URL });
-  const projectId = JSON.parse(fs.readFileSync(keyPath, "utf8")).project_id;
 
   console.log(`Project:  ${projectId}`);
   console.log(`Database: ${DATABASE_URL}`);
