@@ -36,6 +36,25 @@ every real account, shop, reward, voucher and **shop-points balance**.
 
 ---
 
+## 0. Get the new code
+
+1. **Merge the pull request** on GitHub (the repo's *Pull requests* tab → the rebuild PR → **Merge pull request** →
+   **Confirm merge**). This also deletes the old web prototype files, including `package.json` and `pnpm-lock.yaml`:
+   pnpm is no longer used. The only Node tools left are in `tools/seed` and `functions`, and they use plain `npm`.
+2. **Update your copy on your computer.** In a terminal, in your existing `SapotLokal` folder:
+
+   ```powershell
+   git status            # should say "nothing to commit"; if not, commit or stash your changes first
+   git checkout main
+   git pull origin main
+   ```
+
+   Don't have the repo on this computer yet? `git clone https://github.com/maizatulsofea/SapotLokal.git` instead.
+3. **Tidy leftovers from the old version** (they're git-ignored, so `git pull` leaves them behind). Delete these
+   folders in the repo root if they exist: `node_modules`, `dist`, `.vite`. Your `app/google-services.json` stays:
+   it's still needed.
+4. In Android Studio: **File → Sync Project with Gradle Files**.
+
 ## 1. Check your Firebase project
 
 In the [Firebase Console](https://console.firebase.google.com), open your project and check:
